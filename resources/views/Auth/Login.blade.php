@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+        }
+    </script>
+    <style>
+        /* Optional: Add custom transitions for smoother theme switching */
+        * {
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 hover:scale-105 transition-transform duration-700 ease-in-out">
+            <div class="mb-8 text-center">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">E-PRESENCE</h1>
+                <p class="text-gray-600 dark:text-gray-400 max-md:text-sm">Please sign in to your account</p>
+            </div>
+
+            <form action="{{ route('login.submit') }}" method="POST">
+                @csrf
+                
+                <div class="mb-6">
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
+                    <input type="text" id="username" name="username" 
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
+                        placeholder-gray-400 dark:placeholder-gray-400 outline-none max-md:text-xs" 
+                        placeholder="Enter your username">
+                </div>
+
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                    </div>
+                    <input type="password" id="password" name="password" 
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
+                        placeholder-gray-400 dark:placeholder-gray-400 outline-none max-md:text-xs" 
+                        placeholder="Enter your password">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 mb-2 mt-5 max-md:text-sm text-white font-medium py-2.5 px-4 rounded-lg 
+                    transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Register Link -->
+            {{-- <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400 max-md:text-xs">
+                    Don't have an account? 
+                    <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Register</a>
+                </p>
+            </div> --}}
+        </div>
+    </div>
+</body>
+</html>
