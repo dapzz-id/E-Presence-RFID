@@ -1,0 +1,332 @@
+package kadaviradityaa.id.e_presence;
+
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.nfc.NfcAdapter;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.view.WindowInsetsController;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import android.Manifest;
+import androidx.core.content.ContextCompat;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.bumptech.glide.Glide;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import kadaviradityaa.id.e_presence.Library.Module;
+
+public class DashboardActivity extends AppCompatActivity {
+    private CircleImageView profileImage;
+    private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, btnAllowAccess, txtTimeNow, btnBuatSurat;
+    private ImageView statusAbsensiBadge, statusAccessBadge, statusLinkCardBadge;
+    private LinearLayout layoutWarningNFC;
+    private Handler handler = new Handler();
+    private boolean isAbsensi;
+    private SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_dashboard);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(true);
+            getWindow().setNavigationBarDividerColor(Color.BLACK);
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            return insets;
+        });
+
+        initialitaion();
+        LogicApps();
+    }
+
+    private void initialitaion(){
+        profileImage = findViewById(R.id.profileImage);
+        txtNama = findViewById(R.id.tvName);
+        txtTotalHadir = findViewById(R.id.tvAttendanceCount);
+        txtIzinSakit = findViewById(R.id.tvLeaveCount);
+        statusAbsensiBadge = findViewById(R.id.btnTodayAttendance);
+        statusAccessBadge = findViewById(R.id.btnGiveAccess);
+        statusLinkCardBadge = findViewById(R.id.btnConnectCard);
+        layoutWarningNFC = findViewById(R.id.textWarningNFC);
+        btnLinkCard = findViewById(R.id.tvConnectCardAction);
+        btnAllowAccess = findViewById(R.id.tvAllowAccess);
+        txtTimeNow = findViewById(R.id.tvCurrentTime);
+        btnBuatSurat = findViewById(R.id.tvCreateLetter);
+        isAbsensi = false;
+        sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Objects.requireNonNull(getWindow().getInsetsController()).setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            );
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+    }
+
+    private void LogicApps(){
+        boolean checkNFCSupport = isNfcSupported(this);
+        layoutWarningNFC.setVisibility(checkNFCSupport ? View.GONE : View.VISIBLE);
+        btnLinkCard.setEnabled(checkNFCSupport);
+        btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#AAAAAA") : Color.parseColor("#0000FF"));
+
+        boolean checkPermissionAll = isAllPermissionGranted(this);
+        btnAllowAccess.setVisibility(checkPermissionAll ? View.GONE : View.VISIBLE);
+        statusAccessBadge.setImageDrawable(checkPermissionAll ? ContextCompat.getDrawable(this, R.drawable.ix_success_filled) : ContextCompat.getDrawable(this, R.drawable.ic_sharp_do_disturb_on));
+
+        updateTime();
+        Module.init(this);
+        Module.getObjectWithToken(this, Module.urlKoneksi + "api/getMyAccount/" + sharedPreferences.getString("uid", ""), sharedPreferences.getString("token", ""), response -> {
+            try {
+                if (response.getString("status").equals("success")){
+                    txtNama.setText(response.getString("name"));
+                    txtTotalHadir.setText(response.getString("total_hadir_bulan_ini"));
+                    txtIzinSakit.setText(response.getString("total_izin_bulan_ini"));
+                    Glide.with(this)
+                            .load(response.getString("profile"))
+                            .placeholder(R.drawable.co_profile)
+                            .error(R.drawable.co_profile)
+                            .into(profileImage);
+
+                    Glide.with(this)
+                            .load(response.getBoolean("rfid_status") ? R.drawable.ix_success_filled : R.drawable.ic_sharp_do_disturb_on)
+                            .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                            .error(R.drawable.ic_sharp_do_disturb_on)
+                            .into(statusLinkCardBadge);
+
+                    Glide.with(this)
+                            .load(response.getBoolean("absen_hari_ini_status") ? R.drawable.ix_success_filled : R.drawable.ic_sharp_do_disturb_on)
+                            .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                            .error(R.drawable.ic_sharp_do_disturb_on)
+                            .into(statusAbsensiBadge);
+
+                    btnLinkCard.setEnabled(response.getBoolean("rfid_status"));
+                    btnLinkCard.setVisibility(response.getBoolean("rfid_status") ? View.GONE : View.VISIBLE);
+
+                    btnBuatSurat.setEnabled(response.getBoolean("absen_hari_ini_status"));
+                    btnBuatSurat.setVisibility(response.getBoolean("absen_hari_ini_status") ? View.GONE : View.VISIBLE);
+
+                    JSONArray absensiArray = response.getJSONArray("absensi_per_bulan");
+
+                    HashMap<Integer, Integer> absensiMap = new HashMap<>();
+                    for (int i = 1; i <= 12; i++) {
+                        absensiMap.put(i, 0);
+                    }
+
+                    for (int i = 0; i < absensiArray.length(); i++) {
+                        JSONObject data = absensiArray.getJSONObject(i);
+                        int bulan = data.getInt("bulan");
+                        int total = data.getInt("total");
+                        absensiMap.put(bulan, total);
+                    }
+
+                    ArrayList<BarEntry> entries = new ArrayList<>();
+
+                    for (int i = 1; i <= 12; i++) {
+                        int total = absensiMap.get(i);
+                        entries.add(new BarEntry(i, total));
+                    }
+
+                    if (!entries.isEmpty()) {
+                        setupBarChart(entries);
+                    }
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }, error -> {
+            Snackbar.make(findViewById(android.R.id.content), "Tidak ada koneksi internet. Jika terus-menerus error, silahkan hubungi admin (Instagram -> @x.dapzz)", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> {
+                String instagramUrl = "https://www.instagram.com/x.dapzz";
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl));
+                intent.setPackage("com.instagram.android");
+
+                try {
+                    startActivity(intent);
+                    finish();
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl)));
+                    finish();
+                }
+            }).show();
+        });
+    }
+
+    private static boolean isNfcSupported(Context context) {
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
+        if (nfcAdapter != null) return true;
+        else return false;
+    }
+
+    private String getMonthName(int month) {
+        String[] months = {"", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"};
+        return months[month];
+    }
+
+    private void setupBarChart(ArrayList<BarEntry> entries) {
+        BarChart barChart = findViewById(R.id.barChart);
+
+        BarDataSet barDataSet = new BarDataSet(entries, "Absensi Per Bulan");
+        barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        barDataSet.setValueTextSize(12f);
+
+        BarData barData = new BarData(barDataSet);
+        barChart.setData(barData);
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(12, true);
+        xAxis.setAxisMinimum(1f);
+        xAxis.setAxisMaximum(12f);
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            private final String[] months = {"Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"};
+
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value - 1;
+                if (index >= 0 && index < months.length) {
+                    return months[index];
+                } else {
+                    return "";
+                }
+            }
+        });
+
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setAxisMinimum(0f);
+        barChart.setFitBars(true);
+        barChart.invalidate();
+    }
+
+    private static boolean isAllPermissionGranted(Context context) {
+        boolean storagePermission = false;
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+            storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        boolean writeStoragePermission = (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) &&
+                (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+
+        boolean internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
+
+        boolean locationFinePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean locationCoarsePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        boolean nfcPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.NFC) == PackageManager.PERMISSION_GRANTED;
+
+        return storagePermission && writeStoragePermission && internetPermission
+                && locationFinePermission && locationCoarsePermission && nfcPermission;
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+
+    private void updateTime() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String currentTime = sdf.format(Calendar.getInstance().getTime());
+
+                txtTimeNow.setText(currentTime);
+
+                int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+                Typeface poppinsRegular = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_regular);
+                Typeface poppinsBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_bold);
+                Typeface poppinsSemiBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_semibold);
+
+                if (hour >= 0 && hour <= 6) {
+                    btnBuatSurat.setVisibility(View.GONE);
+                    if(isAbsensi){
+                        statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
+                        txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
+                    }else{
+                        txtTimeNow.setTextColor(Color.BLACK);
+                        if(hour == 6) btnBuatSurat.setVisibility(View.VISIBLE);
+                    }
+                    txtTimeNow.setTypeface(poppinsRegular);
+                } else if (hour >= 7 && hour <= 8) {
+                    if(isAbsensi){
+                        statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
+                        btnBuatSurat.setVisibility(View.GONE);
+                        txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
+                        txtTimeNow.setTypeface(poppinsRegular);
+                    }else{
+                        btnBuatSurat.setVisibility(View.VISIBLE);
+                        txtTimeNow.setTextColor(Color.parseColor("#CBCE2F"));
+                        txtTimeNow.setTypeface(poppinsSemiBold);
+                    }
+                } else {
+                    if(isAbsensi){
+                        statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
+                        btnBuatSurat.setVisibility(View.GONE);
+                        txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
+                        txtTimeNow.setTypeface(poppinsRegular);
+                    }else{
+                        btnBuatSurat.setVisibility(View.VISIBLE);
+                        txtTimeNow.setTextColor(Color.parseColor("#FF0000"));
+                        txtTimeNow.setTypeface(poppinsBold);
+                    }
+                }
+
+                handler.postDelayed(this, 1000);
+            }
+        });
+    }
+}
