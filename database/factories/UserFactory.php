@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\WargaTels;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -24,10 +25,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
             'nis' => fake()->unique()->numerify('#########'),
-            'kelas' => fake()->randomElement(['X', 'XI', 'XII']),
-            'jurusan' => fake()->randomElement(['RPL', 'TKJ', 'DKV', 'TRANSMISI']),
+            'email' => fake()->unique()->safeEmail(),
             'password' => Hash::make('password'),
         ];
     }

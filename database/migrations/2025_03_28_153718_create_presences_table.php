@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
             $table->string('nis');
-            $table->foreign('nis')->references('nis')->on('users')->onDelete('cascade');
-            $table->dateTime('time');
-            $table->enum('presence_type', ["Absensi Masuk", "Absensi Keluar"])->default("Absensi Masuk");
-            $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa'])->default('Hadir');
-            $table->timestamps(false);
+            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade');
+            $table->dateTime('time_masuk')->default(now());
+            $table->dateTime('time_keluar')->nullable();
+            $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa', 'Terlambat'])->default('Hadir');
         });
     }
 

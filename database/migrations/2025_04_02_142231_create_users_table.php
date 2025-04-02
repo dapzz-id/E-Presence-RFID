@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('nis')->unique();
+            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade');
             $table->string('username')->unique();
-            $table->string('name');
-            $table->string('kelas')->nullable();
-            $table->string('jurusan')->nullable();
-            $table->string('angka_kelas')->nullable();
+            $table->string('email')->unique();
             $table->string('password')->index();
             $table->string('rfid_id')->nullable()->unique();
             $table->rememberToken();

@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Models\Presence;
 use App\Models\User;
 use App\Models\WargaTels;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Mockery\Undefined;
 
 Route::post('/sanctum/token', function (Request $request) {
     try {
@@ -40,7 +43,56 @@ Route::post('/sanctum/token', function (Request $request) {
     return response()->json([
         'status' => 'success',
         'token' => $user->createToken($request->username)->plainTextToken,
+        'uid' => $user->id,
     ]);
+});
+
+Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
+    $user = User::with('warga_tels')->where('id', $id)->first();
+    if($user){
+        $absensi_per_bulan = Presence::where('nis', $user->nis)
+            ->whereYear('time_masuk', Carbon::now()->year)
+            ->whereIn('status', ['Hadir', 'Terlambat'])
+            ->select(DB::raw('MONTH(time_masuk) as bulan'), DB::raw('COUNT(*) as total'))
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->keyBy('bulan');
+
+        $fullData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $fullData[] = [
+                'bulan' => $i,
+                'total' => $absensi_per_bulan[$i]->total ?? 0
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'name' => $user->warga_tels->name,
+            'absensi_per_bulan' => $fullData,
+            'total_hadir_bulan_ini' => Presence::where('nis', $user->nis)
+                ->whereMonth('time_masuk', Carbon::now()->month)
+                ->whereYear('time_masuk', Carbon::now()->year)
+                ->whereNotIn('status', ['Izin', 'Sakit', 'Alpa'])
+                ->count(),
+            'total_izin_bulan_ini' => Presence::where('nis', $user->nis)
+                ->whereMonth('time_masuk', Carbon::now()->month)
+                ->whereYear('time_masuk', Carbon::now()->year)
+                ->whereNotIn('status', ['Hadir', 'Terlambat'])
+                ->count(),
+            'absen_hari_ini_status' => Presence::where('nis', $user->nis)
+                ->whereDate('time_masuk', Carbon::today())
+                ->exists(),
+            'rfid_status' => $user->rfid_id != "" || $user->rfid_id != null ? true : false,
+            'profile' => env('APP_URL') . 'storage/profile/' . $user->warga_tels->foto_profile,
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'failed',
+        'message' => 'Data tidak ditemukan...'
+    ], 200);
 });
 
 Route::post('/validate-acc', function (Request $request) {
@@ -61,20 +113,20 @@ Route::post('/validate-acc', function (Request $request) {
     }
 });
 
-Route::get('/allAbsensiMasuk', function(){
-    $presences = Presence::where('presence_type', 'Absensi Masuk')
-        ->whereDate('time', Carbon::today())
-        ->orderBy('time', 'desc')
-        ->with('user')
+Route::get('/allAbsensi', function(){
+    $presences = Presence::whereDate('time_masuk', Carbon::today())
+        ->orderBy('time_masuk', 'desc')
+        ->with('warga_tels')
         ->get()
         ->map(function ($item, $index) {
             return [
                 'id' => $index + 1,
                 'NIS' => $item->nis,
-                'Waktu Masuk' => $item->time,
+                'Waktu Masuk' => $item->time_masuk,
+                'Waktu Keluar' => $item->time_keluar,
                 'Status' => $item->status,
-                'Nama Lengkap' => $item->user ? ucwords(strtolower($item->user->name)) : '-',
-                'Kelas' => $item->user ? "{$item->user->kelas} {$item->user->jurusan} {$item->user->angka_kelas}" : '-',
+                'Nama Lengkap' => $item->warga_tels->name ? ucwords(strtolower($item->warga_tels->name)) : '-',
+                'Kelas' => $item->warga_tels->kelas ?? '-',
             ];
         })
         ->values()
@@ -91,16 +143,20 @@ Route::post('/absensiMasuk', function(Request $request){
 
     if($user){
         $presences = Presence::where('nis', $user->nis)
-            ->whereDate('time', Carbon::today())
-            ->where('presence_type', "Absensi Masuk")
+            ->whereDate('time_masuk', Carbon::today())
             ->first();
         
         if(!$presences){
+            if(Carbon::now()->greaterThan(Carbon::today()->addHours(7))){
+                $status = 'Terlambat';
+            }else{
+                $status = 'Hadir';
+            }
+
             Presence::create([
                 'nis' => $user->nis,
-                'presence_type' => 'Absensi Masuk',
-                'time' => Carbon::now()->toDateTimeString(),
-                'status' => 'Hadir'
+                'time_masuk' => Carbon::now(),
+                'status' => $status
             ]);
 
             return response()->json([
@@ -121,6 +177,43 @@ Route::post('/absensiMasuk', function(Request $request){
     }
 });
 
+Route::post('/absensiKeluar', function(Request $request){
+    $user = User::where('rfid_id', $request->id)->first();
+
+    if($user){
+        $presences = Presence::where('nis', $user->nis)
+            ->whereDate('time_masuk', Carbon::today())
+            ->whereNotNull('time_masuk')
+            ->first();
+
+        if (!$presences) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Anda belum melakukan absensi masuk hari ini...'
+            ]);
+        }
+
+        if ($presences->time_keluar !== null) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Anda sudah melakukan absensi keluar hari ini...'
+            ]);
+        }
+
+        $presences->update(['time_keluar' => Carbon::now()]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Absensi keluar berhasil...'
+        ]);
+    }else{
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Absensi keluar gagal...'
+        ]);
+    }
+});
+
 Route::get('/totalUsers', function(){
     $total = User::count();
     return response()->json(['total' => $total]);
@@ -129,8 +222,9 @@ Route::get('/totalUsers', function(){
 Route::post('/daftar-akun', function(Request $request){
     try{
         $data = $request->validate([
-            'nis' => 'required|digits:9',
+            'nis' => 'required|digits:9|unique:users,nis',
             'username' => 'required|unique:users,username',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string'
         ],[
             'nis.required' => 'NIS tidak boleh kosong',
@@ -139,7 +233,11 @@ Route::post('/daftar-akun', function(Request $request){
             'username.required' => 'Username tidak boleh kosong',
             'username.unique' => 'Username sudah digunakan',
             'password.required' => 'Password tidak boleh kosong',
-            'password.string' => 'Password harus berupa huruf'
+            'password.string' => 'Password harus berupa huruf',
+            'email.required' => 'Email tidak boleh kosong',
+            'email.email' => 'Email tidak valid',
+            'email.unique' => 'Email sudah digunakan',
+            'nis.unique' => 'NIS sudah digunakan',
         ]);
     }catch (ValidationException $e){
         return response()->json([
@@ -163,16 +261,12 @@ Route::post('/daftar-akun', function(Request $request){
     }
 });
 
-Route::post('/register-account', function(Request $request){
-    $kelasArray = explode(" ", $request->kelas);
-    
+Route::post('/register-account', function(Request $request){    
     $data = User::create([
         'nis' => $request->nis,
-        'name' => $request->name,
         'username' => $request->username,
+        'email' => $request->email,
         'password' => Hash::make($request->password),
-        'kelas' => ($kelasArray[0] ?? ''),
-        'jurusan' => ($kelasArray[1] ?? '')
     ]);
 
     if($data){
@@ -191,3 +285,5 @@ Route::post('/register-account', function(Request $request){
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     return response()->json(['status' => 'success']);
 });
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);

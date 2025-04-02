@@ -9,4 +9,14 @@ class WargaTels extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    public function presence()
+    {
+        return $this->hasOne(Presence::class, 'nis', 'nis');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'nis', 'nis');
+    }
 }

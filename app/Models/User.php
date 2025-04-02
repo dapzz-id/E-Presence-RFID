@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Passwords\CanResetPassword as ResetPasswordTrait;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPassword
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, ResetPasswordTrait, HasApiTokens;
 
     protected $guard = 'web';
 
@@ -16,12 +20,7 @@ class User extends Authenticatable
 
     public function warga_tels()
     {
-        return $this->hasOne(WargaTels::class, 'nis', 'nis');
-    }
-
-    public function presence()
-    {
-        return $this->hasOne(Presence::class, 'nis', 'nis');
+        return $this->belongsTo(WargaTels::class, 'nis', 'nis');
     }
 
     protected $hidden = [
@@ -34,5 +33,10 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

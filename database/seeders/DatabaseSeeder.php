@@ -35,37 +35,19 @@ class DatabaseSeeder extends Seeder
             'foto_profile' => "Dirtandra Putra Taufiq Al-Rafii.jpg"
         ]);
         
-        function getKelasJurusan($kelasString) {
-            $kelasArray = explode(' ', $kelasString);
-            return [
-                'kelas' => $kelasArray[0],
-                'jurusan' => $kelasArray[1],
-                'angka_kelas' => $kelasArray[2]
-            ];
-        }
-        
-        $data1 = getKelasJurusan($wargaTels1->kelas);
-        $data2 = getKelasJurusan($wargaTels2->kelas);
-        
         User::factory()->create([
             'nis' => $wargaTels1->nis,
             'username' => 'kadaviradityaa',
-            'name' => $wargaTels1->name,
+            'email' => 'kadaviradityaa@gmail.com',
             'password' => Hash::make('kadavi007'),
-            'kelas' => $data1['kelas'],
-            'jurusan' => $data1['jurusan'],
-            'angka_kelas' => $data1['angka_kelas'],
             'rfid_id' => "0262144736"
         ]);
         
         User::factory()->create([
             'nis' => $wargaTels2->nis,
             'username' => 'dirtandraa',
-            'name' => $wargaTels2->name,
+            'email' => 'radityaakadavi@gmail.com',
             'password' => Hash::make('kadavi007'),
-            'kelas' => $data2['kelas'],
-            'jurusan' => $data2['jurusan'],
-            'angka_kelas' => $data2['angka_kelas'],
             'rfid_id' => "2399694825"
         ]);
     }
