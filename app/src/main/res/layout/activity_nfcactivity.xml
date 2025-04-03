@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".NFCActivity">
+
+    <!-- Header with NFC Icon and Title -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:padding="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/nfcIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_nfc_sign"
+            app:tint="#0066CC" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HUBUNGKAN"
+            android:gravity="center"
+            android:layout_marginTop="1dp"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:fontFamily="@font/poppins_bold"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- NFC Logo -->
+    <ImageView
+        android:id="@+id/nfcLogo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="-"
+        android:src="@drawable/ic_nfc"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
+
+    <!-- Instruction Text -->
+    <TextView
+        android:id="@+id/tvInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tempelkan kartu pelajar Anda"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins_regular"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@+id/nfcLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Cancel Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Kembali"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_bold"
+            android:background="@drawable/red_button_background"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Continue Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnContinue"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/gray_button_background"
+            android:enabled="false"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Lanjutkan"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

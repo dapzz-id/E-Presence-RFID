@@ -19,6 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import android.Manifest;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import androidx.activity.EdgeToEdge;
@@ -34,7 +38,6 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,11 +49,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -58,7 +58,8 @@ import kadaviradityaa.id.e_presence.Library.Module;
 
 public class DashboardActivity extends AppCompatActivity {
     private CircleImageView profileImage;
-    private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, btnAllowAccess, txtTimeNow, btnBuatSurat;
+    private ImageView profileImageLarge;
+    private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, btnAllowAccess, txtTimeNow, btnBuatSurat ,txtProfileName, txtClass, txtNIS;
     private ImageView statusAbsensiBadge, statusAccessBadge, statusLinkCardBadge;
     private LinearLayout layoutWarningNFC;
     private Handler handler = new Handler();
@@ -111,6 +112,56 @@ public class DashboardActivity extends AppCompatActivity {
         } else {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
+        profileImageLarge = findViewById(R.id.profileImageLarge);
+        txtProfileName = findViewById(R.id.tvProfileName);
+        txtClass = findViewById(R.id.tvClass);
+        txtNIS = findViewById(R.id.tvStudentId);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ArrayList<Object> permissions2 = new ArrayList<>();
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions2.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                permissions2.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+        }
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions2.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            permissions2.add(Manifest.permission.INTERNET);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions2.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions2.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
+            permissions2.add(Manifest.permission.NFC);
+        }
+
+        if (permissions2.isEmpty()) {
+            btnAllowAccess.setEnabled(false);
+            btnAllowAccess.setVisibility(View.GONE);
+            Glide.with(this)
+                    .load(R.drawable.ix_success_filled)
+                    .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                    .error(R.drawable.ic_sharp_do_disturb_on)
+                    .into(statusAccessBadge);
+        }
     }
 
     private void LogicApps(){
@@ -119,16 +170,15 @@ public class DashboardActivity extends AppCompatActivity {
         btnLinkCard.setEnabled(checkNFCSupport);
         btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#AAAAAA") : Color.parseColor("#0000FF"));
 
-        boolean checkPermissionAll = isAllPermissionGranted(this);
-        btnAllowAccess.setVisibility(checkPermissionAll ? View.GONE : View.VISIBLE);
-        statusAccessBadge.setImageDrawable(checkPermissionAll ? ContextCompat.getDrawable(this, R.drawable.ix_success_filled) : ContextCompat.getDrawable(this, R.drawable.ic_sharp_do_disturb_on));
-
         updateTime();
         Module.init(this);
         Module.getObjectWithToken(this, Module.urlKoneksi + "api/getMyAccount/" + sharedPreferences.getString("uid", ""), sharedPreferences.getString("token", ""), response -> {
             try {
                 if (response.getString("status").equals("success")){
                     txtNama.setText(response.getString("name"));
+                    txtProfileName.setText(response.getString("name"));
+                    txtClass.setText(response.getString("kelas"));
+                    txtNIS.setText(response.getString("nis"));
                     txtTotalHadir.setText(response.getString("total_hadir_bulan_ini"));
                     txtIzinSakit.setText(response.getString("total_izin_bulan_ini"));
                     Glide.with(this)
@@ -136,6 +186,12 @@ public class DashboardActivity extends AppCompatActivity {
                             .placeholder(R.drawable.co_profile)
                             .error(R.drawable.co_profile)
                             .into(profileImage);
+
+                    Glide.with(this)
+                            .load(response.getString("profile"))
+                            .placeholder(R.drawable.co_profile)
+                            .error(R.drawable.co_profile)
+                            .into(profileImageLarge);
 
                     Glide.with(this)
                             .load(response.getBoolean("rfid_status") ? R.drawable.ix_success_filled : R.drawable.ic_sharp_do_disturb_on)
@@ -152,6 +208,7 @@ public class DashboardActivity extends AppCompatActivity {
                     btnLinkCard.setEnabled(response.getBoolean("rfid_status"));
                     btnLinkCard.setVisibility(response.getBoolean("rfid_status") ? View.GONE : View.VISIBLE);
 
+                    isAbsensi = response.getBoolean("absen_hari_ini_status");
                     btnBuatSurat.setEnabled(response.getBoolean("absen_hari_ini_status"));
                     btnBuatSurat.setVisibility(response.getBoolean("absen_hari_ini_status") ? View.GONE : View.VISIBLE);
 
@@ -198,17 +255,96 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             }).show();
         });
+
+        btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
+        btnLinkCard.setOnClickListener(v -> {
+            if (isNfcSupported(this)) {
+                startActivity(new Intent(this, NFCActivity.class));
+            } else {
+                Toast.makeText(this, "NFC tidak didukung pada perangkat ini", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private static final int PERMISSION_REQUEST_CODE = 100;
+
+    private void requestAllPermissions() {
+        ArrayList<Object> permissions = new ArrayList<>();
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+        }
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.INTERNET);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.NFC);
+        }
+
+        if (!permissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        } else {
+            btnAllowAccess.setEnabled(false);
+            btnAllowAccess.setVisibility(View.GONE);
+            Glide.with(this)
+                    .load(R.drawable.ix_success_filled)
+                    .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                    .error(R.drawable.ic_sharp_do_disturb_on)
+                    .into(statusAccessBadge);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            boolean allGranted = true;
+
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            if (allGranted) {
+                btnAllowAccess.setEnabled(false);
+                btnAllowAccess.setVisibility(View.GONE);
+                Glide.with(this)
+                        .load(R.drawable.ix_success_filled)
+                        .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                        .error(R.drawable.ic_sharp_do_disturb_on)
+                        .into(statusAccessBadge);
+            } else {
+                Toast.makeText(this, "Beberapa izin ditolak. Aplikasi mungkin tidak berfungsi dengan baik.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private static boolean isNfcSupported(Context context) {
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
         if (nfcAdapter != null) return true;
         else return false;
-    }
-
-    private String getMonthName(int month) {
-        String[] months = {"", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"};
-        return months[month];
     }
 
     private void setupBarChart(ArrayList<BarEntry> entries) {
