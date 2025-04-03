@@ -34,7 +34,8 @@
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="23sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/CustomTextInputStyle"
@@ -51,20 +52,22 @@
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxStrokeWidth="1dp"
-                app:hintTextColor="@color/black">
+                app:hintTextColor="@color/black"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nis"
-                    android:focusable="true"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:focusable="true"
                     android:fontFamily="@font/dmsans_regular"
                     android:inputType="numberSigned"
                     android:maxLength="9"
                     android:singleLine="true"
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:ignore="TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -82,19 +85,21 @@
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxStrokeWidth="1dp"
-                app:hintTextColor="@color/black">
+                app:hintTextColor="@color/black"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/email"
-                    android:focusable="true"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:focusable="true"
                     android:fontFamily="@font/dmsans_regular"
                     android:inputType="textEmailAddress"
                     android:singleLine="true"
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:ignore="TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -113,19 +118,21 @@
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxStrokeWidth="1dp"
                 app:endIconTint="@color/black"
-                app:hintTextColor="@color/black">
+                app:hintTextColor="@color/black"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:autofillHints="username"
                     android:fontFamily="@font/dmsans_regular"
                     android:inputType="text"
-                    android:autofillHints="username"
                     android:singleLine="true"
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:ignore="TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -144,7 +151,8 @@
                 app:boxStrokeWidth="1dp"
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/black"
-                app:hintTextColor="@color/black">
+                app:hintTextColor="@color/black"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
@@ -155,20 +163,22 @@
                     android:singleLine="true"
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:ignore="TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/forgotPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Forgot Password?"
-                android:textSize="12sp"
-                android:textColor="#2C86A6"
-                android:textStyle="bold"
+                android:layout_gravity="right"
                 android:layout_marginTop="12dp"
-                android:layout_marginRight="10dp"
-                android:layout_gravity="right"/>
+                android:layout_marginEnd="10dp"
+                android:text="Forgot Password?"
+                android:textColor="#2C86A6"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,RtlHardcoded,TextContrastCheck" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_sign"
@@ -182,14 +192,16 @@
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 app:backgroundTint="#FF2B2BE8"
-                app:rippleColor="@null" />
+                app:rippleColor="@null"
+                tools:ignore="HardcodedText" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="5dp"
-                android:gravity="center_horizontal|center_vertical"></LinearLayout>
+                android:gravity="center_horizontal|center_vertical"
+                tools:ignore="UselessLeaf"></LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -206,17 +218,19 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/dmsans_regular"
                     android:text="Already have an account?"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/btn_resign"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
                     android:fontFamily="@font/dmsans_bold"
                     android:text="Sign in"
                     android:textColor="#3B82F6"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

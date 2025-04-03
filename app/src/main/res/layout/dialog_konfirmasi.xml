@@ -15,7 +15,8 @@
         android:paddingEnd="28dp"
         android:paddingTop="28dp"
         android:background="@drawable/dialog_background"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
         <!-- Icon dan Judul -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -126,7 +127,7 @@
                 android:fontFamily="@font/montserrat_regular"
                 android:textAllCaps="true"
                 android:textSize="12sp"
-                tools:ignore="HardcodedText" />
+                tools:ignore="HardcodedText,VisualLintBounds" />
         </LinearLayout>
 
         <!-- Tombol Aksi -->
@@ -142,26 +143,26 @@
                 android:id="@+id/btnBatal"
                 android:layout_width="107dp"
                 android:layout_height="35dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_custom_dialog"
+                android:fontFamily="@font/montserrat_bold"
                 android:text="Batalkan"
                 android:textAllCaps="false"
-                android:textSize="11sp"
-                android:fontFamily="@font/montserrat_bold"
-                android:background="@drawable/rounded_custom_dialog"
                 android:textColor="@android:color/white"
-                android:layout_marginEnd="10dp"
-                tools:ignore="HardcodedText"/>
+                android:textSize="11sp"
+                tools:ignore="ButtonStyle,HardcodedText,TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/btnLanjut"
                 android:layout_width="107dp"
                 android:layout_height="35dp"
-                android:text="Lanjutkan"
-                android:textSize="11sp"
-                android:textAllCaps="false"
-                android:fontFamily="@font/montserrat_bold"
                 android:background="@drawable/rounded_custom_dialog_blue"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Lanjutkan"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                tools:ignore="HardcodedText"/>
+                android:textSize="11sp"
+                tools:ignore="ButtonStyle,HardcodedText,TouchTargetSizeCheck" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

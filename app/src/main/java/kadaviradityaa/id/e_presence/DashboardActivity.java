@@ -1,13 +1,11 @@
 package kadaviradityaa.id.e_presence;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,7 +60,7 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, btnAllowAccess, txtTimeNow, btnBuatSurat ,txtProfileName, txtClass, txtNIS;
     private ImageView statusAbsensiBadge, statusAccessBadge, statusLinkCardBadge;
     private LinearLayout layoutWarningNFC;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private boolean isAbsensi;
     private SharedPreferences sharedPreferences;
 
@@ -97,7 +95,8 @@ public class DashboardActivity extends AppCompatActivity {
         statusAccessBadge = findViewById(R.id.btnGiveAccess);
         statusLinkCardBadge = findViewById(R.id.btnConnectCard);
         layoutWarningNFC = findViewById(R.id.textWarningNFC);
-        btnLinkCard = findViewById(R.id.tvConnectCardAction);
+        btnLinkCard = findViewById(R.id.tvConnectCardActions);
+        btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
         btnAllowAccess = findViewById(R.id.tvAllowAccess);
         txtTimeNow = findViewById(R.id.tvCurrentTime);
         btnBuatSurat = findViewById(R.id.tvCreateLetter);
@@ -168,7 +167,7 @@ public class DashboardActivity extends AppCompatActivity {
         boolean checkNFCSupport = isNfcSupported(this);
         layoutWarningNFC.setVisibility(checkNFCSupport ? View.GONE : View.VISIBLE);
         btnLinkCard.setEnabled(checkNFCSupport);
-        btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#AAAAAA") : Color.parseColor("#0000FF"));
+        btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#0000FF") : Color.parseColor("#AAAAAA"));
 
         updateTime();
         Module.init(this);
@@ -205,7 +204,6 @@ public class DashboardActivity extends AppCompatActivity {
                             .error(R.drawable.ic_sharp_do_disturb_on)
                             .into(statusAbsensiBadge);
 
-                    btnLinkCard.setEnabled(response.getBoolean("rfid_status"));
                     btnLinkCard.setVisibility(response.getBoolean("rfid_status") ? View.GONE : View.VISIBLE);
 
                     isAbsensi = response.getBoolean("absen_hari_ini_status");
@@ -240,30 +238,9 @@ public class DashboardActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-        }, error -> {
-            Snackbar.make(findViewById(android.R.id.content), "Tidak ada koneksi internet. Jika terus-menerus error, silahkan hubungi admin (Instagram -> @x.dapzz)", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> {
-                String instagramUrl = "https://www.instagram.com/x.dapzz";
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl));
-                intent.setPackage("com.instagram.android");
-
-                try {
-                    startActivity(intent);
-                    finish();
-                } catch (ActivityNotFoundException e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl)));
-                    finish();
-                }
-            }).show();
-        });
+        }, error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show());
 
         btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
-        btnLinkCard.setOnClickListener(v -> {
-            if (isNfcSupported(this)) {
-                startActivity(new Intent(this, NFCActivity.class));
-            } else {
-                Toast.makeText(this, "NFC tidak didukung pada perangkat ini", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -301,7 +278,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         if (!permissions.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, (String[]) permissions.toArray(new Object[0]), PERMISSION_REQUEST_CODE);
         } else {
             btnAllowAccess.setEnabled(false);
             btnAllowAccess.setVisibility(View.GONE);
@@ -385,7 +362,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private static boolean isAllPermissionGranted(Context context) {
-        boolean storagePermission = false;
+        boolean storagePermission;
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
             storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         } else {
@@ -427,7 +404,7 @@ public class DashboardActivity extends AppCompatActivity {
                 Typeface poppinsBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_bold);
                 Typeface poppinsSemiBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_semibold);
 
-                if (hour >= 0 && hour <= 6) {
+                if (hour <= 6) {
                     btnBuatSurat.setVisibility(View.GONE);
                     if(isAbsensi){
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
@@ -437,7 +414,7 @@ public class DashboardActivity extends AppCompatActivity {
                         if(hour == 6) btnBuatSurat.setVisibility(View.VISIBLE);
                     }
                     txtTimeNow.setTypeface(poppinsRegular);
-                } else if (hour >= 7 && hour <= 8) {
+                } else if (hour <= 8) {
                     if(isAbsensi){
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         btnBuatSurat.setVisibility(View.GONE);

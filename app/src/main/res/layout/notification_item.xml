@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="16dp"
@@ -19,7 +20,8 @@
             android:text="Notifikasi Kehadiran"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            android:fontFamily="@font/poppins_bold" />
+            android:fontFamily="@font/poppins_bold"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tvNotificationContent"
@@ -29,6 +31,7 @@
             android:text="Anda telah berhasil melakukan absensi pada hari: Jumat, 14/03/2025 10:03"
             android:textColor="@android:color/black"
             android:textSize="12sp"
-            android:fontFamily="@font/poppins_regular" />
+            android:fontFamily="@font/poppins_regular"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

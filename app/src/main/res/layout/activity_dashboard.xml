@@ -28,9 +28,10 @@
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginStart="16dp"
-            app:civ_border_overlay="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/co_profile" />
+            android:src="@drawable/co_profile"
+            app:civ_border_overlay="true"
+            tools:ignore="ImageContrastCheck" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +47,8 @@
                 android:text="Halo,"
                 android:textColor="@color/black"
                 android:fontFamily="@font/dmsans_regular"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/tvName"
@@ -57,7 +59,8 @@
                 android:textAllCaps="true"
                 android:textColor="@android:color/black"
                 android:textSize="12sp"
-                android:fontFamily="@font/dmsans_bold" />
+                android:fontFamily="@font/dmsans_bold"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
     </LinearLayout>
 
@@ -99,7 +102,8 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/black"
                     android:textSize="12sp"
-                    android:fontFamily="@font/poppins_bold" />
+                    android:fontFamily="@font/poppins_bold"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/tvAttendanceCount"
@@ -109,7 +113,8 @@
                     android:text="10"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
-                    android:fontFamily="@font/poppins_bold" />
+                    android:fontFamily="@font/poppins_bold"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -142,7 +147,8 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/black"
                     android:textSize="12sp"
-                    android:fontFamily="@font/poppins_bold" />
+                    android:fontFamily="@font/poppins_bold"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/tvLeaveCount"
@@ -152,7 +158,8 @@
                     android:text="20"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
-                    android:fontFamily="@font/poppins_bold" />
+                    android:fontFamily="@font/poppins_bold"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -201,19 +208,21 @@
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/tvCurrentTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_bold"
                             android:text="12:00"
                             android:textColor="#FF0000"
                             android:textSize="12sp"
-                            android:fontFamily="@font/poppins_bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText,TextContrastCheck" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -244,7 +253,8 @@
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/tvCreateLetter"
@@ -257,7 +267,8 @@
                             android:fontFamily="@font/poppins_regular"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/btnTodayAttendance"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/btnTodayAttendance"
@@ -268,7 +279,7 @@
                             app:layout_constraintBottom_toBottomOf="@+id/tvTodayAttendanceLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="TouchTargetSizeCheck" />
+                            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -298,7 +309,8 @@
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/tvAllowAccess"
@@ -311,7 +323,8 @@
                             android:fontFamily="@font/poppins_regular"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/btnGiveAccess"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/btnGiveAccess"
@@ -322,7 +335,7 @@
                             app:layout_constraintBottom_toBottomOf="@+id/tvGiveAccessLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="TouchTargetSizeCheck" />
+                            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -351,21 +364,22 @@
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
-                            android:id="@+id/tvConnectCardAction"
+                            android:id="@+id/tvConnectCardActions"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:enabled="false"
+                            android:fontFamily="@font/poppins_regular"
                             android:text="Hubungkan"
                             android:textColor="#AAAAAA"
                             android:textSize="12sp"
-                            android:fontFamily="@font/poppins_regular"
                             app:layout_constraintBottom_toBottomOf="@+id/tvConnectCardLabel"
                             app:layout_constraintEnd_toStartOf="@+id/btnConnectCard"
-                            app:layout_constraintTop_toTopOf="@+id/tvConnectCardLabel" />
+                            app:layout_constraintTop_toTopOf="@+id/tvConnectCardLabel"
+                            tools:ignore="HardcodedText,TextContrastCheck" />
 
                         <ImageView
                             android:id="@+id/btnConnectCard"
@@ -376,7 +390,7 @@
                             app:layout_constraintBottom_toBottomOf="@+id/tvConnectCardLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/tvConnectCardLabel"
-                            tools:ignore="TouchTargetSizeCheck" />
+                            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
                         <LinearLayout
                             android:id="@+id/textWarningNFC"
@@ -385,23 +399,26 @@
                             android:layout_marginTop="8dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            app:layout_constraintTop_toBottomOf="@+id/tvConnectCardLabel">
+                            app:layout_constraintTop_toBottomOf="@+id/tvConnectCardLabel"
+                            tools:ignore="UseCompoundDrawables">
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:contentDescription="-"
                                 android:src="@drawable/flat_color_icons_nfc_sign"
-                                app:tint="#FF0000" />
+                                app:tint="#FF0000"
+                                tools:ignore="HardcodedText" />
 
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
+                                android:fontFamily="@font/poppins_regular"
                                 android:text="Perangkat milikmu tidak mendukung fitur Near Field Communication (NFC)."
                                 android:textColor="#FF0000"
-                                android:fontFamily="@font/poppins_regular"
-                                android:textSize="11sp" />
+                                android:textSize="11sp"
+                                tools:ignore="HardcodedText,TextContrastCheck" />
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -433,7 +450,8 @@
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/tvShowAll"
@@ -444,7 +462,8 @@
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_regular"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/barChart"
@@ -474,6 +493,7 @@
             android:id="@+id/tvNotificationTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
             android:text="NOTIFIKASI"
             android:textColor="@android:color/black"
             android:textSize="16sp"
@@ -481,7 +501,8 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <!-- Delete Icon -->
         <ImageView
@@ -493,7 +514,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvNotificationTitle"
             app:layout_constraintBottom_toBottomOf="@+id/tvNotificationTitle"
-            app:tint="#FF0000" />
+            app:tint="#FF0000"
+            tools:ignore="ContentDescription" />
 
         <!-- Notification ListView -->
         <ListView
@@ -529,7 +551,8 @@
                 android:textColor="@android:color/darker_gray"
                 android:textSize="16sp"
                 android:fontFamily="@font/poppins_regular"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -542,7 +565,6 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Profile Image -->
         <ImageView
             android:id="@+id/profileImageLarge"
             android:layout_width="110dp"
@@ -553,9 +575,9 @@
             android:src="@drawable/co_profile"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
-        <!-- Profile Name -->
         <TextView
             android:id="@+id/tvProfileName"
             android:layout_width="wrap_content"
@@ -567,9 +589,9 @@
             android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@+id/profileImageLarge"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
-        <!-- Student ID -->
         <TextView
             android:id="@+id/tvStudentId"
             android:layout_width="wrap_content"
@@ -580,9 +602,9 @@
             android:fontFamily="@font/poppins_regular"
             app:layout_constraintTop_toBottomOf="@+id/tvProfileName"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
-        <!-- Class -->
         <TextView
             android:id="@+id/tvClass"
             android:layout_width="wrap_content"
@@ -593,7 +615,8 @@
             android:fontFamily="@font/poppins_regular"
             app:layout_constraintTop_toBottomOf="@+id/tvStudentId"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
         <!-- Settings Cards -->
         <androidx.cardview.widget.CardView
@@ -626,6 +649,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:importantForAccessibility="no"
                         android:text="Tentang Pembuat"
                         android:textColor="@android:color/black"
                         android:textSize="12sp"
@@ -633,7 +657,8 @@
                         android:fontFamily="@font/poppins_regular"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:ignore="HardcodedText" />
 
                     <ImageView
                         android:layout_width="24dp"
@@ -642,7 +667,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         android:layout_marginEnd="8dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:ignore="ContentDescription" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -670,6 +696,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
                     android:text="Keluar"
                     android:textColor="@android:color/white"
                     android:textSize="12sp"
@@ -677,7 +704,8 @@
                     android:fontFamily="@font/poppins_regular"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:ignore="HardcodedText" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -687,12 +715,12 @@
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginEnd="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:tint="#FFFFFF" />
+                    app:tint="#FFFFFF"
+                    tools:ignore="ContentDescription" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -706,6 +734,7 @@
         android:fitsSystemWindows="false"
         app:layout_constraintStart_toStartOf="parent"
         app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/bottom_navigation_menu"
+        tools:ignore="VisualLintBottomNav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

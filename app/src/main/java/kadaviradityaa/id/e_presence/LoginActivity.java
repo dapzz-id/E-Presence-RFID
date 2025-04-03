@@ -7,13 +7,19 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,11 +28,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -44,6 +53,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText txtNIS, txtUsername, txtPass, txtMail;
     private TextView txtDesc, btnReSign, btnForgotPassword;
     private static boolean signStatus;
+    private NfcAdapter nfcAdapter;
+    private String uidCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         signStatus = true;
 
         LogicApps();
+//        detectTapCardLogin();
     }
 
     private void initialitation(){
@@ -78,6 +90,27 @@ public class LoginActivity extends AppCompatActivity {
         layoutEmail = findViewById(R.id.layoutEmail);
         txtMail = findViewById(R.id.email);
         btnForgotPassword = findViewById(R.id.forgotPassword);
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null) {
+            return;
+        }
+
+        if (!nfcAdapter.isEnabled()) {
+            showNfcSettingsDialog();
+        }
+    }
+    private void showNfcSettingsDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Nyalakan NFC")
+                .setMessage("NFC Anda tidak aktif. Silakan aktifkan di pengaturan.")
+                .setPositiveButton("Buka Pengaturan", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Batal", null)
+                .setCancelable(false)
+                .show();
     }
 
     private void viewTheSign(boolean condition){
@@ -119,6 +152,74 @@ public class LoginActivity extends AppCompatActivity {
             animator.start();
         }
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        IntentFilter nfcIntent = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+//        nfcAdapter.enableForegroundDispatch(this, PendingIntent.getActivity(this, 0, new Intent(this, getClass()), 0), new IntentFilter[]{nfcIntent}, null);
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        nfcAdapter.disableForegroundDispatch(this);
+//    }
+//
+//    private String bytesToHex(byte[] bytes) {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (byte b : bytes) {
+//            stringBuilder.append(String.format("%02X", b));
+//        }
+//        return stringBuilder.toString();
+//    }
+//
+//    private void detectTapCardLogin(){
+//        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(getIntent().getAction())) {
+//            Tag tag = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
+//            if (tag != null) {
+//                byte[] uid = tag.getId();
+//                uidCard = bytesToHex(uid);
+//                if(!uidCard.isEmpty()) {
+//                    Toast.makeText(this, "Tunggu sebentar, login Anda sedang diproses...", Toast.LENGTH_SHORT).show();
+//                    JSONObject postDatas = new JSONObject();
+//                    try {
+//                        postDatas.put("id", uidCard);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    Module.postObject(this, Module.urlKoneksi + "api/sanctum/tap", postDatas,
+//                            response -> {
+//                                String token = null;
+//                                try {
+//                                    if(response.getString("status").equals("success")){
+//                                        token = response.getString("token");
+//
+//                                        SharedPreferences sharedPreferences = this.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+//                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                        editor.putString("token", token);
+//                                        editor.putString("uid", response.getString("uid"));
+//                                        editor.putBoolean("status", true);
+//                                        editor.apply();
+//
+//                                        startActivity(new Intent(this, DashboardActivity.class));
+//                                        finish();
+//                                    } else if (response.getString("status").equals("failed")) {
+//                                        Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show();
+//                                    }
+//                                } catch (JSONException e) {
+//                                    throw new RuntimeException(e);
+//                                }
+//                            },
+//                            error -> {
+//                                Toast.makeText(this, "Silahkan coba lagi nanti", Toast.LENGTH_SHORT).show();
+//                            }
+//                    );
+//                }
+//            }
+//        }
+//    }
 
     private void LogicApps(){
         btnReSign.setOnClickListener(v -> {

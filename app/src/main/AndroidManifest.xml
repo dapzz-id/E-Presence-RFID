@@ -42,10 +42,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EPresence"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        tools:targetApi="33">
         <activity
             android:name=".NFCActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:launchMode="singleTop">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.nfc.action.TAG_DISCOVERED"/>-->
+<!--                <category android:name="android.intent.category.DEFAULT"/>-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.nfc.action.TECH_DISCOVERED"/>-->
+<!--            </intent-filter>-->
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
         <activity
             android:name=".ResetPasswordActivity"
             android:exported="false" />

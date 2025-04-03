@@ -1,14 +1,6 @@
 package kadaviradityaa.id.e_presence.Library;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.provider.Settings;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;

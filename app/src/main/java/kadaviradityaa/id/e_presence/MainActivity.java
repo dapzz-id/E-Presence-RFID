@@ -1,10 +1,8 @@
 package kadaviradityaa.id.e_presence;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -62,21 +60,7 @@ public class MainActivity extends AppCompatActivity {
                             throw new RuntimeException(e);
                         }
                     },
-                    error -> {
-                        Snackbar.make(findViewById(android.R.id.content), "Tidak ada koneksi internet. Jika terus-menerus error, silahkan hubungi admin (Instagram -> @x.dapzz)", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> {
-                            String instagramUrl = "https://www.instagram.com/x.dapzz";
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl));
-                            intent.setPackage("com.instagram.android");
-
-                            try {
-                                startActivity(intent);
-                                finish();
-                            } catch (ActivityNotFoundException e) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl)));
-                                finish();
-                            }
-                        }).show();
-                    }
+                    error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show()
                 );
             }else{
                 startActivity(new Intent(this, LoginActivity.class));

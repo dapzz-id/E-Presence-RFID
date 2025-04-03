@@ -11,10 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
+
         <ImageView
             android:layout_width="160dp"
             android:layout_height="140dp"
-            android:src="@drawable/icon_app" />
+            android:importantForAccessibility="no"
+            android:src="@drawable/icon_app"
+            tools:ignore="ImageContrastCheck" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
