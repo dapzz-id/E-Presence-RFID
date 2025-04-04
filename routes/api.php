@@ -15,7 +15,7 @@ use Mockery\Undefined;
 
 Route::post('/sanctum/token', function (Request $request) {
     try {
-        $dm = $request->validate([
+        $request->validate([
             'username' => 'required',
             'password' => 'required|string',
         ], [
@@ -47,6 +47,38 @@ Route::post('/sanctum/token', function (Request $request) {
     ]);
 });
 
+Route::post('/sanctum/tap', function(Request $request){
+    try {
+        $request->validate([
+            'id' => 'required|exists:users,rfid_id'
+        ], [
+            'id.required' => 'ID kartu tidak boleh kosong',
+            'id.exists' => 'ID kartu tidak terdaftar',
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => collect($e->errors())->flatten()->first()
+        ], 200);
+    }
+
+    $user = User::where('rfid_id', $request->id)->first();
+
+    if($user){
+        $user->tokens()->delete();
+        return response()->json([
+            'status' => 'success',
+            'token' => $user->createToken($user->username)->plainTextToken,
+            'uid' => $user->id,
+        ]);
+    }else{
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Kartu Anda tidak terdaftar...'
+        ]);
+    }
+});
+
 Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
     $user = User::with('warga_tels')->where('id', $id)->first();
     if($user){
@@ -70,6 +102,8 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
         return response()->json([
             'status' => 'success',
             'name' => $user->warga_tels->name,
+            'kelas' => $user->warga_tels->kelas,
+            'nis' => $user->nis,
             'absensi_per_bulan' => $fullData,
             'total_hadir_bulan_ini' => Presence::where('nis', $user->nis)
                 ->whereMonth('time_masuk', Carbon::now()->month)
@@ -136,6 +170,45 @@ Route::get('/allAbsensi', function(){
         });
 
     return response()->json(["data" => $presences, "count" => $presences->count(), "total_tidak_hadir" => ($presences->filter(fn ($p) => $p['Status'] === 'Izin')->count() + $presences->filter(fn ($p) => $p['Status'] === 'Sakit')->count())]);
+});
+
+Route::middleware('auth:sanctum')->patch('/linkedCard/{id}', function(Request $request, $id){
+    try {
+        $request->validate([
+            'id_card' => 'required|unique:users,rfid_id',
+        ], [
+            'id_card.required' => 'ID kartu tidak boleh kosong',
+            'id_card.unique' => 'ID kartu sudah terdaftar',
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => collect($e->errors())->flatten()->first()
+        ], 200);
+    }
+
+    $user = User::find($id);
+
+    if($user && is_null($user->rfid_id)){
+        $user->update(['rfid_id' => $request->id_card]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kartu berhasil dihubungkan...'
+        ]);
+    }else{
+        if(!is_null($user->rfid_id)){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Akun Anda telah terhubung dengan kartu pelajar...'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Akun Anda tidak ditemukan...'
+            ]);
+        }
+    }
 });
 
 Route::post('/absensiMasuk', function(Request $request){
