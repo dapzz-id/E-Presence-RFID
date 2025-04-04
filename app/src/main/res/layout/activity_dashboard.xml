@@ -8,7 +8,6 @@
     android:background="#F5F6FA"
     tools:context=".DashboardActivity">
 
-    <!-- Profile Section -->
     <LinearLayout
         android:id="@+id/profileSection"
         android:layout_width="match_parent"
@@ -68,6 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:id="@+id/viewDashboard"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/profileSection"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
@@ -163,7 +163,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Scrollable Content -->
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
@@ -180,7 +179,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Menu Items -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardCurrentTime"
                     android:layout_width="match_parent"
@@ -423,7 +421,6 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Chart Section -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardChart"
                     android:layout_width="match_parent"
@@ -488,7 +485,6 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Notification Title -->
         <TextView
             android:id="@+id/tvNotificationTitle"
             android:layout_width="wrap_content"
@@ -498,19 +494,18 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:fontFamily="@font/poppins_bold"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="34dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText" />
 
-        <!-- Delete Icon -->
         <ImageView
             android:id="@+id/btnDeleteNotifications"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_trash_full"
-            android:layout_marginEnd="26dp"
+            android:layout_marginEnd="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvNotificationTitle"
             app:layout_constraintBottom_toBottomOf="@+id/tvNotificationTitle"
@@ -522,7 +517,7 @@
             android:id="@+id/listViewNotifications"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:divider="@android:color/transparent"
             android:dividerHeight="8dp"
             android:paddingHorizontal="16dp"
@@ -560,7 +555,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:id="@+id/viewProfile"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/profileSection"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
@@ -618,7 +613,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="HardcodedText" />
 
-        <!-- Settings Cards -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardSettings"
             android:layout_width="match_parent"
@@ -639,7 +633,6 @@
                 android:background="@color/white"
                 android:padding="16dp">
 
-                <!-- About -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layoutAbout"
                     android:layout_width="match_parent"
@@ -673,7 +666,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Logout Button -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLogout"
             android:layout_width="match_parent"
@@ -691,21 +683,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FF0000"
+                android:id="@+id/layoutLogout"
                 android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/poppins_regular"
                     android:importantForAccessibility="no"
                     android:text="Keluar"
                     android:textColor="@android:color/white"
                     android:textSize="12sp"
-                    android:layout_marginStart="6dp"
-                    android:fontFamily="@font/poppins_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <ImageView
                     android:layout_width="24dp"

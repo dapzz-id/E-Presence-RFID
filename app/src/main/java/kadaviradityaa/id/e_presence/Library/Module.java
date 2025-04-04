@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class Module {
 
-    public static String urlKoneksi = "http://192.168.0.105:8000/";
+    public static String urlKoneksi = "http://192.168.0.104:8000/";
     private static RequestQueue requestQueue;
 
     public static void init(Context context) {
@@ -65,8 +65,15 @@ public class Module {
     }
 
     // PUT Object
-    public static void putObject(Context context, String url, JSONObject data, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, data, listener, errorListener);
+    public static void patchObjectWithToken(Context context, String url, String token, JSONObject data, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PATCH, url, data, listener, errorListener){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
+            }
+        };
         requestQueue.add(request);
     }
 

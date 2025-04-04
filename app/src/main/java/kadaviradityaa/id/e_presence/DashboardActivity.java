@@ -1,17 +1,22 @@
 package kadaviradityaa.id.e_presence;
 
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowInsetsController;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +25,7 @@ import android.Manifest;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -38,6 +44,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
@@ -63,12 +70,14 @@ public class DashboardActivity extends AppCompatActivity {
     private final Handler handler = new Handler();
     private boolean isAbsensi;
     private SharedPreferences sharedPreferences;
+    private ConstraintLayout btnAbout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_dashboard);
+
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -83,7 +92,34 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         initialitaion();
+        initBottomNavigation();
         LogicApps();
+    }
+
+    private void initBottomNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.btnHomeNav) {
+                findViewById(R.id.viewDashboard).setVisibility(LinearLayout.VISIBLE);
+                findViewById(R.id.viewNotification).setVisibility(LinearLayout.GONE);
+                findViewById(R.id.viewProfile).setVisibility(LinearLayout.GONE);
+            }
+
+            if (id == R.id.btnAnnouncement) {
+                findViewById(R.id.viewDashboard).setVisibility(LinearLayout.GONE);
+                findViewById(R.id.viewNotification).setVisibility(LinearLayout.VISIBLE);
+                findViewById(R.id.viewProfile).setVisibility(LinearLayout.GONE);
+            }
+
+            if (id == R.id.btnProfile) {
+                findViewById(R.id.viewDashboard).setVisibility(LinearLayout.GONE);
+                findViewById(R.id.viewNotification).setVisibility(LinearLayout.GONE);
+                findViewById(R.id.viewProfile).setVisibility(LinearLayout.VISIBLE);
+            }
+
+            return true;
+        });
     }
 
     private void initialitaion(){
@@ -96,10 +132,11 @@ public class DashboardActivity extends AppCompatActivity {
         statusLinkCardBadge = findViewById(R.id.btnConnectCard);
         layoutWarningNFC = findViewById(R.id.textWarningNFC);
         btnLinkCard = findViewById(R.id.tvConnectCardActions);
-        btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
         btnAllowAccess = findViewById(R.id.tvAllowAccess);
         txtTimeNow = findViewById(R.id.tvCurrentTime);
         btnBuatSurat = findViewById(R.id.tvCreateLetter);
+        btnAbout = findViewById(R.id.layoutAbout);
+
         isAbsensi = false;
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
 
@@ -116,6 +153,10 @@ public class DashboardActivity extends AppCompatActivity {
         txtProfileName = findViewById(R.id.tvProfileName);
         txtClass = findViewById(R.id.tvClass);
         txtNIS = findViewById(R.id.tvStudentId);
+
+        findViewById(R.id.viewDashboard).setVisibility(LinearLayout.VISIBLE);
+        findViewById(R.id.viewNotification).setVisibility(LinearLayout.GONE);
+        findViewById(R.id.viewProfile).setVisibility(LinearLayout.GONE);
     }
 
     @Override
@@ -205,6 +246,7 @@ public class DashboardActivity extends AppCompatActivity {
                             .into(statusAbsensiBadge);
 
                     btnLinkCard.setVisibility(response.getBoolean("rfid_status") ? View.GONE : View.VISIBLE);
+                    btnLinkCard.setEnabled(!response.getBoolean("rfid_status") && isNfcSupported(this));
 
                     isAbsensi = response.getBoolean("absen_hari_ini_status");
                     btnBuatSurat.setEnabled(response.getBoolean("absen_hari_ini_status"));
@@ -241,6 +283,86 @@ public class DashboardActivity extends AppCompatActivity {
         }, error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show());
 
         btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
+        btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
+
+        btnAbout.setOnClickListener(v -> {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.dialog_info_dev);
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            TextView btnInstagram = dialog.findViewById(R.id.goToInstagram);
+            TextView btnLinkedIn = dialog.findViewById(R.id.goToLinkedIn);
+            TextView btnWebsite = dialog.findViewById(R.id.goToWeb);
+            Button btnClose = dialog.findViewById(R.id.btnCancel);
+
+            btnInstagram.setOnClickListener(v1 -> {
+                Uri uri = Uri.parse("https://instagram.com/x.dapzz");
+                Intent instaAppIntent = new Intent(Intent.ACTION_VIEW, uri);
+                instaAppIntent.setPackage("com.instagram.android");
+
+                Uri webUri = Uri.parse("https://instagram.com/x.dapzz");
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+
+                try {
+                    startActivity(instaAppIntent);
+                    dialog.dismiss();
+                } catch (ActivityNotFoundException e) {
+                    startActivity(webIntent);
+                    dialog.dismiss();
+                }
+            });
+
+            btnWebsite.setOnClickListener(v1 -> {
+                Uri webUri = Uri.parse("https://dapzz.my.id");
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+                startActivity(webIntent);
+                dialog.dismiss();
+            });
+
+            btnLinkedIn.setOnClickListener(v1 -> {
+                Uri uriApp = Uri.parse("linkedin://in/ditzzyaa");
+                Intent linkedInAppIntent = new Intent(Intent.ACTION_VIEW, uriApp);
+
+                Uri uriWeb = Uri.parse("https://www.linkedin.com/in/ditzzyaa");
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, uriWeb);
+
+                try {
+                    startActivity(linkedInAppIntent);
+                    dialog.dismiss();
+                } catch (ActivityNotFoundException e) {
+                    startActivity(webIntent);
+                    dialog.dismiss();
+                }
+            });
+
+            btnClose.setOnClickListener(view -> dialog.dismiss());
+
+            dialog.setCancelable(false);
+            dialog.show();
+        });
+        findViewById(R.id.layoutLogout).setOnClickListener(v -> {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.dialog_logout);
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            Button btnLogout = dialog.findViewById(R.id.btnLogout);
+            Button btnClose = dialog.findViewById(R.id.btnCancel);
+
+            btnLogout.setOnClickListener(v1 -> {
+                SharedPreferences loginPrefs = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginPrefs.edit();
+                editor.clear();
+                editor.apply();
+
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            });
+
+            btnClose.setOnClickListener(view -> dialog.dismiss());
+
+            dialog.setCancelable(false);
+            dialog.show();
+        });
     }
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -320,8 +442,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private static boolean isNfcSupported(Context context) {
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-        if (nfcAdapter != null) return true;
-        else return false;
+        return nfcAdapter != null;
     }
 
     private void setupBarChart(ArrayList<BarEntry> entries) {
@@ -359,28 +480,6 @@ public class DashboardActivity extends AppCompatActivity {
         barChart.getAxisLeft().setAxisMinimum(0f);
         barChart.setFitBars(true);
         barChart.invalidate();
-    }
-
-    private static boolean isAllPermissionGranted(Context context) {
-        boolean storagePermission;
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
-            storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        } else {
-            storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
-        }
-
-        boolean writeStoragePermission = (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) &&
-                (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-
-        boolean internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
-
-        boolean locationFinePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        boolean locationCoarsePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-        boolean nfcPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.NFC) == PackageManager.PERMISSION_GRANTED;
-
-        return storagePermission && writeStoragePermission && internetPermission
-                && locationFinePermission && locationCoarsePermission && nfcPermission;
     }
 
     @Override

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/btnHomeNav" android:title="Home" android:icon="@drawable/tabler_smart_home" />
-    <item android:id="@+id/btnAnnouncement" android:title="Announcement" android:icon="@drawable/ant_design_notification_outlined" />
-    <item android:id="@+id/btnProfile" android:title="Profile" android:icon="@drawable/iconamoon_profile_light" />
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/btnHomeNav" android:title="Home" android:icon="@drawable/tabler_smart_home"
+        tools:ignore="HardcodedText" />
+    <item android:id="@+id/btnAnnouncement" android:title="Announcement" android:icon="@drawable/ant_design_notification_outlined"
+        tools:ignore="HardcodedText" />
+    <item android:id="@+id/btnProfile" android:title="Profile" android:icon="@drawable/iconamoon_profile_light"
+        tools:ignore="HardcodedText" />
 </menu>
