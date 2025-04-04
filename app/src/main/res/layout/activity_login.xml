@@ -67,7 +67,7 @@
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
                     android:textSize="12sp"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -99,7 +99,7 @@
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
                     android:textSize="12sp"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -132,7 +132,7 @@
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
                     android:textSize="12sp"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -164,7 +164,7 @@
                     android:textColor="@color/black"
                     android:textColorHint="#455A64"
                     android:textSize="12sp"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView

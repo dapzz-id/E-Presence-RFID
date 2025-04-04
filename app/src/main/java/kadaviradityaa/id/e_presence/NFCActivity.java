@@ -35,7 +35,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -112,7 +111,7 @@ public class NFCActivity extends AppCompatActivity {
                             try {
                                 if(response1.has("status") && response1.getString("status").equals("success")){
                                     Toast.makeText(this, response1.getString("message"), Toast.LENGTH_SHORT).show();
-                                    new Handler(Looper.getMainLooper()).postDelayed(this::finish, 3000);
+                                    new Handler(Looper.getMainLooper()).postDelayed(this::finish, 1500);
                                 }else if (response1.has("status") && response1.getString("status").equals("failed")){
                                     Toast.makeText(this, response1.getString("message"), Toast.LENGTH_SHORT).show();
                                 }
@@ -120,9 +119,7 @@ public class NFCActivity extends AppCompatActivity {
                                 throw new RuntimeException(e);
                             }
                         },
-                        error -> {
-                            Toast.makeText(this, "Silahkan coba lagi nanti", Toast.LENGTH_SHORT).show();
-                        }
+                        error -> Toast.makeText(this, "Silahkan coba lagi nanti", Toast.LENGTH_SHORT).show()
                 );
             });
 
