@@ -204,13 +204,13 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void LogicApps(){
-        boolean checkNFCSupport = isNfcSupported(this);
-        layoutWarningNFC.setVisibility(checkNFCSupport ? View.GONE : View.VISIBLE);
-        btnLinkCard.setEnabled(checkNFCSupport);
-        btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#0000FF") : Color.parseColor("#AAAAAA"));
+    @Override
+    protected void onResume(){
+        super.onResume();
+        loadUserData();
+    }
 
-        updateTime();
+    private void loadUserData(){
         Module.init(this);
         Module.getObjectWithToken(this, Module.urlKoneksi + "api/getMyAccount/" + sharedPreferences.getString("uid", ""), sharedPreferences.getString("token", ""), response -> {
             try {
@@ -281,6 +281,16 @@ public class DashboardActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show());
+    }
+
+    private void LogicApps(){
+        boolean checkNFCSupport = isNfcSupported(this);
+        layoutWarningNFC.setVisibility(checkNFCSupport ? View.GONE : View.VISIBLE);
+        btnLinkCard.setEnabled(checkNFCSupport);
+        btnLinkCard.setTextColor(checkNFCSupport ? Color.parseColor("#0000FF") : Color.parseColor("#AAAAAA"));
+
+        updateTime();
+        loadUserData();
 
         btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
         btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
