@@ -44,6 +44,11 @@ return [
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
+        ],
+
+        'superadmin' => [
+            'driver' => 'session',
+            'provider' => 'sadmins',
         ]
     ],
 
@@ -74,6 +79,11 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\AdminAccount::class),
         ],
+
+        'sadmins' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\SuperAdmin::class),
+        ],
     ],
 
     /*
@@ -100,6 +110,13 @@ return [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 30,
+        ],
+
+        'admin_accounts' => [
+            'provider' => 'admins',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 20,
+            'throttle' => 20,
         ],
     ],
 

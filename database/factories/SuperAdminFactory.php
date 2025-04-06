@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AdminAccount>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SuperAdmin>
  */
-class AdminAccountFactory extends Factory
+class SuperAdminFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,7 +19,6 @@ class AdminAccountFactory extends Factory
     {
         return [
             'username' => fake()->userName(),
-            'email' => fake()->safeEmail(),
             'name' => fake()->name(),
             'password' => Hash::make('password')
         ];

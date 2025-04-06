@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AuthAdminController extends Controller
 {
     public function forgotPassword(Request $request)
     {
         try{
             $request->validate([
-                'email' => 'required|email|exists:users,email',
+                'email' => 'required|email|exists:admin_accounts,email',
             ],[
                 'email.required' => 'Email tidak boleh kosong',
                 'email.exists' => 'Email tidak ditemukan',
@@ -28,7 +28,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $status = Password::broker('users')->sendResetLink($request->only('email'));
+        $status = Password::broker('admin_accounts')->sendResetLink($request->only('email'));
 
         return $status === Password::RESET_LINK_SENT
             ? response()->json(['status' => 'success', 'message' => 'Link reset password telah dikirim ke email'], 200)
@@ -41,15 +41,15 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required',
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|min:6|confirmed',
+            'email' => 'required|email|exists:admin_accounts,email',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Data tidak valid'], 400);
         }
 
-        $status = Password::broker('users')->reset(
+        $status = Password::broker('admin_accounts')->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
@@ -58,13 +58,15 @@ class AuthController extends Controller
             }
         );
 
-        return $status === Password::PASSWORD_RESET
-            ? view('Auth.successfully')
-            : view('Auth.failed');
+        if ($status !== Password::PASSWORD_RESET) {
+            return view('Auth.failed');
+        }
+        
+        return view('Auth.successfully');
     }
 
     public function showResetForm(Request $request)
     {
-        return view('Auth.reset-password', ['token' => $request->token, 'email' => $request->email]);
+        return view('Auth.reset-password-admin', ['token' => $request->token, 'email' => $request->email]);
     }
 }

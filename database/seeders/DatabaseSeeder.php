@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\AdminAccount;
+use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\WargaTels;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         WargaTels::factory(18)->create();
         AdminAccount::factory(2)->create();
+        SuperAdmin::factory(2)->create();
 
         $wargaTels1 = WargaTels::factory()->create([
             'nis' => '232410012',

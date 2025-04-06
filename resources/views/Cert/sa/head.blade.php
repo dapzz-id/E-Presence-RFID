@@ -22,8 +22,8 @@
 <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full transition-transform duration-300 ease-in-out z-20">
     <div class="pt-16 px-4">
         <nav class="space-y-1">
-            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/dashboard' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Home</a>
-            <a href="{{ route('siswa') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || request()->path() == 'admin/akun-siswa' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Siswa</a>
+            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'superadmin/dashboard' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Home</a>
+            <a href="{{ route('siswa') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'superadmin/notifikasi' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Notifikasi</a>
             <a href="#" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'rfid-card' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Register Card</a>
             <a href="{{ route('logout') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'logout' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Logout</a>
         </nav>

@@ -23,6 +23,11 @@ class User extends Authenticatable implements CanResetPassword
         return $this->belongsTo(WargaTels::class, 'nis', 'nis');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'nis', 'nis');
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
