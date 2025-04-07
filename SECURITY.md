@@ -80,8 +80,8 @@
 
 | Version Java | Supported      |
 | ------- | ------------------ |
-| < 17   | Not Recommended     |
-| 17  | Recommended            |
+| < 17   | :x:     |
+| 17  | :white_check_mark:            |
 | > 17  | Very Recommended     |
 
 ## Reporting a Vulnerability
