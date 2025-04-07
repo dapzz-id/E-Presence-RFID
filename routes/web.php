@@ -4,6 +4,8 @@ use App\Exports\PresenceExport;
 use App\Exports\PresencePerMonthExport;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\SiswaController;
 use App\Models\AdminAccount;
 use App\Models\Presence;
 use App\Models\User;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 
@@ -145,35 +148,6 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
         return view('Main.dashboard', compact('total', 'totalHariIni', 'totalTidakHadir', 'dataPresensi', 'filter'));
     })->name('dashboard');
 
-    Route::get('/siswa', function (Request $request) {
-        if (Auth::guard('admin')->check()) {
-            $user = Auth::guard('admin')->user();
-            $user->update(['last_seen' => Carbon::now()]);
-        }
-
-        $search = $request->query('search');
-        $kelas = $request->query('kelas');
-    
-        $query = WargaTels::query();
-    
-        // Filter by search query
-        if (!empty($search)) {
-            $query->where('name', 'like', "%$search%")
-                  ->orWhere('nis', 'like', "%$search%")
-                  ->orWhere('alamat', 'like', "%$search%");
-        }
-    
-        // Filter by kelas
-        if (!empty($kelas) && $kelas !== 'all') {
-            $query->where('kelas', $kelas);
-        }
-    
-        // Pagination 10 data per halaman
-        $wargaTels = $query->paginate(10, ['*'], 'data-siswa');
-    
-        return view('Main.Components.data-siswa', compact('wargaTels'));
-    })->name('siswa');
-
     Route::get('/akun-siswa', function (Request $request) {
         if (Auth::guard('admin')->check()) {
             $user = Auth::guard('admin')->user();
@@ -205,51 +179,71 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
         return view('Main.Components.akun-siswa', compact('akunSiswa'));
     })->name('akun.siswa');
 
-    Route::post('/siswa/add', function(Request $request){
-        $request->validate([
-            'nis' => 'required|unique:warga_tels,nis',
-            'name' => 'required',
-            'class' => 'required',
-            'address' => 'required',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ],[
-            'nis.required' => 'Kolom NIS tidak boleh kosong',
-            'nis.unique' => 'NIS sudah terdaftar',
-            'name.required' => 'Kolom Nama tidak boleh kosong',
-            'class.required' => 'Kolom Kelas tidak boleh kosong',
-            'address.required' => 'Kolom Alamat tidak boleh kosong',
-            'photo.required' => 'Kolom Foto tidak boleh kosong',
-            'photo.image' => 'File harus berupa gambar',
-            'photo.mimes' => 'File harus berupa jpeg, png, jpg',
-            'photo.max' => 'Ukuran file maksimal 2MiB',
-        ]);
+    Route::get('/siswa/template/download', [SiswaController::class, 'downloadTemplate'])->name('siswa.template.download');
+    Route::post('/siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
 
-        if($request->file('photo')){
-            $file = $request->file('photo');
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $image = Image::make($file)
-                ->fit(255, 340, function ($constraint) {
-                    $constraint->upsize();
-                })
-                ->encode(null, 100);
+    Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa');
+    Route::get('/siswa/add', [SiswaController::class, 'create'])->name('siswa.add');
+    Route::post('/siswa/add', [SiswaController::class, 'store'])->name('siswa.store');
+    Route::get('/siswa/edit/{nis}', [SiswaController::class, 'edit'])->name('siswa.edit');
+    Route::put('/siswa/update', [SiswaController::class, 'update'])->name('siswa.update');
+    Route::delete('/siswa/delete/{nis}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
+    Route::get('/get-profile-photos', [SiswaController::class, 'getProfilePhotos'])->name('siswa.photos');
 
-            Storage::disk('public')->put("profile/{$filename}", (string) $image);
+    Route::get('/photos', [PhotoController::class, 'index'])->name('photos.index');
+    Route::post('/photos/upload', [PhotoController::class, 'upload'])->name('photos.upload');
+    Route::post('/photos/delete', [PhotoController::class, 'delete'])->name('photos.delete');
+
+    Route::get('/checkStatusCard/{id}', function($id){
+
+        $user = User::where('rfid_id', $id)->exists();
+        if($user){
+            return response()->json(['success' => true, 'message' => 'RFID telah terdaftar!']);
+        }else{
+            return response()->json(['success' => false, 'message' => 'RFID belum terdaftar!']);
+        }
+    })->name('checkStatusCard');
+
+    Route::get('/rfid-connect', function(){
+        if (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user();
+            $user->update(['last_seen' => Carbon::now()]);
         }
 
-        WargaTels::create([
-            'nis' => $request->nis,
-            'name' => $request->name,
-            'kelas' => $request->class,
-            'alamat' => $request->address,
-            'foto_profile' => $filename,
-        ]);
+        $user = User::where(function ($query) {
+            $query->whereNull('rfid_id')
+                  ->orWhere('rfid_id', '');
+        })->with('warga_tels')->get();
+        
+        return view('Main.rfid-connect', compact('user'));
+    })->name('rfid.connect');
 
-        return redirect()->route('siswa')->with('success', 'Siswa berhasil ditambahkan');
-    })->name('siswa.store');
+    Route::post('/rfid-connect', function(Request $request){
+        try{
+            $request->validate([
+                'uid' => 'required',
+                'nis' => 'required|exists:users,nis',
+            ],[
+                'uid.required' => 'RFID tidak boleh kosong',
+                'nis.required' => 'Kolom NIS tidak boleh kosong',
+                'nis.exists' => 'NIS tidak terdaftar',
+            ]);
+        }catch (ValidationException $e){
+            return response()->json([
+                'status' => false,
+                'message' => collect($e->errors())->flatten()->first()
+            ], 200);
+        }
 
-    Route::get('/siswa/add', function(){
-        return view('Main.add-siswa');
-    })->name('siswa.add');
+        $user = User::where('nis', $request->nis)->first();
+        if($user){
+            $user->rfid_id = $request->uid;
+            $user->save();
+            return response()->json(['success' => true, 'message' => 'RFID berhasil terdaftar!']);
+        }else{
+            return response()->json(['success' => false, 'message' => 'RFID gagal terdaftar!']);
+        }
+    })->name('rfid.store');
 
     Route::get('/export-presence', function () {
         if (Auth::guard('admin')->check()) {

@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Siswa</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Edit Siswa - {{ old('name', $siswa->name) }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -80,7 +80,6 @@
             background: #555;
         }
 
-        /* For dark mode */
         .dark .custom-scrollbar::-webkit-scrollbar-track {
             background: #1f2937;
         }
@@ -92,6 +91,12 @@
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #6b7280;
         }
+
+        .required-field::after {
+            content: '*';
+            color: #ef4444;
+            margin-left: 4px;
+        }
     </style>
 </head>
 
@@ -100,14 +105,16 @@
 
     <div class="container mx-auto px-8 py-6 mt-10">
         <div class="mb-6">
-            <h1 class="text-3xl font-bold">Tambah Siswa</h1>
-            <p class="text-gray-400">Tambahkan data siswa baru</p>
+            <h1 class="text-3xl font-bold">Edit Data Siswa</h1>
+            <p class="text-gray-400">Perbarui data siswa</p>
         </div>
 
         <div class="max-w-3xl">
-            <form action="{{ route('siswa.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('siswa.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" id="existing_photo" name="existing_photo" value="">
+                @method('PUT')
+                <input type="hidden" id="existing_photo" name="existing_photo" value="{{ $siswa->foto_profile }}">
+                <input type="hidden" id="original_nis" name="original_nis" value="{{ $siswa->nis }}">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
@@ -115,7 +122,7 @@
                             <label for="nis" class="block text-sm font-medium mb-1 required-field">NIS</label>
                             <input type="text" id="nis" name="nis" placeholder="Masukkan NIS"
                                 class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded @error('nis') border-red-500 @enderror"
-                                required value="{{ old('nis') }}" />
+                                required readonly value="{{ old('nis', $siswa->nis) }}" />
                             @error('nis')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -126,7 +133,7 @@
                                 Lengkap</label>
                             <input type="text" id="name" name="name" placeholder="Masukkan nama lengkap"
                                 class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded @error('name') border-red-500 @enderror"
-                                required value="{{ old('name') }}" />
+                                required value="{{ old('name', $siswa->name) }}" />
                             @error('name')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -137,11 +144,11 @@
                             <select id="class" name="class"
                                 class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded @error('class') border-red-500 @enderror"
                                 required>
-                                <option value="" disabled selected>Pilih kelas</option>
+                                <option value="" disabled>Pilih kelas</option>
                                 @foreach (['X RPL 1', 'X RPL 2', 'X RPL 3', 'X RPL 4', 'XI RPL 1', 'XI RPL 2', 'XI RPL 3', 'XI RPL 4', 'XII RPL 1', 'XII RPL 2', 'XII RPL 3', 'XII RPL 4', 'X DKV 1', 'X DKV 2', 'X DKV 3', 'XI DKV 1', 'XI DKV 2', 'XI DKV 3', 'XII DKV 1', 'XII DKV 2', 'XII DKV 3', 'X TKJ 1', 'X TKJ 2', 'X TKJ 3', 'XI TKJ 1', 'XI TKJ 2', 'XI TKJ 3', 'XII TKJ 1', 'XII TKJ 2', 'XII TKJ 3', 'X TRANSMISI', 'XI TRANSMISI', 'XII TRANSMISI'] as $kelasOption)
                                     <option value="{{ $kelasOption }}"
-                                        {{ old('class') == $kelasOption ? 'selected' : '' }}>{{ $kelasOption }}
-                                    </option>
+                                        {{ old('class', $siswa->kelas) == $kelasOption ? 'selected' : '' }}>
+                                        {{ $kelasOption }}</option>
                                 @endforeach
                             </select>
                             @error('class')
@@ -153,7 +160,7 @@
                             <label for="address" class="block text-sm font-medium mb-1 required-field">Alamat</label>
                             <textarea name="address" id="address" autocomplete="street-address" cols="30" rows="5" required
                                 class="w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded @error('address') border-red-500 @enderror"
-                                placeholder="Masukan alamat rumah">{{ old('address') }}</textarea>
+                                placeholder="Masukan alamat rumah">{{ old('address', $siswa->alamat) }}</textarea>
                             @error('address')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -165,7 +172,8 @@
                             <label class="block text-sm font-medium mb-1 ml-4 max-sm:ml-0 required-field">Foto</label>
                             <div class="mt-2 flex flex-col items-center justify-center border-2 border-dashed aspect-[3/4] ml-4 max-sm:mx-auto border-gray-600 rounded-lg p-6 h-64 @error('photo') border-red-500 @enderror"
                                 id="photo-container">
-                                <div class="text-center" id="upload-placeholder">
+                                <div class="text-center {{ $siswa->foto_profile ? 'hidden' : '' }}"
+                                    id="upload-placeholder">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-gray-400">
@@ -180,18 +188,22 @@
                                             Pilih Foto
                                         </label>
                                         <input id="photo-upload" name="photo" type="file" accept="image/*"
-                                            class="hidden" disabled />
+                                            class="hidden" readonly />
                                     </div>
                                     <p class="mt-2 text-sm text-gray-400 max-sm:text-xs">PNG, JPG up to 2MiB</p>
 
                                     <button type="button" id="browse-photos-btn"
-                                        class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                                        class="mt-3 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                                        onclick="openPhotoBrowser()">
                                         <i class="bi bi-images mr-1"></i> Browse existing photos
                                     </button>
                                 </div>
-                                <div class="relative w-full h-full hidden" id="photo-preview-container">
-                                    <img src="/placeholder.svg" alt="Preview" id="photo-preview"
-                                        class="w-full h-full object-cover rounded-lg" onclick="openPhotoBrowser()" />
+                                <div class="relative w-full h-full {{ $siswa->foto_profile ? '' : 'hidden' }}"
+                                    id="photo-preview-container">
+                                    <img src="{{ $siswa->foto_profile ? asset('storage/profile/' . $siswa->foto_profile) : '/placeholder.svg' }}"
+                                        alt="Preview" id="photo-preview"
+                                        class="w-full h-full object-cover rounded-lg cursor-pointer"
+                                        onclick="openPhotoBrowser()" />
                                     <button type="button" id="remove-photo"
                                         class="absolute top-2 right-2 bg-black text-white p-1 rounded-full">
                                         ×
@@ -199,8 +211,9 @@
                                 </div>
                             </div>
                             <span id="current_photo_name"
-                                class="text-sm text-gray-500 dark:text-gray-400 ml-4 mt-2 block">No photo
-                                selected</span>
+                                class="text-sm text-gray-500 dark:text-gray-400 ml-4 mt-2 block">
+                                {{ $siswa->foto_profile ? $siswa->foto_profile : 'No photo selected' }}
+                            </span>
                             @error('photo')
                                 <p class="text-red-500 text-xs mt-1 ml-4">{{ $message }}</p>
                             @enderror
@@ -211,10 +224,10 @@
                 <div class="mt-8 flex justify-end space-x-4">
                     <a href="{{ route('siswa') }}">
                         <button type="button"
-                            class="px-4 py-2 border border-gray-600 text-white rounded-md hover:bg-gray-700">Batal</button>
+                            class="px-4 py-2 border border-gray-600 text-gray-700 dark:text-white rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">Batal</button>
                     </a>
-                    <button type="submit"
-                        class="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-md">Simpan</button>
+                    <button type="submit" class="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-md">Simpan
+                        Perubahan</button>
                 </div>
             </form>
         </div>
@@ -305,7 +318,7 @@
                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
 
-                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    const maxSize = 2 * 1024 * 1024;
                     if (file.size > maxSize) {
                         alert('Ukuran file tidak boleh lebih dari 2 MiB');
                         photoUpload.value = '';
@@ -354,7 +367,6 @@
             });
         }
 
-        // Photo browser functionality
         const photoBrowserModal = document.getElementById('photoBrowserModal');
         const photosContainer = document.getElementById('photos-container');
         const photosLoading = document.getElementById('photos-loading');
@@ -443,27 +455,22 @@
             if (photoPreviewContainer) photoPreviewContainer.classList.remove('hidden');
             if (uploadPlaceholder) uploadPlaceholder.classList.add('hidden');
 
-            // Set the hidden input for existing photo
             const existingPhoto = document.getElementById('existing_photo');
             if (existingPhoto) {
                 existingPhoto.value = photo.name;
             }
 
-            // Update the current photo name display
             if (currentPhotoName) {
                 currentPhotoName.textContent = photo.name + ' (selected from library)';
             }
 
-            // Reset file input
             if (photoUpload) {
                 photoUpload.value = '';
             }
 
-            console.log('Closing photo browser after selecting:', photo.name);
             closePhotoBrowser();
         }
 
-        // Photo search functionality
         if (photoSearch) {
             photoSearch.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
@@ -491,6 +498,13 @@
                 closePhotoBrowser();
             }
         });
+
+        function closeAlert(alertId) {
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                alertElement.style.display = 'none';
+            }
+        }
     </script>
 </body>
 
