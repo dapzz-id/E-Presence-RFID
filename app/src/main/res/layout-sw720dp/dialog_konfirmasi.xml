@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="8dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_background"
+        android:orientation="vertical"
+        android:elevation="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:minWidth="320dp"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/gradient_header"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Icon Identity"
+                android:src="@drawable/card"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="10dp"
+                tools:ignore="HardcodedText"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="KONFIRMASI DATA"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text="Nama"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text=":"
+                    android:layout_marginEnd="8dp"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:id="@+id/textNama"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#0F172A"
+                    android:textAllCaps="true"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="kadavi raditya a"
+                    tools:ignore="HardcodedText"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text="Kelas"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text=":"
+                    android:layout_marginEnd="8dp"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:id="@+id/textKelas"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#0F172A"
+                    android:textAllCaps="true"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="xi rpl 2"
+                    tools:ignore="HardcodedText"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text="Alamat"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#334155"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text=":"
+                    android:layout_marginEnd="8dp"
+                    tools:ignore="HardcodedText"/>
+
+                <TextView
+                    android:id="@+id/textAlamat"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#0F172A"
+                    android:textAllCaps="true"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="taman puri cendana, grand mawar, blok a4 no 10, rt 004 rw 016"
+                    tools:ignore="HardcodedText,VisualLintBounds"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp">
+
+            <Button
+                android:id="@+id/btnBatal"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/button_outline"
+                android:fontFamily="@font/montserrat_medium"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Batalkan"
+                android:textAllCaps="false"
+                android:textColor="#64748B"
+                android:textSize="14sp"
+                tools:ignore="ButtonStyle,HardcodedText,TouchTargetSizeCheck" />
+
+            <Button
+                android:id="@+id/btnLanjut"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@drawable/button_gradient"
+                android:fontFamily="@font/montserrat_medium"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Lanjutkan"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                tools:ignore="ButtonStyle,HardcodedText,TouchTargetSizeCheck" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class Module {
 
-    public static String urlKoneksi = "http://192.168.0.104:8000/";
+    public static String urlKoneksi = "https://e-presence.web.id/";
     private static RequestQueue requestQueue;
 
     public static void init(Context context) {

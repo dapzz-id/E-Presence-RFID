@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/btnHomeNav" android:title="Home" android:icon="@drawable/tabler_smart_home"
         tools:ignore="HardcodedText" />
-    <item android:id="@+id/btnAnnouncement" android:title="Announcement" android:icon="@drawable/ant_design_notification_outlined"
+    <item android:id="@+id/btnAnnouncement" android:title="Announcement" android:visible="false" android:enabled="false" android:icon="@drawable/ant_design_notification_outlined"
         tools:ignore="HardcodedText" />
     <item android:id="@+id/btnProfile" android:title="Profile" android:icon="@drawable/iconamoon_profile_light"
         tools:ignore="HardcodedText" />

@@ -1,5 +1,7 @@
 package kadaviradityaa.id.e_presence;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,12 +62,21 @@ public class MainActivity extends AppCompatActivity {
                             throw new RuntimeException(e);
                         }
                     },
-                    error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show()
+                    error -> {
+                        salinKeClipboard(this, error.toString());
+                        Snackbar.make(findViewById(android.R.id.content), error.toString(), Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show();
+                    }
                 );
             }else{
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
             }
         }, 3000);
+    }
+
+    private static void salinKeClipboard(Context context, String text) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", text);
+        clipboard.setPrimaryClip(clip);
     }
 }
