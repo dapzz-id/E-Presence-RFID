@@ -249,7 +249,7 @@ public class DashboardActivity extends AppCompatActivity {
                     btnLinkCard.setEnabled(!response.getBoolean("rfid_status") && isNfcSupported(this));
 
                     isAbsensi = response.getBoolean("absen_hari_ini_status");
-                    btnBuatSurat.setEnabled(response.getBoolean("absen_hari_ini_status"));
+                    btnBuatSurat.setEnabled(!response.getBoolean("absen_hari_ini_status"));
                     btnBuatSurat.setVisibility(response.getBoolean("absen_hari_ini_status") ? View.GONE : View.VISIBLE);
 
                     JSONArray absensiArray = response.getJSONArray("absensi_per_bulan");
@@ -294,6 +294,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
         btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
+
+        btnBuatSurat.setOnClickListener(v -> startActivity(new Intent(this, LeaveFormActivity.class)));
 
         btnAbout.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
@@ -350,6 +352,7 @@ public class DashboardActivity extends AppCompatActivity {
             dialog.setCancelable(false);
             dialog.show();
         });
+
         findViewById(R.id.layoutLogout).setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.dialog_logout);
@@ -514,22 +517,28 @@ public class DashboardActivity extends AppCompatActivity {
                 Typeface poppinsSemiBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_semibold);
 
                 if (hour <= 6) {
+                    btnBuatSurat.setEnabled(false);
                     btnBuatSurat.setVisibility(View.GONE);
                     if(isAbsensi){
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
                     }else{
                         txtTimeNow.setTextColor(Color.BLACK);
-                        if(hour == 6) btnBuatSurat.setVisibility(View.VISIBLE);
+                        if(hour == 6){
+                            btnBuatSurat.setVisibility(View.VISIBLE);
+                            btnBuatSurat.setEnabled(true);
+                        }
                     }
                     txtTimeNow.setTypeface(poppinsRegular);
                 } else if (hour <= 8) {
                     if(isAbsensi){
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         btnBuatSurat.setVisibility(View.GONE);
+                        btnBuatSurat.setEnabled(false);
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
                         txtTimeNow.setTypeface(poppinsRegular);
                     }else{
+                        btnBuatSurat.setEnabled(true);
                         btnBuatSurat.setVisibility(View.VISIBLE);
                         txtTimeNow.setTextColor(Color.parseColor("#CBCE2F"));
                         txtTimeNow.setTypeface(poppinsSemiBold);
@@ -538,9 +547,11 @@ public class DashboardActivity extends AppCompatActivity {
                     if(isAbsensi){
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         btnBuatSurat.setVisibility(View.GONE);
+                        btnBuatSurat.setEnabled(false);
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
                         txtTimeNow.setTypeface(poppinsRegular);
                     }else{
+                        btnBuatSurat.setEnabled(true);
                         btnBuatSurat.setVisibility(View.VISIBLE);
                         txtTimeNow.setTextColor(Color.parseColor("#FF0000"));
                         txtTimeNow.setTypeface(poppinsBold);

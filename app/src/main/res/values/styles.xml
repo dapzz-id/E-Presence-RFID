@@ -3,4 +3,15 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
     </style>
+
+    <style name="ChipStyle" parent="Widget.Material3.Chip.Filter">
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/chip_stroke</item>
+        <item name="chipBackgroundColor">@color/chip_background</item>
+    </style>
+
+    <style name="ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">@font/dmsans_semibold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>

@@ -11,6 +11,7 @@ android {
         applicationId "kadaviradityaa.id.e_presence"
         minSdk 26
         targetSdk 35
+        vectorDrawables.useSupportLibrary = true
         versionCode 1
         versionName "1.0"
 
@@ -19,10 +20,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -34,6 +37,7 @@ dependencies {
     implementation libs.material
     implementation libs.constraintlayout
     implementation libs.firebase.storage
+    implementation libs.common
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

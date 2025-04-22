@@ -1,23 +1,64 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.EPresence" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Base theme -->
+    <style name="Theme.EPresence" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Skema warna Material 3 -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/purple_700</item>
+
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
+        <item name="colorSecondaryContainer">@color/teal_700</item>
+
+        <!-- Status bar -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <!-- Customize your theme here. -->
+
+        <!-- Default komponen -->
+        <item name="textInputStyle">@style/Widget.EPresence.TextInputLayout</item>
+        <item name="chipStyle">@style/Widget.EPresence.Chip</item>
+        <item name="materialButtonStyle">@style/Widget.EPresence.Button</item>
     </style>
 
-    <style name="CustomTextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <!-- TextInputLayout Style -->
+    <style name="Widget.EPresence.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.EPresence.MediumComponent</item>
+        <item name="hintTextColor">@color/text_input_hint</item>
+        <item name="android:textColorHint">@color/text_input_hint</item>
+    </style>
+
+    <!-- Chip Style -->
+    <style name="Widget.EPresence.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/chip_stroke</item>
+        <item name="chipSurfaceColor">@color/chip_background</item>
+        <item name="android:textColor">@color/chip_text</item>
+    </style>
+
+    <!-- Button Style -->
+    <style name="Widget.EPresence.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">28dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <!-- Shape Appearance -->
+    <style name="ShapeAppearance.EPresence.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="CustomTextInputStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/colorBoxStrokeFocused</item>
-        <item name="colorControlActivated">@color/colorBoxStrokeDefault</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.EPresence.MediumComponent</item>
+        <item name="hintTextColor">@color/text_input_hint</item>
+        <item name="android:textColorHint">@color/text_input_hint</item>
     </style>
 </resources>
