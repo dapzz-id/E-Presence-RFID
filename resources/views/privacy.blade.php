@@ -11,7 +11,7 @@
         <header class="mb-10">
             <div class="flex items-center justify-between mb-6">
                 <h1 class="text-3xl font-bold text-blue-600">E-Presence</h1>
-                <div class="text-sm text-gray-500">Terakhir diperbarui: 15 April 2025</div>
+                <div class="text-sm text-gray-500">Terakhir diperbarui: 16 April 2025</div>
             </div>
             <h2 class="text-4xl font-bold mb-2">Kebijakan Privasi</h2>
             <p class="text-lg text-gray-600">Sistem Presensi Siswa Berbasis RFID</p>
