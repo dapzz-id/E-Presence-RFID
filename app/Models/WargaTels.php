@@ -19,4 +19,9 @@ class WargaTels extends Model
     {
         return $this->hasOne(User::class, 'nis', 'nis');
     }
+
+    public function leaveDocument()
+    {
+        return $this->hasOne(LeaveDocument::class, 'nis', 'nis');
+    }
 }

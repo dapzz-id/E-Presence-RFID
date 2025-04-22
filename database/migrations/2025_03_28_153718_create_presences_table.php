@@ -18,6 +18,10 @@ return new class extends Migration
             $table->dateTime('time_masuk')->default(now());
             $table->dateTime('time_keluar')->nullable();
             $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa', 'Terlambat'])->default('Hadir');
+            $table->enum('status_hari', ['Hari Produktif', 'Hari Non-Produktif']);
+            $table->enum('status_keluar', ['Belum Waktunya', 'Tepat Waktu', 'Terlambat'])->default('Tepat Waktu');
+            $table->longText('alasan_datang_telat')->nullable();
+            $table->longText('alasan_pulang_telat')->nullable();
         });
     }
 

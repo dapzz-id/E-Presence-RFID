@@ -31,12 +31,13 @@
     <div class="pt-16 px-4">
         <nav class="space-y-1">
             <a href="{{ route('dashboard') }}"
-                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/dashboard' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Home</a>
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/dashboard' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Dasbor</a>
+            <a href="{{ route('hari.index') }}"
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/hari' || request()->path() == 'admin/hari/form' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Tentukan Hari</a>
             <a href="{{ route('siswa') }}"
-                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || request()->path() == 'admin/akun-siswa' || request()->path() == 'admin/photos' || Str::startsWith(request()->path(), 'admin/siswa/edit/') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Siswa</a>
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || request()->path() == 'admin/akun-siswa' || request()->path() == 'admin/photos' || Str::startsWith(request()->path(), 'admin/siswa/edit/') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Kelola Siswa</a>
             <a href="{{ route('rfid.connect') }}"
-                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Register
-                Card</a>
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Daftarkan Kartu</a>
             <a onclick="confirmLogout()"
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'logout' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Logout</a>
         </nav>

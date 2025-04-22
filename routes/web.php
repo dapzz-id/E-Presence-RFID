@@ -4,15 +4,18 @@ use App\Exports\PresenceExport;
 use App\Exports\PresencePerMonthExport;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SiswaController;
 use App\Models\AdminAccount;
+use App\Models\Hari;
 use App\Models\Presence;
 use App\Models\User;
 use App\Models\WargaTels;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +25,14 @@ use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 
 Route::get('/', function () {
+    return view('main');
+})->name('view.main');
+
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('view.privacy');
+
+Route::get('/login', function(){
     if(Auth::guard('admin')->check()){
         return redirect()->route('dashboard');
     }else if (Auth::guard('superadmin')->check()){
@@ -70,83 +81,187 @@ Route::prefix('superadmin')->middleware('auth:superadmin')->group(function (){
 
 
 Route::prefix('admin')->middleware('auth:admin')->group(function (){    
-    Route::get('/dashboard', function (Request $request) {
-        if (Auth::guard('admin')->check()) {
-            $user = Auth::guard('admin')->user();
-            $user->update(['last_seen' => Carbon::now()]);
-        }
+    // Route::get('/dashboard', function (Request $request) {
+    //     if (Auth::guard('admin')->check()) {
+    //         $user = Auth::guard('admin')->user();
+    //         $user->update(['last_seen' => Carbon::now()]);
+    //     }
 
-        $filter = $request->query('filter', 'Hari ini');
+    //     $filter = $request->query('filter', 'Hari ini');
+    //     $tab = $request->query('tab', 'all');
         
-        $dateFrom = null;
-        $dateTo = null;
+    //     $dateFrom = null;
+    //     $dateTo = null;
         
-        switch ($filter) {
-            case 'Hari ini':
-                $dateFrom = Carbon::today();
-                $dateTo = Carbon::today()->endOfDay();
-                break;
-            case 'Kemarin':
-                $dateFrom = Carbon::yesterday();
-                $dateTo = Carbon::yesterday()->endOfDay();
-                break;
-            case 'Minggu Lalu':                
-                $dateFrom = Carbon::now()->subWeek()->startOfWeek();
-                $dateTo = Carbon::now()->subWeek()->endOfWeek();
-                break;
-            case 'Minggu Ini':                
-                $dateFrom = Carbon::now()->startOfWeek();
-                $dateTo = Carbon::now()->endOfWeek();
-                break;
-            case 'Bulan Lalu':
-                $dateFrom = Carbon::now()->subMonth()->startOfMonth();
-                $dateTo = Carbon::now()->subMonth()->endOfMonth();
-                break;
-            case 'Bulan Ini':
-                $dateFrom = Carbon::now()->startOfMonth();
-                $dateTo = Carbon::now()->endOfMonth();
-                break;
-            case 'Tahun Lalu':
-                $dateFrom = Carbon::now()->subYear()->startOfYear();
-                $dateTo = Carbon::now()->subYear()->endOfYear();
-                break;
-            case 'Tahun Ini':
-                $dateFrom = Carbon::now()->startOfYear();
-                $dateTo = Carbon::now()->endOfDay();
-                break;
-            default:
-                $dateFrom = Carbon::today();
-                $dateTo = Carbon::today()->endOfDay();
-                break;
-        }
+    //     switch ($filter) {
+    //         case 'Hari ini':
+    //             $dateFrom = Carbon::today();
+    //             $dateTo = Carbon::today()->endOfDay();
+    //             break;
+    //         case 'Kemarin':
+    //             $dateFrom = Carbon::yesterday();
+    //             $dateTo = Carbon::yesterday()->endOfDay();
+    //             break;
+    //         case 'Minggu Lalu':                
+    //             $dateFrom = Carbon::now()->subWeek()->startOfWeek();
+    //             $dateTo = Carbon::now()->subWeek()->endOfWeek();
+    //             break;
+    //         case 'Minggu Ini':                
+    //             $dateFrom = Carbon::now()->startOfWeek();
+    //             $dateTo = Carbon::now()->endOfWeek();
+    //             break;
+    //         case 'Bulan Lalu':
+    //             $dateFrom = Carbon::now()->subMonth()->startOfMonth();
+    //             $dateTo = Carbon::now()->subMonth()->endOfMonth();
+    //             break;
+    //         case 'Bulan Ini':
+    //             $dateFrom = Carbon::now()->startOfMonth();
+    //             $dateTo = Carbon::now()->endOfMonth();
+    //             break;
+    //         case 'Tahun Lalu':
+    //             $dateFrom = Carbon::now()->subYear()->startOfYear();
+    //             $dateTo = Carbon::now()->subYear()->endOfYear();
+    //             break;
+    //         case 'Tahun Ini':
+    //             $dateFrom = Carbon::now()->startOfYear();
+    //             $dateTo = Carbon::now()->endOfDay();
+    //             break;
+    //         case 'Custom':
+    //             $dateFrom = Carbon::parse($request->query('date_from'))->startOfDay();
+    //             $dateTo = Carbon::parse($request->query('date_to'))->endOfDay();
+    //             break;
+    //         default:
+    //             $dateFrom = Carbon::today();
+    //             $dateTo = Carbon::today()->endOfDay();
+    //             break;
+    //     }
         
-        $total = (string)User::count();
-        $presencesQuery = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo]);
+    //     $total = (string)User::count();
+    //     $presencesQuery = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo]);
         
-        $presences = $presencesQuery->orderBy('time_masuk', 'desc')
-            ->with('warga_tels')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'Status' => $item->status,
-                ];
-            })
-            ->values()
-            ->map(function ($item, $index) {
-                $item['id'] = $index + 1;
-                return $item;
-            });
+    //     if ($tab === 'hadir') {
+    //         $presencesQuery->where('status', 'Hadir');
+    //     } elseif ($tab === 'izin') {
+    //         $presencesQuery->where('status', 'Izin');
+    //     } elseif ($tab === 'sakit') {
+    //         $presencesQuery->where('status', 'Sakit');
+    //     }
         
-        $dataPresensi = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo])
-            ->with('warga_tels')
-            ->paginate(10);
+    //     $presences = $presencesQuery->orderBy('time_masuk', 'desc')
+    //         ->with('warga_tels')
+    //         ->get()
+    //         ->map(function ($item) {
+    //             return [
+    //                 'Status' => $item->status,
+    //             ];
+    //         })
+    //         ->values()
+    //         ->map(function ($item, $index) {
+    //             $item['id'] = $index + 1;
+    //             return $item;
+    //         });
         
-        $totalHariIni = (string)$presences->count();
-        $totalTidakHadir = (string)($presences->filter(fn ($p) => $p['Status'] === 'Izin')->count() + 
-                                   $presences->filter(fn ($p) => $p['Status'] === 'Sakit')->count());
+    //     $dataPresensiQuery = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo])
+    //         ->with('warga_tels');
+            
+    //     if ($tab === 'hadir') {
+    //         $dataPresensiQuery->where('status', 'Hadir');
+    //     } elseif ($tab === 'izin') {
+    //         $dataPresensiQuery->where('status', 'Izin');
+    //     } elseif ($tab === 'sakit') {
+    //         $dataPresensiQuery->where('status', 'Sakit');
+    //     }
         
-        return view('Main.dashboard', compact('total', 'totalHariIni', 'totalTidakHadir', 'dataPresensi', 'filter'));
-    })->name('dashboard');
+    //     $dataPresensi = $dataPresensiQuery->paginate(10)->withQueryString();
+        
+    //     $leaveDocuments = DB::table('leave_documents')
+    //         ->join('warga_tels', 'leave_documents.nis', '=', 'warga_tels.nis')
+    //         ->where(function($query) use ($dateFrom, $dateTo) {
+    //             $query->whereBetween('start_date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+    //                   ->orWhereBetween('end_date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+    //                   ->orWhere(function($q) use ($dateFrom, $dateTo) {
+    //                       $q->where('start_date', '<=', $dateFrom->toDateString())
+    //                         ->where('end_date', '>=', $dateTo->toDateString());
+    //                   });
+    //         })
+    //         ->when($tab === 'izin', function($query) {
+    //             return $query->where('type', 'Izin');
+    //         })
+    //         ->when($tab === 'sakit', function($query) {
+    //             return $query->where('type', 'Sakit');
+    //         })
+    //         ->select('leave_documents.*', 'warga_tels.name', 'warga_tels.kelas')
+    //         ->get();
+        
+    //     $totalHariIni = (string)$presences->count();
+    //     $totalTidakHadir = (string)($presences->filter(fn ($p) => $p['Status'] === 'Izin')->count() + 
+    //                                $presences->filter(fn ($p) => $p['Status'] === 'Sakit')->count());
+        
+    //     $currentMonth = Carbon::now()->month;
+    //     $currentYear = Carbon::now()->year;
+    //     $currentMonthStart = Carbon::now()->startOfMonth();
+    //     $currentMonthEnd = Carbon::now()->endOfMonth();
+        
+    //     // Total attendance this month
+    //     $totalHadirBulanIni = (string)Presence::whereBetween('time_masuk', [$currentMonthStart, $currentMonthEnd])
+    //         ->where('status', 'Hadir')
+    //         ->count();
+            
+    //     // Total excused/sick this month
+    //     $totalIzinSakitBulanIni = (string)Presence::whereBetween('time_masuk', [$currentMonthStart, $currentMonthEnd])
+    //         ->whereIn('status', ['Izin', 'Sakit'])
+    //         ->count();
+            
+    //     // Get current month's schedule
+    //     $jadwalBulanIni = Hari::getForMonthYear($currentMonth, $currentYear);
+        
+    //     // Total attendance on non-productive days
+    //     $totalMasukHariNonProduktif = 0;
+        
+    //     // Determine day type for today
+    //     $today = Carbon::today()->toDateString();
+    //     $dayType = 'Hari Produktif';
+        
+    //     if ($jadwalBulanIni) {
+    //         $hariTambahan = $jadwalBulanIni->hari_tambahan ?? [];
+    //         $hariLibur = $jadwalBulanIni->hari_libur ?? [];
+            
+    //         if (!empty($hariTambahan)) {
+    //             $totalMasukHariNonProduktif = (string)Presence::whereIn(DB::raw('DATE(time_masuk)'), $hariTambahan)
+    //                 ->count();
+                
+    //             // Check if today is a non-productive day
+    //             if (in_array($today, $hariTambahan)) {
+    //                 $dayType = 'Hari Non-Produktif';
+    //             }
+    //         }
+            
+    //         // Check if today is a holiday
+    //         if (!empty($hariLibur) && in_array($today, $hariLibur)) {
+    //             $dayType = 'Hari Libur';
+    //         }
+    //     }
+        
+    //     return view('Main.dashboard', compact(
+    //         'total', 
+    //         'totalHariIni', 
+    //         'totalTidakHadir', 
+    //         'dataPresensi', 
+    //         'filter',
+    //         'totalHadirBulanIni',
+    //         'totalIzinSakitBulanIni',
+    //         'totalMasukHariNonProduktif',
+    //         'dayType',
+    //         'tab',
+    //         'leaveDocuments'
+    //     ));
+    // })->name('dashboard');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/hari', [App\Http\Controllers\HariController::class, 'index'])->name('hari.index');
+    Route::get('/hari/form', [App\Http\Controllers\HariController::class, 'monthForm'])->name('hari.month-form');
+    Route::post('/hari/save', [App\Http\Controllers\HariController::class, 'saveMonth'])->name('hari.save-month');
 
     Route::get('/akun-siswa', function (Request $request) {
         if (Auth::guard('admin')->check()) {
@@ -245,13 +360,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
         }
     })->name('rfid.store');
 
-    Route::get('/export-presence', function () {
-        if (Auth::guard('admin')->check()) {
-            $user = Auth::guard('admin')->user();
-            $user->update(['last_seen' => Carbon::now()]);
-        }
-        return Excel::download(new PresencePerMonthExport(), 'Presensi-Tahun-' . now()->year . '.xlsx');
-    });
+    Route::get('/export-presence', [App\Http\Controllers\ExportController::class, 'exportPresence'])->name('export.presence');
 });
 
 Route::get('/logout', function(){
