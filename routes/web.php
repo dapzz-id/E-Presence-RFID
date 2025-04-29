@@ -5,6 +5,7 @@ use App\Exports\PresencePerMonthExport;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LateController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SiswaController;
 use App\Models\AdminAccount;
@@ -79,6 +80,14 @@ Route::prefix('superadmin')->middleware('auth:superadmin')->group(function (){
     })->name('dashboard.sa');
 });
 
+Route::get('/late-arrival', [LateController::class, 'showArrivalForm']);
+Route::post('/late-arrival', [LateController::class, 'storeArrival'])->name('late-arrival.store');
+
+Route::get('/late-departure', [LateController::class, 'showDepartureForm']);
+Route::post('/late-departure', [LateController::class, 'storeDeparture'])->name('late-departure.store');
+
+Route::get('/early-departure', [LateController::class, 'showEarlyDepartureForm']);
+Route::post('/early-departure', [LateController::class, 'storeEarlyDeparture'])->name('early-departure.store');
 
 Route::prefix('admin')->middleware('auth:admin')->group(function (){    
     // Route::get('/dashboard', function (Request $request) {

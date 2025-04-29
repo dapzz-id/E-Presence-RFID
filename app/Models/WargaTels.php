@@ -24,4 +24,9 @@ class WargaTels extends Model
     {
         return $this->hasOne(LeaveDocument::class, 'nis', 'nis');
     }
+
+    public function lateEntry()
+    {
+        return $this->hasMany(LateEntry::class, 'nis', 'nis');
+    }
 }

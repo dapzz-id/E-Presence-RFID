@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WhatsAppController;
+use App\Models\LateEntry;
 use App\Models\Notification;
 use App\Models\Presence;
 use App\Models\User;
@@ -260,22 +262,34 @@ Route::post('/absensiMasuk', function(Request $request){
             ->first();
         
         if(!$presences){
-            if(Carbon::now()->greaterThan(Carbon::today()->addHours(7))){
-                $status = 'Terlambat';
+            if(Carbon::now()->greaterThan(Carbon::today()->addHours(7)->addMinutes(00)->addSeconds(00))){
+                $token = Illuminate\Support\Str::random(40);
+
+                LateEntry::create([
+                    'nis' => $user->nis,
+                    'rfid_id' => $user->rfid_id,
+                    'time' => Carbon::now(),
+                    'type' => 'Presensi Masuk',
+                    'token' => $token
+                ]);
+
+                return response()->json([
+                    'status' => 'late',
+                    'redirect_url' => url('/late-arrival?token=' . $token),
+                    'message' => 'Anda terlambat, silakan isi form keterlambatan.'
+                ]);
             }else{
-                $status = 'Hadir';
+                Presence::create([
+                    'nis' => $user->nis,
+                    'time_masuk' => Carbon::now(),
+                    'status' => 'Hadir'
+                ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Absensi masuk berhasil...'
+                ]);
             }
-
-            Presence::create([
-                'nis' => $user->nis,
-                'time_masuk' => Carbon::now(),
-                'status' => $status
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Absensi masuk berhasil...'
-            ]);
         }else{
             return response()->json([
                 'status' => 'failed',
@@ -305,24 +319,61 @@ Route::post('/absensiKeluar', function(Request $request){
                 'message' => 'Anda belum melakukan absensi masuk hari ini...'
             ]);
         }
-
-        if ($presences->time_keluar !== null) {
+        
+        if($presences->time_keluar !== null){
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Anda sudah melakukan absensi keluar hari ini...'
             ]);
         }
 
-        $presences->update(['time_keluar' => Carbon::now()]);
+        if (Carbon::now()->greaterThan(Carbon::today()->addHours(16)->addMinutes(30))) {
+            $token = Illuminate\Support\Str::random(40);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Absensi keluar berhasil...'
-        ]);
+            LateEntry::create([
+                'nis' => $user->nis,
+                'rfid_id' => $user->rfid_id,
+                'time' => Carbon::now(),
+                'type' => 'Presensi Keluar',
+                'token' => $token
+            ]);
+
+            return response()->json([
+                'status' => 'late',
+                'redirect_url' => url('/late-departure?token=' . $token),
+                'message' => 'Anda terlambat pulang, silakan isi form keterlambatan.'
+            ]);
+        }else if (Carbon::now()->lessThan(Carbon::today()->addHours(16)->addMinutes(30)) && Carbon::now()->lessThan(Carbon::today()->addHours(15)->addMinutes(29)->addSeconds(59))) {
+            $token = Illuminate\Support\Str::random(40);
+
+            LateEntry::create([
+                'nis' => $user->nis,
+                'rfid_id' => $user->rfid_id,
+                'time' => Carbon::now(),
+                'type' => 'Presensi Keluar',
+                'token' => $token
+            ]);
+
+            return response()->json([
+                'status' => 'early',
+                'redirect_url' => url('/early-departure?token=' . $token),
+                'message' => 'Anda pulang lebih awal, silakan isi form alasan pulang lebih awal.'
+            ]);
+        }else if(Carbon::now()->lessThan(Carbon::today()->addHours(16)->addMinutes(30)) && Carbon::now()->greaterThan(Carbon::today()->addHours(15)->addMinutes(29)->addSeconds(59))){
+            $presences->update([
+                'time_keluar' => Carbon::now(),
+                'status_keluar' => 'Tepat Waktu'
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Absensi pulang tepat waktu...'
+            ]);
+        }
     }else{
         return response()->json([
             'status' => 'failed',
-            'message' => 'Absensi keluar gagal...'
+            'message' => 'Absensi pulang gagal...'
         ]);
     }
 });
@@ -331,6 +382,8 @@ Route::get('/totalUsers', function(){
     $total = User::count();
     return response()->json(['total' => $total]);
 });
+
+Route::post('/send-whatsapp', [WhatsAppController::class, 'send']);
 
 Route::post('/daftar-akun', function(Request $request){
     try{

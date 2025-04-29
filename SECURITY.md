@@ -76,13 +76,13 @@
 | < 8.2   | :x:                |
 | 8.2.x   | :white_check_mark: |
 | 8.3.x   | :white_check_mark: |
-| 8.4.x   | Not Recommended    |
+| 8.4.x   | :x:    |
 
 | Version Java | Supported      |
 | ------- | ------------------ |
-| < 17   | :x:     |
-| 17  | :white_check_mark:            |
-| > 17  | Very Recommended     |
+| < 11   | :x:     |
+| 11  | :white_check_mark:            |
+| > 11  | :white_check_mark:     |
 
 ## Reporting a Vulnerability
 

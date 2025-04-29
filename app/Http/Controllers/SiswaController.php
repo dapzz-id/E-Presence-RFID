@@ -71,7 +71,7 @@ class SiswaController extends Controller
                             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                             if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
                                 $newPath = 'profile/' . $fileName;
-                                Storage::disk('public')->put($newPath, file_get_contents($filePath));
+                                Storage::disk('s3')->put($newPath, file_get_contents($filePath));
                                 
                                 $photoMap[$fileName] = $fileName;
                             }
@@ -192,7 +192,7 @@ class SiswaController extends Controller
                 })
                 ->encode(null, 100);
 
-            Storage::disk('public')->put("profile/{$filename}", (string) $image);
+            Storage::disk('s3')->put("profile/{$filename}", (string) $image);
         }
         elseif($request->existing_photo) {
             $filename = $request->existing_photo;
@@ -268,12 +268,12 @@ class SiswaController extends Controller
                 })
                 ->encode(null, 100);
                 
-            Storage::disk('public')->put("profile/{$filename}", (string) $image);
+            Storage::disk('s3')->put("profile/{$filename}", (string) $image);
             $data['foto_profile'] = $filename;
             
             $oldPhoto = WargaTels::where('nis', $originalNis)->value('foto_profile');
-            if ($oldPhoto && $oldPhoto !== $filename && Storage::disk('public')->exists("profile/{$oldPhoto}")) {
-                Storage::disk('public')->delete("profile/{$oldPhoto}");
+            if ($oldPhoto && $oldPhoto !== $filename && Storage::disk('s3')->exists("profile/{$oldPhoto}")) {
+                Storage::disk('s3')->delete("profile/{$oldPhoto}");
             }
         } elseif ($request->input('existing_photo')) {
             $data['foto_profile'] = $request->input('existing_photo');
@@ -291,8 +291,8 @@ class SiswaController extends Controller
             return redirect()->route('siswa')->with('error', 'Siswa tidak ditemukan');
         }
         
-        if ($siswa->foto_profile && Storage::disk('public')->exists("profile/{$siswa->foto_profile}")) {
-            Storage::disk('public')->delete("profile/{$siswa->foto_profile}");
+        if ($siswa->foto_profile && Storage::disk('s3')->exists("profile/{$siswa->foto_profile}")) {
+            Storage::disk('s3')->delete("profile/{$siswa->foto_profile}");
         }
         
         $siswa->delete();
@@ -303,12 +303,12 @@ class SiswaController extends Controller
     public function getProfilePhotos()
     {
         $photos = [];
-        $files = Storage::disk('public')->files('profile');
+        $files = Storage::disk('s3')->files('profile');
         
         foreach ($files as $file) {
             if (in_array(pathinfo($file, PATHINFO_EXTENSION), ['jpg', 'jpeg', 'png'])) {
                 $fileName = basename($file);
-                $fileSize = Storage::disk('public')->size($file);
+                $fileSize = Storage::disk('s3')->size($file);
                 
                 if ($fileSize < 1024) {
                     $formattedSize = $fileSize . ' B';

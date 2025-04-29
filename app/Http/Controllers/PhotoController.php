@@ -9,7 +9,7 @@ class PhotoController extends Controller
 {
     public function index()
     {
-        $photos = Storage::disk('public')->files('profile');
+        $photos = Storage::disk('s3')->files('profile');
         
         $photos = array_map(function($path) {
             return basename($path);
@@ -34,9 +34,9 @@ class PhotoController extends Controller
                 
                 try {
                     // This will automatically replace the file if it already exists
-                    Storage::disk('public')->put($filePath, file_get_contents($file));
+                    Storage::disk('s3')->put($filePath, file_get_contents($file));
                     
-                    $fileExists = Storage::disk('public')->exists($filePath);
+                    $fileExists = Storage::disk('s3')->exists($filePath);
                     $uploadedFiles[] = [
                         'filename' => $filename,
                         'replaced' => $fileExists
@@ -79,8 +79,8 @@ class PhotoController extends Controller
         $filename = $request->input('filename');
         $path = 'profile/' . $filename;
         
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if (Storage::disk('s3')->exists($path)) {
+            Storage::disk('s3')->delete($path);
             return response()->json(['success' => true]);
         }
         

@@ -44,4 +44,14 @@ class User extends Authenticatable implements CanResetPassword
     {
         $this->notify(new ResetPasswordNotification($token));
     }
+
+    public function lateEntry()
+    {
+        return $this->hasMany(LateEntry::class, 'rfid_id', 'rfid_id');
+    }
+
+    public function presence()
+    {
+        return $this->hasMany(Presence::class, 'nis', 'nis');
+    }
 }

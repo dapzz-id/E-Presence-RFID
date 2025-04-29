@@ -430,8 +430,8 @@
                                                 <div class="w-2/3 pr-2">
                                                     <h4 class="text-white font-bold id-card-title mb-1">Kadavi Raditya Alvino</h4>
                                                     <div class="flex flex-col space-y-1 text-white">
-                                                        <p class="id-card-text">NIS 232410012 &nbsp; RPL 2023/2024</p>
-                                                        <p class="id-card-micro">Perumahan Taman Puri Cendana</p>
+                                                        <p class="id-card-text">NIS 123456789 &nbsp; RPL 2023/2024</p>
+                                                        <p class="id-card-micro">Taman Puri Cendana</p>
                                                         <p class="id-card-micro">Jawa Barat, Desa Tridaya Sakti</p>
                                                         <p class="id-card-micro">Kec. Tambun Selatan, Kab. Bekasi</p>
                                                     </div>
@@ -710,8 +710,8 @@
                         <i class="bi bi-clock text-primary-400 text-xl md:text-2xl"></i>
                     </div>
                     <h3 class="text-lg md:text-xl font-semibold mb-3">Hemat Waktu</h3>
-                    <p class="text-gray-400 text-sm md:text-base">
-                        Otomatisasi proses absensi menghemat waktu guru dan staf administrasi hingga 85%, memungkinkan mereka fokus pada tugas-tugas penting lainnya.
+                    <p class="text-gray-400 text-sm md:text-base prose prose-justify prose-sm dark:prose-invert">
+                        Otomatisasi proses absensi menghemat waktu guru dan staf hingga 85%, memungkinkan mereka fokus pada tugas-tugas penting lainnya.
                     </p>
                 </div>
                 
@@ -721,8 +721,8 @@
                         <i class="bi bi-graph-up-arrow text-primary-400 text-xl md:text-2xl"></i>
                     </div>
                     <h3 class="text-lg md:text-xl font-semibold mb-3">Tingkatkan Kedisiplinan</h3>
-                    <p class="text-gray-400 text-sm md:text-base">
-                        Sistem notifikasi real-time dan laporan kehadiran membantu meningkatkan kedisiplinan siswa hingga 40% dalam 3 bulan pertama penggunaan.
+                    <p class="text-gray-400 text-sm md:text-base prose prose-justify prose-sm dark:prose-invert">
+                        Sistem laporan kehadiran membantu meningkatkan kedisiplinan siswa.
                     </p>
                 </div>
                 
@@ -732,7 +732,7 @@
                         <i class="bi bi-file-earmark-text text-primary-400 text-xl md:text-2xl"></i>
                     </div>
                     <h3 class="text-lg md:text-xl font-semibold mb-3">Laporan Komprehensif</h3>
-                    <p class="text-gray-400 text-sm md:text-base">
+                    <p class="text-gray-400 text-sm md:text-base prose prose-justify prose-sm dark:prose-invert">
                         Dapatkan wawasan mendalam tentang pola kehadiran dengan laporan analitik yang dapat disesuaikan untuk pengambilan keputusan berbasis data.
                     </p>
                 </div>
@@ -746,8 +746,11 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16" data-aos="fade-up">
                 <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Hubungi Kami</h2>
-                <p class="text-gray-400 text-base md:text-lg">
-                    Tertarik untuk mengimplementasikan E-Presence di sekolah Anda? Hubungi kami untuk konsultasi gratis.
+                <p class="text-gray-400 text-base md:text-lg max-md:hidden">
+                    Tertarik untuk mengimplementasikan E-Presence di sekolah/kampus Anda? <br> Hubungi kami untuk konsultasi <u>gratis</u>.
+                </p>
+                <p class="text-gray-400 text-base md:text-lg max-md:block hidden">
+                    Tertarik untuk mengimplementasikan E-Presence di sekolah/kampus Anda? <br><br> Hubungi kami untuk konsultasi <u>gratis</u>.
                 </p>
             </div>
             
@@ -766,7 +769,7 @@
                         </div>
                         
                         <div>
-                            <label for="school" class="block mb-2 text-sm font-medium text-gray-300">Nama Sekolah</label>
+                            <label for="school" class="block mb-2 text-sm font-medium text-gray-300">Nama Sekolah/Kampus</label>
                             <input type="text" id="school" class="w-full rounded-md border-gray-700 bg-gray-900 text-white px-3 py-2 md:px-4 md:py-3 focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
                         </div>
                         
@@ -783,32 +786,29 @@
                 
                 <div class="w-full lg:w-1/2" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                     <div class="bg-gray-900 border border-gray-700 rounded-xl p-5 md:p-8 h-full">
-                        <h3 class="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Informasi Kontak</h3>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-4 md:mb-12">Informasi Kontak</h3>
                         
                         <div class="space-y-4 md:space-y-6">
                             <div class="flex items-start">
                                 <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary-500/20 rounded-lg flex items-center justify-center mr-3 md:mr-4">
-                                    <i class="bi bi-geo-alt text-primary-400 text-xl md:text-2xl"></i>
+                                    <i class="bi bi-instagram text-primary-400 text-xl md:text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-base md:text-lg font-medium text-white mb-1">Alamat</h4>
-                                    <p class="text-gray-400 text-xs md:text-sm">
-                                        Jl. Jend. Sudirman No. 28 <br>
-                                        Jakarta Pusat, 10220 <br>
-                                        Indonesia
+                                    <p class="text-gray-400 text-xs md:text-sm mt-0.5">
+                                        @raadeveloperz <br>
+                                        @x.dapzz
                                     </p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start">
                                 <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary-500/20 rounded-lg flex items-center justify-center mr-3 md:mr-4">
-                                    <i class="bi bi-telephone text-primary-400 text-xl md:text-2xl"></i>
+                                    <i class="bi bi-whatsapp text-primary-400 text-xl md:text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-base md:text-lg font-medium text-white mb-1">Telepon</h4>
-                                    <p class="text-gray-400 text-xs md:text-sm">
-                                        (021) 12345678 <br>
-                                        (021) 87654321
+                                    <p class="text-gray-400 text-xs md:text-sm mt-0.5">
+                                        (WhatsApp Only) <br>
+                                         +62 895-3831-07479
                                     </p>
                                 </div>
                             </div>
@@ -818,10 +818,9 @@
                                     <i class="bi bi-envelope text-primary-400 text-xl md:text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-base md:text-lg font-medium text-white mb-1">Email</h4>
-                                    <p class="text-gray-400 text-xs md:text-sm">
-                                        info@epresence.id <br>
-                                        support@epresence.id
+                                    <p class="text-gray-400 text-xs md:text-sm mt-0.5">
+                                        support@raadeveloperz.web.id <br>
+                                        raadeveloperz@gmail.com
                                     </p>
                                 </div>
                             </div>
@@ -840,7 +839,6 @@
         </div>
     </footer>
     
-    <!-- AOS JavaScript -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
@@ -851,7 +849,6 @@
     </script>
     
     <script>
-        // Mobile menu toggle
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         
@@ -859,7 +856,6 @@
             mobileMenu.classList.toggle('hidden');
         });
         
-        // FAQ toggle function
         function toggleFAQ(button) {
             const faqItem = button.parentNode;
             const answer = faqItem.querySelector('div');
@@ -874,17 +870,14 @@
         // Generate barcode lines
         const barcodeContainer = document.getElementById('barcode-container');
         if (barcodeContainer) {
-            // Clear any existing content
             barcodeContainer.innerHTML = '';
             
-            // Generate random barcode lines - responsive count based on screen width
             const lineCount = window.innerWidth < 640 ? 80 : (window.innerWidth < 1024 ? 100 : 170);
             
             for (let i = 0; i < lineCount; i++) {
                 const line = document.createElement('div');
                 line.className = 'barcode-line';
                 
-                // Random width for more realistic barcode
                 const width = Math.random() > 0.7 ? 
                     (Math.random() > 0.5 ? 3 : 2) : 1;
                 
@@ -900,7 +893,6 @@
         const cardContainer = document.getElementById('card-container');
         
         if (card && cardContainer) {
-            // Function to handle card tilt based on cursor position
             function handleCardTilt(e) {
                 const rect = cardContainer.getBoundingClientRect();
                 const x = e.clientX - rect.left; // x position within the element
@@ -914,7 +906,6 @@
                 const isLeft = x < centerX;
                 const isTop = y < centerY;
                 
-                // Calculate the rotation based on cursor position and quadrant
                 let rotateY, rotateX;
                 
                 if (isLeft && isTop) {
@@ -935,7 +926,6 @@
                     rotateX = 15; // Tilt up
                 }
                 
-                // Apply the rotation
                 card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
                 
                 // Update shine effect based on cursor position
@@ -966,11 +956,9 @@
                 }
             }
             
-            // Add event listeners for desktop
             cardContainer.addEventListener('mousemove', handleCardTilt);
             cardContainer.addEventListener('mouseleave', resetCardPosition);
             
-            // Add touch event listeners for mobile
             cardContainer.addEventListener('touchmove', function(e) {
                 e.preventDefault();
                 const touch = e.touches[0];
@@ -1004,7 +992,6 @@
                 }
             }
             
-            // Adjust AOS for mobile
             if (window.innerWidth < 768) {
                 AOS.init({
                     disable: true
@@ -1027,10 +1014,7 @@
             }
         }
         
-        // Initial call to handleResize
         handleResize();
-
-        // Listen for window resize events
         window.addEventListener('resize', handleResize);
     </script>
 </body>

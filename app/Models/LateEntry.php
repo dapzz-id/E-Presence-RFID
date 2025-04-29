@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Presence extends Model
+class LateEntry extends Model
 {
+    protected $table = 'late_entries';
+
     protected $guarded = ['id'];
-    public $timestamps = false;
 
     public function warga_tels()
     {
@@ -16,6 +17,6 @@ class Presence extends Model
 
     public function users()
     {
-        return $this->belongsTo(User::class, 'nis', 'nis');
+        return $this->belongsTo(User::class, 'rfid_id', 'rfid_id');
     }
 }

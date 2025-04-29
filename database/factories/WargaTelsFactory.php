@@ -31,7 +31,7 @@ class WargaTelsFactory extends Factory
                 'XII TKJ 1', 'XII TKJ 2', 'XII TKJ 3',
                 'X TRANSMISI', 'XI TRANSMISI', 'XI TRANSMISI'
             ]),
-            'alamat' => fake("id")->address()
+            'alamat' => fake("id")->address(),
         ];
     }
 }
