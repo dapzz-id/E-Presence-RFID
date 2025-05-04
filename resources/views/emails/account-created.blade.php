@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presence Notification</title>
+    <title>Akun Berhasil Dibuat</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -57,23 +57,45 @@
             margin-bottom: 20px;
         }
         
-        .notification-container {
+        .success-icon {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .account-info {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
             padding: 25px;
-            margin: 20px 0;
+            margin: 25px 0;
         }
         
-        .notification-icon {
-            text-align: center;
-            margin-bottom: 15px;
+        .account-info p {
+            margin-bottom: 12px;
         }
         
-        .notification-message {
-            color: #333;
-            font-size: 16px;
-            line-height: 1.7;
+        .account-info p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .account-info strong {
+            color: #2c3e50;
+            font-weight: 600;
+            display: inline-block;
+            width: 100px;
+        }
+        
+        .next-steps {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 25px 0;
+        }
+        
+        .next-steps h2 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 10px;
         }
         
         .divider {
@@ -115,8 +137,12 @@
                 font-size: 22px;
             }
             
-            .notification-container {
+            .account-info {
                 padding: 20px;
+            }
+            
+            .account-info strong {
+                width: 80px;
             }
         }
     </style>
@@ -128,20 +154,28 @@
         </div>
         
         <div class="content">
-            <h1>Notifikasi Kehadiran</h1>
+            <h1>Akun Siswa Berhasil Dibuat</h1>
             
-            <div class="notification-container">
-                <div class="notification-icon">
-                    <!-- You can replace this with an appropriate icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                </div>
-                
-                <div class="notification-message">
-                    {!! $body !!}
-                </div>
+            <p>Halo, <strong>{{ $name }}</strong>!</p>
+            
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            
+            <p>Akun Anda telah berhasil dibuat. Berikut adalah informasi akun Anda:</p>
+            
+            <div class="account-info">
+                <p><strong>Username:</strong> {{ $username }}</p>
+                <p><strong>Email:</strong> {{ $email }}</p>
+            </div>
+            
+            <div class="next-steps">
+                <h2>Langkah Selanjutnya</h2>
+                <p>Anda dapat login menggunakan username dan password yang telah Anda buat.</p>
+                <p>Jika Anda memiliki pertanyaan atau masalah dengan akun Anda, silakan hubungi administrator.</p>
             </div>
             
             <div class="divider"></div>

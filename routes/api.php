@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Models\LateEntry;
 use App\Models\Notification;
@@ -200,7 +201,10 @@ Route::get('/allAbsensi', function(){
                 'NIS' => $item->nis,
                 'Waktu Masuk' => $item->time_masuk,
                 'Waktu Keluar' => $item->time_keluar,
-                'Status' => $item->status,
+                'Status Masuk' => $item->status,
+                'Status Keluar' => $item->status_keluar,
+                'Alasan Masuk' => $item->alasan_datang_telat ?? '-',
+                'Alasan Keluar' => $item->alasan_pulang_telat ?? $item->alasan_pulang_duluan ?? '-',
                 'Nama Lengkap' => $item->warga_tels->name ? ucwords(strtolower($item->warga_tels->name)) : '-',
                 'Kelas' => $item->warga_tels->kelas ?? '-',
             ];
@@ -211,8 +215,11 @@ Route::get('/allAbsensi', function(){
             return $item;
         });
 
-    return response()->json(["data" => $presences, "count" => $presences->count(), "total_tidak_hadir" => ($presences->filter(fn ($p) => $p['Status'] === 'Izin')->count() + $presences->filter(fn ($p) => $p['Status'] === 'Sakit')->count())]);
+    return response()->json(["data" => $presences, "count" => $presences->count(), "total_tidak_hadir" => ($presences->filter(fn ($p) => $p['Status Masuk'] === 'Izin')->count() + $presences->filter(fn ($p) => $p['Status Masuk'] === 'Sakit')->count())]);
 });
+
+Route::get('/siswa/{nis}', [CreateAkunSiswaController::class, 'getSiswaByNis']);
+Route::post('/send-verification-code', [CreateAkunSiswaController::class, 'sendVerificationCode']);
 
 Route::middleware('auth:sanctum')->patch('/linkedCard/{id}', function(Request $request, $id){
     try {

@@ -742,7 +742,7 @@
     
     <!-- Contact Section -->
     <section id="kontak" class="py-16 md:py-20 bg-gray-800 relative">
-        <div class="absolute inset-0 bg-gradient-to-b from-gray-800 via-gray-800 to-gray-900"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-gray-800 via-gray-800 to-gray-800"></div>
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16" data-aos="fade-up">
                 <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Hubungi Kami</h2>
@@ -754,37 +754,8 @@
                 </p>
             </div>
             
-            <div class="flex flex-col lg:flex-row gap-8 md:gap-12">
-                <div class="w-full lg:w-1/2" data-aos="fade-right" data-aos-duration="1000">
-                    <form class="space-y-4 md:space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div>
-                                <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Nama Lengkap</label>
-                                <input type="text" id="name" class="w-full rounded-md border-gray-700 bg-gray-900 text-white px-3 py-2 md:px-4 md:py-3 focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                            </div>
-                            <div>
-                                <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Email</label>
-                                <input type="email" id="email" class="w-full rounded-md border-gray-700 bg-gray-900 text-white px-3 py-2 md:px-4 md:py-3 focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label for="school" class="block mb-2 text-sm font-medium text-gray-300">Nama Sekolah/Kampus</label>
-                            <input type="text" id="school" class="w-full rounded-md border-gray-700 bg-gray-900 text-white px-3 py-2 md:px-4 md:py-3 focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                        </div>
-                        
-                        <div>
-                            <label for="message" class="block mb-2 text-sm font-medium text-gray-300">Pesan</label>
-                            <textarea id="message" rows="4" class="w-full rounded-md border-gray-700 bg-gray-900 text-white px-3 py-2 md:px-4 md:py-3 focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium text-center transition-colors w-full">
-                            Kirim Pesan
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="w-full lg:w-1/2" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+            <div class="flex flex-col lg:flex-row gap-8 md:gap-12">                
+                <div class="w-full lg:w-1/2 mx-auto" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                     <div class="bg-gray-900 border border-gray-700 rounded-xl p-5 md:p-8 h-full">
                         <h3 class="text-xl md:text-2xl font-semibold mb-4 md:mb-12">Informasi Kontak</h3>
                         
@@ -830,6 +801,141 @@
             </div>
         </div>
     </section>
+    
+    <section id="reviews" class="py-16 md:py-20 bg-gray-800 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-gray-800 via-gray-900 to-gray-900"></div>
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-10" data-aos="fade-up" data-aos-duration="1000">
+            <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-white">Ulasan Pelanggan</h2>
+            <p class="text-gray-400 text-base md:text-lg">
+            Lihat apa kata pelanggan kami tentang SMK Telekomunikasi Telesandi Bekasi
+            </p>
+        </div>
+        
+        <!-- Google Rating Summary -->
+        <div class="flex flex-col items-center justify-center mb-10" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+            <div class="flex items-center mb-4">
+                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" 
+                    alt="Google" class="h-12 mt-3 mb-2">
+            </div>
+            
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md flex items-center transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Tulis Review
+            </button>
+        </div>
+        
+        <!-- Reviews Header with Navigation -->
+        <div class="flex justify-between items-center mb-6" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+            <h4 class="text-lg font-medium text-white">Google Reviews</h4>
+            <div class="flex gap-2">
+            <button id="scroll-left" class="bg-gray-800 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <button id="scroll-right" class="bg-gray-800 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+            </div>
+        </div>
+        
+        <!-- Scrollable Container -->
+        <div class="overflow-x-auto pb-4 hide-scrollbar" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400" id="scroll-wrapper">
+            <div class="flex gap-5 min-w-max" id="reviews-container">
+            <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+        </div>
+    </section>
+    
+    <!-- Include Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <style>
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari, Opera */
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchReviews();
+            
+            document.getElementById('scroll-left').addEventListener('click', function() {
+                document.getElementById('scroll-wrapper').scrollBy({
+                left: -300,
+                behavior: 'smooth'
+                });
+            });
+            
+            document.getElementById('scroll-right').addEventListener('click', function() {
+                document.getElementById('scroll-wrapper').scrollBy({
+                left: 300,
+                behavior: 'smooth'
+                });
+            });
+        });
+        
+        function fetchReviews() {
+            axios.get('./get-reviews')
+            .then(response => {
+                const data = response.data;
+                const container = document.getElementById("reviews-container");
+                container.innerHTML = data.result.reviews.slice(0, 8).map((review, index) => `
+                    <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-lg flex flex-col w-80 min-w-[320px]" 
+                        data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${400 + (index * 100)}">
+                    <!-- Header with profile, name, stars -->
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-3 mb-2">
+                            <img src="${review.profile_photo_url}" 
+                                alt="${review.author_name}" 
+                                class="w-10 h-10 rounded-full object-cover">
+                            <h4 class="font-medium text-white">${review.author_name}</h4>
+                            </div>
+                            <div class="text-yellow-400 flex">
+                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                            </div>
+                        </div>
+                        <span class="text-2xl font-bold text-white">G</span>
+                        </div>
+                    
+                        <!-- Review Content -->
+                        <div class="mt-4">
+                        <p class="text-gray-300">
+                            ${review.text || '-'}
+                        </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="mt-auto px-5 py-3 border-t border-gray-700">
+                        <p class="text-xs text-gray-500">
+                        Diposting pada: ${new Date(review.time * 1000).toLocaleDateString('id-ID')}
+                        </p>
+                    </div>
+                    </div>
+                `).join('');
+            }).catch(err => {
+                document.getElementById("reviews-container").innerHTML = `
+                    <div class="text-center py-10 text-red-400 w-full">
+                    Gagal memuat ulasan. Silakan refresh halaman.
+                    </div>`;
+                console.error("Error:", err);
+            });
+        }
+    </script>
     
     <footer class="py-6 md:py-8 bg-gray-900 border-t border-gray-800">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">

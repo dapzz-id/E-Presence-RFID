@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presence Notification</title>
+    <title>Kode Verifikasi</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -26,7 +26,6 @@
             max-width: 600px;
             margin: 0 auto;
             background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .header {
@@ -57,23 +56,35 @@
             margin-bottom: 20px;
         }
         
-        .notification-container {
+        .code-container {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        
-        .notification-icon {
+            padding: 20px;
+            margin: 30px 0;
             text-align: center;
-            margin-bottom: 15px;
         }
         
-        .notification-message {
-            color: #333;
-            font-size: 16px;
-            line-height: 1.7;
+        .code {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #2c3e50;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 1px dashed #dee2e6;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .warning {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #856404;
         }
         
         .divider {
@@ -115,8 +126,9 @@
                 font-size: 22px;
             }
             
-            .notification-container {
-                padding: 20px;
+            .code {
+                font-size: 28px;
+                letter-spacing: 6px;
             }
         }
     </style>
@@ -128,21 +140,22 @@
         </div>
         
         <div class="content">
-            <h1>Notifikasi Kehadiran</h1>
+            <h1>Kode Verifikasi Akun Siswa</h1>
             
-            <div class="notification-container">
-                <div class="notification-icon">
-                    <!-- You can replace this with an appropriate icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                </div>
-                
-                <div class="notification-message">
-                    {!! $body !!}
-                </div>
+            <p>Halo,</p>
+            
+            <p>Terima kasih telah mendaftar. Untuk menyelesaikan proses pembuatan akun siswa, silakan gunakan kode verifikasi berikut:</p>
+            
+            <div class="code-container">
+                <div class="code">{{ $code }}</div>
+                <p>Kode ini berlaku selama <strong>{{ $expires_in }}</strong></p>
             </div>
+            
+            <div class="warning">
+                <strong>Perhatian:</strong> Jangan berikan kode ini kepada siapapun. Tim kami tidak akan pernah meminta kode verifikasi Anda.
+            </div>
+            
+            <p>Jika Anda tidak merasa meminta kode verifikasi ini, silakan abaikan email ini atau hubungi tim dukungan kami.</p>
             
             <div class="divider"></div>
             

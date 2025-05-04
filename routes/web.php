@@ -2,8 +2,10 @@
 
 use App\Exports\PresenceExport;
 use App\Exports\PresencePerMonthExport;
+use App\Http\Controllers\AkunSiswaController;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LateController;
 use App\Http\Controllers\PhotoController;
@@ -18,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -26,7 +29,22 @@ use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 
 Route::get('/', function () {
-    return view('main');
+    $place_id = "ChIJyYc-qv-NaS4RHRrpF29RtnD38";
+    $api_key = env('GOOGLE_MAPS_API_KEY');
+
+    $response = Http::get("https://maps.googleapis.com/maps/api/place/details/json", [
+        'place_id' => $place_id,
+        'fields' => 'rating,reviews,user_ratings_total',
+        'key' => $api_key
+    ]);
+
+    $data = $response->json();
+
+    return view('main', [
+        'response' => $data,
+        'averageRating' => $data['result']['rating'] ?? 0,
+        'totalReviews' => $data['result']['user_ratings_total'] ?? 0
+    ]);
 })->name('view.main');
 
 Route::get('/privacy', function () {
@@ -88,6 +106,17 @@ Route::post('/late-departure', [LateController::class, 'storeDeparture'])->name(
 
 Route::get('/early-departure', [LateController::class, 'showEarlyDepartureForm']);
 Route::post('/early-departure', [LateController::class, 'storeEarlyDeparture'])->name('early-departure.store');
+
+Route::get('/get-reviews', function () {
+    $place_id = "ChIJyYc-qv-NaS4RrpF29RtnD38"; // Ganti dengan milikmu
+    $api_key = env('GOOGLE_MAPS_API_KEY'); // Ganti dengan API key-mu
+
+    $url = "https://maps.googleapis.com/maps/api/place/details/json?place_id={$place_id}&fields=rating,reviews,user_ratings_total&key={$api_key}";
+
+    $response = Http::get($url);
+
+    return response()->json($response->json());
+});
 
 Route::prefix('admin')->middleware('auth:admin')->group(function (){    
     // Route::get('/dashboard', function (Request $request) {
@@ -267,6 +296,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
     // })->name('dashboard');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'showForm'])->name('akun.siswa.create');
+    Route::post('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'store'])->name('akun.siswa.create.post');
+    Route::post('/akun-siswa/delete-multiple', [AkunSiswaController::class, 'deleteMultiple'])->name('akun.delete.multiple');
 
     Route::get('/hari', [App\Http\Controllers\HariController::class, 'index'])->name('hari.index');
     Route::get('/hari/form', [App\Http\Controllers\HariController::class, 'monthForm'])->name('hari.month-form');

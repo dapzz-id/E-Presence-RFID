@@ -303,7 +303,7 @@
                             {{ $filter ?? 'hari ini' }}</p>
                     </div>
                     <div class="flex items-center space-x-2 mr-4">
-                        <div class="relative z-20">
+                        <div class="relative">
                             <button type="button"
                                 class="inline-flex items-center px-2 py-2 sm:px-3 sm:py-3 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md shadow-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                                 id="filter-menu-button" aria-expanded="false" aria-haspopup="true">
