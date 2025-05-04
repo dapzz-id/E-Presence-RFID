@@ -40,7 +40,7 @@ class PresenceObserver
 
         $pesanAlasan = '';
         if ($jamSekarang >= 7 && $alasan !== '-' && $alasan !== '' && $alasan !== null) {
-            $pesanAlasan = "Alasan telat datang: {$alasan} <br><br>";
+            $pesanAlasan = "<b>Alasan telat datang:</b> {$alasan} <br><br>";
         }        
 
         return [
@@ -48,8 +48,8 @@ class PresenceObserver
             'body' => <<<MSG
                 Halo, {$greeting} bapak/ibu!<br>
                 Berikut adalah laporan presensi harian untuk siswa/i {$nama}, bahwasanya telah berhasil melakukan presensi datang!<br><br>
-                Tanggal & Waktu: {$waktu}<br>
-                Lokasi: SMKS Telekomunikasi Telesandi Bekasi<br>
+                <b>Tanggal & Waktu:</b> {$waktu}<br>
+                <b>Lokasi:</b> SMKS Telekomunikasi Telesandi Bekasi<br>
                 {$pesanAlasan}
                 Pesan ini dikirim otomatis oleh sistem presensi digital raadeveloperz.
             MSG
@@ -72,9 +72,9 @@ class PresenceObserver
 
         $pesanAlasan = '';
         if (now()->greaterThan(Carbon::createFromTime(16, 30)) && $alasan !== '-' && $alasan !== '' && $alasan !== null) {
-            $pesanAlasan = "Alasan telat pulang: {$alasan} <br><br>";
+            $pesanAlasan = "<b>Alasan telat pulang:</b> {$alasan} <br><br>";
         }else if (now()->lessThan(Carbon::createFromTime(16, 30)) && now()->lessThan(Carbon::createFromTime(15, 29, 59)) && $alasan !== '-' && $alasan !== '' && $alasan !== null){
-            $pesanAlasan = "Alasan pulang lebih awal: {$alasan} <br><br>";
+            $pesanAlasan = "<b>Alasan pulang lebih awal:</b> {$alasan} <br><br>";
         }
 
         return [
@@ -83,8 +83,8 @@ class PresenceObserver
                 Halo, {$greeting} bapak/ibu!
                 Berikut adalah laporan presensi harian untuk siswa/i {$nama}, bahwasanya telah berhasil melakukan presensi pulang!
                 
-                Tanggal & Waktu: {$waktu}
-                Lokasi: SMKS Telekomunikasi Telesandi Bekasi<br>
+                <b>Tanggal & Waktu:</b> {$waktu}
+                <b>Lokasi:</b> SMKS Telekomunikasi Telesandi Bekasi<br>
                 {$pesanAlasan}
                 Pesan ini dikirim otomatis oleh sistem presensi digital raadeveloperz.
             MSG
