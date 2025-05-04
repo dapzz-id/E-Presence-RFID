@@ -46,8 +46,15 @@ class DashboardController extends Controller
         
         // Apply status filter
         if (in_array($tab, ['hadir', 'izin', 'sakit'])) {
-            $presencesQuery->where('status', ucfirst($tab));
-        }
+            if ($tab === 'hadir') {
+                $presencesQuery->where(function($query) {
+                    $query->where('status', 'Hadir')
+                          ->orWhere('status', 'Terlambat');
+                });
+            } else {
+                $presencesQuery->where('status', ucfirst($tab));
+            }
+        }        
         
         // Get data
         $presences = $presencesQuery->get();
