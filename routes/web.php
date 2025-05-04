@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EditAkunSiswaController;
 use App\Http\Controllers\LateController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SiswaController;
@@ -117,6 +118,9 @@ Route::get('/get-reviews', function () {
 
     return response()->json($response->json());
 });
+
+Route::patch('/akun-siswa/ban-akun/{id}', [AkunSiswaController::class, 'banAccount'])->name('akun.ban');
+Route::patch('/akun-siswa/unban-akun/{id}', [AkunSiswaController::class, 'unbanAccount'])->name('akun.unban');
 
 Route::prefix('admin')->middleware('auth:admin')->group(function (){    
     // Route::get('/dashboard', function (Request $request) {
@@ -300,6 +304,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
     Route::get('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'showForm'])->name('akun.siswa.create');
     Route::post('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'store'])->name('akun.siswa.create.post');
     Route::post('/akun-siswa/delete-multiple', [AkunSiswaController::class, 'deleteMultiple'])->name('akun.delete.multiple');
+    Route::get('/akun-siswa/edit-akun/{id}', [EditAkunSiswaController::class, 'showForm'])->name('akun.siswa.edit');
+    Route::post('/akun-siswa/edit-akun/{id}', [EditAkunSiswaController::class, 'update'])->name('akun.siswa.update');
+    Route::post('/akun-siswa/edit-akun/rfid/remove/{id}', [EditAkunSiswaController::class, 'removeRfid'])->name('akun.siswa.rfid.remove');
 
     Route::get('/hari', [App\Http\Controllers\HariController::class, 'index'])->name('hari.index');
     Route::get('/hari/form', [App\Http\Controllers\HariController::class, 'monthForm'])->name('hari.month-form');

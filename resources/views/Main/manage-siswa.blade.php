@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Data Siswa</title>
+    @stack('styles')
+    @vite(['resources/js/app.js'])
+    @stack('scripts')
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -203,7 +206,7 @@
                 document.getElementById('btn-fotoSiswa').classList.add('border-transparent', 'text-gray-500',
                     'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-300',
                     'hover:border-gray-300', 'dark:hover:border-gray-600');
-            } else if (currentPath === 'akun.siswa') {
+            } else if (currentPath === 'akun.siswa' || currentPath === 'akun.siswa.create' || currentPath === 'akun.siswa.edit') {
                 document.getElementById('btn-akunSiswa').classList.remove('border-transparent', 'text-gray-500',
                     'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-300',
                     'hover:border-gray-300', 'dark:hover:border-gray-600');

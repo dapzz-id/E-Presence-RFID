@@ -430,7 +430,7 @@
                                                 <div class="w-2/3 pr-2">
                                                     <h4 class="text-white font-bold id-card-title mb-1">Kadavi Raditya Alvino</h4>
                                                     <div class="flex flex-col space-y-1 text-white">
-                                                        <p class="id-card-text">NIS 123456789 &nbsp; RPL 2023/2024</p>
+                                                        <p class="id-card-text">NIS 232410012 &nbsp; RPL 2023/2024</p>
                                                         <p class="id-card-micro">Taman Puri Cendana</p>
                                                         <p class="id-card-micro">Jawa Barat, Desa Tridaya Sakti</p>
                                                         <p class="id-card-micro">Kec. Tambun Selatan, Kab. Bekasi</p>
@@ -448,8 +448,8 @@
                                                 
                                                 <!-- Student photo -->
                                                 <div class="w-1/3 pl-2 flex-shrink-0">
-                                                    <div class="bg-red-500 p-1 rounded">
-                                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student Photo" class="w-full aspect-[3/4] object-cover rounded">
+                                                    <div class="bg-red-500">
+                                                        <img src="{{ asset('src/8b98c84e-7b27-4b03-a9bf-963af9b378b7.png') }}" alt="Student Photo" class="w-full aspect-[3/4] object-cover rounded">
                                                     </div>
                                                 </div>
                                             </div>

@@ -25,7 +25,7 @@ class CreateAkunSiswaController extends Controller
             $query->select('nis')
                   ->from('users')
                   ->whereNotNull('nis');
-        })->orderBy('kelas')->orderBy('name')->get();
+        })->orderBy('nis')->get();
         
         return view('Main.Components.Forms.create-akun-siswa', compact('siswa'));
     }

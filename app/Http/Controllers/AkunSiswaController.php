@@ -34,4 +34,45 @@ class AkunSiswaController extends Controller
             return redirect()->back()->with('error', 'Gagal menghapus akun: ' . $e->getMessage());
         }
     }
+
+    public function banAccount($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->status_ban = 'inactive';
+            $user->save();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Akun berhasil di-banned'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mem-banned akun: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Aktifkan kembali akun siswa (unban)
+     */
+    public function unbanAccount($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->status_ban = 'active';
+            $user->save();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Akun berhasil di-unban'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal meng-unban akun: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

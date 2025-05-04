@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CreateAkunSiswaController;
+use App\Http\Controllers\EditAkunSiswaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Models\LateEntry;
 use App\Models\Notification;
@@ -220,6 +221,7 @@ Route::get('/allAbsensi', function(){
 
 Route::get('/siswa/{nis}', [CreateAkunSiswaController::class, 'getSiswaByNis']);
 Route::post('/send-verification-code', [CreateAkunSiswaController::class, 'sendVerificationCode']);
+Route::post('/check-rfid-status', [EditAkunSiswaController::class, 'checkRfidStatus'])->name('api.check.rfid.status');
 
 Route::middleware('auth:sanctum')->patch('/linkedCard/{id}', function(Request $request, $id){
     try {

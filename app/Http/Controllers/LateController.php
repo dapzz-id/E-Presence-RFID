@@ -67,7 +67,7 @@ class LateController extends Controller
             ]);
 
             $lateEntry->delete();
-            return redirect()->back()->with('success', 'Laporan keterlambatan datang berhasil dikirim!');
+            return redirect('/');
         } else {
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda sudah melakukan absensi masuk hari ini...'
@@ -152,7 +152,7 @@ class LateController extends Controller
             ]);
 
             $lateEntry->delete();
-            return redirect()->back()->with('success', 'Laporan keterlambatan pulang berhasil dikirim!');
+            return redirect('/');
         } else {
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda belum melakukan absensi masuk hari ini...'
@@ -213,7 +213,7 @@ class LateController extends Controller
                 'time_keluar' => $lateEntry->time,
             ]);
             $lateEntry->delete();
-            return redirect()->back()->with('success', 'Laporan pulang lebih awal berhasil dikirim!');
+            return redirect('/');
         } else {
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda belum melakukan absensi masuk hari ini...'

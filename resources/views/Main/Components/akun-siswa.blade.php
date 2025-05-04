@@ -25,7 +25,7 @@
                     </select>
                 </div>
                 <div class="flex flex-row max-w-max justify-center items-center max-md:mt-4 max-md:mx-auto">
-                    <div title="Add Akun Siswa" class="bg-green-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center ms-8 me-2 cursor-pointer">
+                    <div title="Add Akun Siswa" class="bg-green-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center ms-8 me-2 cursor-pointer" onclick="window.location.href='{{ route('akun.siswa.create') }}'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus-icon lucide-circle-plus my-2 text-white"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                     </div>
                     <div id="deleteSelectedBtn" title="Delete Akun Siswa" class="bg-red-700 p-4 px-4 rounded-full max-md:rounded-lg flex items-center justify-center me-2 cursor-pointer">
@@ -109,8 +109,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         @if ($akunku->rfid_id == '' || $akunku->rfid_id == null)
                                             <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 items-center">
-                                                <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                class="p-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 items-center">
+                                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd"
                                                         d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -119,8 +119,8 @@
                                             </span>
                                         @else
                                             <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 items-center">
-                                                <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                class="p-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 items-center">
+                                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -140,7 +140,9 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big-icon lucide-circle-check-big text-green-600 cursor-pointer"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
                                                 </div>
                                             @endif
-                                            <svg id="btnEdit" title="Edit Akun Siswa" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen-icon lucide-square-pen text-orange-600 mx-2 cursor-pointer"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                                            <div id="btnEdit" title="Edit Akun Siswa" onclick="window.location.href='{{ route('akun.siswa.edit', $akunku->id) }}'">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen-icon lucide-square-pen text-orange-600 mx-2 cursor-pointer"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                                            </div>
                                             <div data-emailAkun="{{ $akunku->email }}" data-namaAkun="{{ $akunku->warga_tels->name }}" title="Reset Password Akun Siswa" class="btnResetPw">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw-key-icon lucide-rotate-ccw-key text-blue-600 cursor-pointer"><path d="m14.5 9.5 1 1"/><path d="m15.5 8.5-4 4"/><path d="M3 12a9 9 0 1 0 9-9 9.74 9.74 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><circle cx="10" cy="14" r="2"/></svg>
                                             </div>
@@ -280,8 +282,8 @@
                 
                 if (selectedCheckboxes.length === 0) {
                     Swal.fire({
-                        title: "Peringatan",
-                        text: "Pilih minimal satu akun untuk dihapus",
+                        title: "Warning",
+                        text: "Select at least one account to delete.",
                         icon: "warning"
                     });
                     return;
@@ -291,14 +293,14 @@
                 const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
                 
                 Swal.fire({
-                    title: "Konfirmasi Hapus",
-                    html: `Apakah Anda yakin ingin menghapus ${selectedCheckboxes.length} akun siswa yang dipilih?`,
+                    title: "Confirm Delete",
+                    html: `Are you sure you want to delete the selected ${selectedCheckboxes.length} student accounts?`,
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#d33",
                     cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Ya, hapus!",
-                    cancelButtonText: "Batal",
+                    confirmButtonText: "Ya, do it!",
+                    cancelButtonText: "Cancel",
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                 }).then((result) => {
@@ -306,12 +308,6 @@
                         deleteForm.submit();
                     }
                 });
-            });
-            
-            // Existing script for other functionality
-            document.getElementById('btnEdit').addEventListener('click', function() {
-                var idAkun = this.getAttribute('data-idAkun');
-                window.location.href = '/manage-siswa/edit-akun/' + idAkun;
             });
 
             document.querySelectorAll('.btnBan').forEach(function(button) {
@@ -331,7 +327,7 @@
                         allowEscapeKey: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            axios.patch(`/manage-siswa/ban-akun/${idAkun}`)
+                            axios.patch('/akun-siswa/ban-akun/' + idAkun)
                             .then(response => {
                                 if(response.data?.status == 'success'){
                                     let timerInterval;                                                    
@@ -368,7 +364,7 @@
                                 }
                             })
                             .catch(error => {
-                                Swal.fire('Gagal', 'Terjadi kesalahan', 'error');
+                                Swal.fire('Gagal', error.message, 'error');
                             });
                         }
                     });
@@ -392,7 +388,7 @@
                         allowEscapeKey: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            axios.patch(`/manage-siswa/unban-akun/${idAkun}`)
+                            axios.patch(`/akun-siswa/unban-akun/${idAkun}`)
                             .then(response => {
                                 if(response.data?.status == 'success'){
                                     let timerInterval;                                                    
@@ -415,7 +411,6 @@
                                             clearInterval(timerInterval);
                                         }
                                     }).then((result) => {
-                                        /* Read more about handling dismissals below */
                                         if (result.dismiss === Swal.DismissReason.timer) {
                                             window.location.reload();
                                         }
@@ -443,32 +438,32 @@
                     
                     Swal.fire({
                         title: "Reset Password",
-                        html: `Apakah Anda yakin ingin mereset password untuk akun:<br><b>${namaAkun}</b>?`,
+                        html: `Are you sure you want to reset the password for the account:<br><b>${namaAkun}</b>?`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
                         cancelButtonColor: "#d33",
-                        confirmButtonText: "Ya, reset!",
-                        cancelButtonText: "Batal",
+                        confirmButtonText: "Yes, do it!",
+                        cancelButtonText: "Cancel",
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Send reset password request
-                            axios.post('/manage-siswa/reset-password', {
+                            axios.post('/api/forgot-password', {
                                 email: emailAkun
                             })
                             .then(response => {
                                 if(response.data?.status == 'success'){
                                     Swal.fire({
-                                        title: "Berhasil!",
-                                        text: "Password telah direset dan dikirim ke email pengguna",
+                                        title: "Successfully!",
+                                        text: "Reset Password link has been sent to user's email",
                                         icon: "success"
                                     });
                                 } else {
                                     Swal.fire({
-                                        title: "Gagal!",
-                                        text: "Gagal mereset password",
+                                        title: "Failed!",
+                                        text: "Failed to reset password",
                                         icon: "error"
                                     });
                                 }
