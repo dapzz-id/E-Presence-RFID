@@ -790,7 +790,7 @@
                                 </div>
                                 <div>
                                     <p class="text-gray-400 text-xs md:text-sm mt-0.5">
-                                        support@raadeveloperz.web.id <br>
+                                        ditzztechid@gmail.com <br>
                                         raadeveloperz@gmail.com
                                     </p>
                                 </div>

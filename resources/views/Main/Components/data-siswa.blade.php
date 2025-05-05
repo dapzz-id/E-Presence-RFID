@@ -84,17 +84,13 @@
                                         {{ $wargaku->kelas }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $wargaku->alamat }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        <img src="{{ env('APP_URL') . 'storage/profile/' . $wargaku->foto_profile }}"
-                                            alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
+                                        <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $wargaku->foto_profile, now()->addMinutes(5)) }}" alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <button title="Edit Button"
                                             class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
                                             onclick="window.location.href = '{{ route('siswa.edit', $wargaku->nis) }}'"><i
                                                 class="bi bi-pencil text-orange-300"></i></button>
-                                        <button title="Delete Button"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><i
-                                                class="bi bi-trash3"></i></button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -105,14 +101,15 @@
         </form>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function()){
+            document.addEventListener('DOMContentLoaded', function() {
                 const selectAllCheckbox = document.getElementById('selectAll');
                 const accountCheckboxes = document.querySelectorAll('.account-checkbox');
 
                 selectAllCheckbox.addEventListener('change', function() {
-                const isChecked = this.checked;
-                accountCheckboxes.forEach(checkbox => {
-                    checkbox.checked = isChecked;
+                    const isChecked = this.checked;
+                    accountCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
                 });
 
                 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
@@ -151,7 +148,6 @@
                     });
                 });
             });
-        }
         </script>
 
         <!-- Pagination -->
