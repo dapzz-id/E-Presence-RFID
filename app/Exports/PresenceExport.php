@@ -142,7 +142,7 @@ class PresenceExport implements FromView, WithStyles, WithDrawings, WithTitle
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
         $drawing->setPath(public_path('favicon.ico'));
-        $drawing->setHeight(70);
+        $drawing->setHeight(60);
         $drawing->setCoordinates('A1');
 
         return $drawing;

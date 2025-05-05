@@ -35,7 +35,7 @@
             <a href="{{ route('hari.index') }}"
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/hari' || request()->path() == 'admin/hari/form' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Tentukan Hari</a>
             <a href="{{ route('siswa') }}"
-                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || request()->path() == 'admin/akun-siswa' || request()->path() == 'admin/photos' || Str::startsWith(request()->path(), 'admin/siswa/edit/') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Kelola Siswa</a>
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || Str::startsWith(request()->path(), 'admin/akun-siswa') || request()->path() == 'admin/photos' || Str::startsWith(request()->path(), 'admin/siswa/edit/') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Kelola Siswa</a>
             <a href="{{ route('rfid.connect') }}"
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Daftarkan Kartu</a>
             <a onclick="confirmLogout()"

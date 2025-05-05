@@ -25,7 +25,7 @@
                 </div>
                 <div class="flex flex-row max-w-max justify-center items-center max-md:mt-4 max-md:mx-auto">
                     <div title="Import Data Siswa" class="bg-blue-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center ms-8 me-2 cursor-pointer" onclick="openImportModal()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sheet-icon lucide-sheet my-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sheet-icon lucide-sheet my-2 text-white"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>
                     </div>
                     
                     <div title="Add Data Siswa" class="bg-green-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center me-2 cursor-pointer" onclick="window.location.href='{{ route('siswa.add') }}'">

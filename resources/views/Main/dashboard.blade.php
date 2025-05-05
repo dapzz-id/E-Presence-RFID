@@ -671,7 +671,7 @@
                 </div>
         
                     <div class="mt-6 mr-2 flex justify-end space-x-4">
-                        <a href="{{ url('/export-presence?filter=' . urlencode($filter) . '&tab=' . $tab . ($dateFrom ? '&date_from=' . $dateFrom : '') . ($dateTo ? '&date_to=' . $dateTo : '')) }}"
+                        <a href="{{ url('/admin/export-presence?filter=' . urlencode($filter) . '&tab=' . $tab . ($dateFrom ? '&date_from=' . $dateFrom : '') . ($dateTo ? '&date_to=' . $dateTo : '')) }}"
                             class="inline-flex items-center px-4 ps-3 py-2 border border-transparent text-sm max-md:text-xs font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                             <img src="{{ asset('src/xlsx.png') }}" alt="" class="w-4 mr-2 h-auto">
                             Export to XLSX

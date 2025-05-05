@@ -1,0 +1,254 @@
+@extends('Main.manage-siswa')
+
+@section('content')
+    <div id="presensi-chart" class="tab-content">
+        <h2 class="text-xl font-semibold mb-2">Statistik kehadiran siswa bulan ini</h2>
+        
+        <div class="border-b border-gray-300 dark:border-gray-700 mb-6">
+            <nav class="flex space-x-8">
+                <a href="{{ route('attendance.index') }}" class="border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 pb-4 px-1">
+                    Data Presensi
+                </a>
+            </nav>
+        </div>
+
+        <form method="GET" action="{{ route('attendance.index') }}" class="flex flex-col md:flex-row justify-between gap-4 mb-6 w-full">
+            <div class="flex w-full md:w-auto mb-4 md:mb-0">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama siswa..." 
+                    class="w-full rounded-l-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50 py-2 px-4 border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="submit" 
+                    class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-r-md whitespace-nowrap">
+                    Cari
+                </button>
+            </div>
+
+            <div class="flex flex-row max-md:flex-col gap-2">
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    <select name="bulan" onchange="this.form.submit()" 
+                        class="w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50 py-2 px-4 border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        @foreach ($months as $key => $month)
+                            <option value="{{ $key }}" {{ request('bulan', $currentMonth) == $key ? 'selected' : '' }}>
+                                {{ $month }}
+                            </option>
+                        @endforeach
+                    </select>
+                    
+                    <select name="tahun" onchange="this.form.submit()" 
+                        class="w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50 py-2 px-4 border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        @foreach ($years as $year)
+                            <option value="{{ $year }}" {{ request('tahun', $currentYear) == $year ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endforeach
+                    </select>
+                    
+                    <select name="kelas" onchange="this.form.submit()" 
+                        class="w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50 py-2 px-4 border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="all">Semua Kelas</option>
+                        @foreach (['X RPL 1', 'X RPL 2', 'XI RPL 1', 'XI RPL 2', 'XII RPL 1', 'XII RPL 2'] as $kelasOption)
+                            <option value="{{ $kelasOption }}" {{ request('kelas') == $kelasOption ? 'selected' : '' }}>
+                                {{ $kelasOption }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex flex-row max-w-max justify-center items-center max-md:mt-4 max-md:mx-auto lg:ms-8 lg:me-2">
+                    <button
+                        class="inline-flex items-center px-2 py-2 sm:px-3 sm:py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                        title="Refresh Page Button" onclick="window.location.reload()">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Chart Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+            <div class="h-96">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <div class="flex justify-center mt-4 space-x-6">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-500 mr-2"></div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">Hari Produktif</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-orange-500 mr-2"></div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">Hari Non-Produktif</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                No
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Nama
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Kelas
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Jumlah Presensi
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Perbandingan
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Hari Non-Produktif
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Persentase
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @forelse ($attendanceData as $student)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $loop->iteration }} .
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $student->name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $student->class }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $student->productive_days }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    @if ($student->comparison > 0)
+                                        <span class="text-green-600 dark:text-green-400">+{{ $student->comparison }}</span>
+                                    @elseif ($student->comparison < 0)
+                                        <span class="text-red-600 dark:text-red-400">{{ $student->comparison}}</span>
+                                    @else
+                                        <span>0</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $student->non_productive_days }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $student->percentage }}%
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    Tidak ada data presensi yang ditemukan
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+                <div class="text-sm text-gray-700 dark:text-gray-300">
+                    Showing {{ $attendanceData->firstItem() ?? 0 }} to {{ $attendanceData->lastItem() ?? 0 }} of {{ $attendanceData->total() ?? 0 }} results
+                </div>
+                <div class="flex space-x-2">
+                    {{ $attendanceData->appends(request()->except('page'))->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all checkbox functionality
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const attendanceCheckboxes = document.querySelectorAll('.attendance-checkbox');
+            
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    attendanceCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                });
+            }
+            
+            // Chart initialization
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            
+            // Chart data from PHP
+            const chartData = @json($chartData);
+            
+            const config = {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Hari Produktif',
+                            data: chartData.productiveDays.map(days => (days / {{ $totalProductiveDays }}) * 100),
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Hari Non-Produktif',
+                            data: chartData.nonProductiveDays,
+                            backgroundColor: 'rgba(249, 115, 22, 0.7)',
+                            borderColor: 'rgba(249, 115, 22, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y + '%';
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Nama Siswa'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jumlah Presensi'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
+@endsection

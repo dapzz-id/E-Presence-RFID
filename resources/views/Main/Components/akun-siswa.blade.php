@@ -25,7 +25,11 @@
                     </select>
                 </div>
                 <div class="flex flex-row max-w-max justify-center items-center max-md:mt-4 max-md:mx-auto">
-                    <div title="Add Akun Siswa" class="bg-green-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center ms-8 me-2 cursor-pointer" onclick="window.location.href='{{ route('akun.siswa.create') }}'">
+                    <div title="Chart Akun Siswa" class="bg-blue-700 p-4 px-4 rounded-full max-md:rounded-lg flex items-center justify-center ms-8 me-2 cursor-pointer" onclick="window.location.href='{{ route('attendance.index') }}'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-no-axes-combined-icon lucide-chart-no-axes-combined text-white"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>
+                    </div>
+
+                    <div title="Add Akun Siswa" class="bg-green-700 p-2 px-4 rounded-full max-md:rounded-lg flex items-center justify-center me-2 cursor-pointer" onclick="window.location.href='{{ route('akun.siswa.create') }}'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus-icon lucide-circle-plus my-2 text-white"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                     </div>
 

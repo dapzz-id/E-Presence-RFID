@@ -3,6 +3,7 @@
 use App\Exports\PresenceExport;
 use App\Exports\PresencePerMonthExport;
 use App\Http\Controllers\AkunSiswaController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CreateAkunSiswaController;
@@ -312,6 +313,8 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
     Route::get('/hari', [App\Http\Controllers\HariController::class, 'index'])->name('hari.index');
     Route::get('/hari/form', [App\Http\Controllers\HariController::class, 'monthForm'])->name('hari.month-form');
     Route::post('/hari/save', [App\Http\Controllers\HariController::class, 'saveMonth'])->name('hari.save-month');
+
+    Route::get('/akun-siswa/getChart', [AttendanceController::class, 'index'])->name('attendance.index');
 
     Route::get('/akun-siswa', function (Request $request) {
         if (Auth::guard('admin')->check()) {
