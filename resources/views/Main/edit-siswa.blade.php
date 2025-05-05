@@ -188,7 +188,7 @@
                                             Pilih Foto
                                         </label>
                                         <input id="photo-upload" name="photo" type="file" accept="image/*"
-                                            class="hidden" readonly />
+                                            class="hidden" disabled />
                                     </div>
                                     <p class="mt-2 text-sm text-gray-400 max-sm:text-xs">PNG, JPG up to 2MiB</p>
 

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
         
             $table->foreign('nis')->references('nis')->on('warga_tels')->onDelete('cascade');
-            $table->foreign('rfid_id')->references('rfid_id')->on('users')->onDelete('cascade');
+            $table->foreign('rfid_id')->references('rfid_id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });               
     }
 

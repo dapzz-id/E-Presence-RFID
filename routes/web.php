@@ -304,6 +304,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
     Route::get('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'showForm'])->name('akun.siswa.create');
     Route::post('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'store'])->name('akun.siswa.create.post');
     Route::post('/akun-siswa/delete-multiple', [AkunSiswaController::class, 'deleteMultiple'])->name('akun.delete.multiple');
+    Route::post('/siswa/delete-multiple', [AkunSiswaController::class, 'deleteMultipleSiswa'])->name('siswa.delete.multiple');
     Route::get('/akun-siswa/edit-akun/{id}', [EditAkunSiswaController::class, 'showForm'])->name('akun.siswa.edit');
     Route::post('/akun-siswa/edit-akun/{id}', [EditAkunSiswaController::class, 'update'])->name('akun.siswa.update');
     Route::post('/akun-siswa/edit-akun/rfid/remove/{id}', [EditAkunSiswaController::class, 'removeRfid'])->name('akun.siswa.rfid.remove');

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password')->index();
+            $table->enum('status_ban', ['active', 'inactive'])->default('active');
             $table->string('rfid_id')->nullable()->unique();
             $table->rememberToken();
             $table->timestamps(false);

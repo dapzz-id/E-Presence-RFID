@@ -393,11 +393,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === "Enter") {
             scannedRfid = rfidBuffer;
             
-            // Show success UI
-            nfcIcon.classList.add('hidden');
-            successIcon.classList.remove('hidden');
-            scanStatus.textContent = 'Kartu RFID terdeteksi';
-            btnConfirmRfid.classList.remove('hidden');
+            axios.post('{{ route("api.check.rfid.status") }}', {
+                rfid_id: scannedRfid,
+                current_user_id: {{ $user->id }}
+            })
+            .then(function(response) {
+                if (!response.data.success) {
+                    // RFID is already used
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'RFID Sudah Digunakan',
+                        html: `RFID ini sudah digunakan oleh:<br><b>${response.data.user.name}</b> (${response.data.user.kelas})`,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            title: 'text-base sm:text-lg',
+                            content: 'text-sm',
+                            confirmButton: 'text-sm'
+                        }
+                    });
+                }else {
+                    nfcIcon.classList.add('hidden');
+                    successIcon.classList.remove('hidden');
+                    scanStatus.textContent = 'Kartu RFID terdeteksi';
+                    btnConfirmRfid.classList.remove('hidden');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+            });
             
             rfidBuffer = "";
             return;
