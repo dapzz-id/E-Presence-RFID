@@ -93,6 +93,82 @@ class DashboardController extends Controller
         ));
     }
 
+    public function index2(Request $request)
+    {
+        if (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user();
+            $user->update(['last_seen' => Carbon::now()]);
+        }
+
+        $filter = $request->query('filter', 'Hari ini');
+        $tab = $request->query('tab', 'all');
+        
+        // Determine date range
+        $dateRange = $this->getDateRange($filter, $request);
+        $dateFrom = $dateRange['dateFrom'];
+        $dateTo = $dateRange['dateTo'];
+        
+        // Get day type for the filtered date (use first date for display purposes)
+        $dayType = $this->determineDayType($dateFrom);
+        $todayDayType = $this->determineDayType(Carbon::today());
+        
+        // Main query
+        $presencesQuery = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo])
+            ->with('warga_tels')
+            ->whereHas('warga_tels', function($query) use ($request) {
+                $query->where('kelas', $request->query('kelas'));
+            });
+        
+        // Apply status filter
+        if (in_array($tab, ['hadir', 'izin', 'sakit'])) {
+            if ($tab === 'hadir') {
+                $presencesQuery->where(function($query) {
+                    $query->where('status', 'Hadir')
+                          ->orWhere('status', 'Terlambat');
+                });
+            } else {
+                $presencesQuery->where('status', ucfirst($tab));
+            }
+        }        
+        
+        // Get data
+        $presences = $presencesQuery->get();
+        $dataPresensi = $presencesQuery->paginate(10)->withQueryString();
+        
+        // Leave documents
+        $leaveDocuments = $this->getLeaveDocuments($dateFrom, $dateTo, $tab);
+        
+        // Counts
+        $total = User::whereHas('warga_tels', function($query) use ($request) {
+            $query->where('kelas', $request->query('kelas'));
+        })->count();        
+        $totalHariIni = (string)$presences->count();
+        $totalTidakHadir = (string)$presences->whereIn('status', ['Izin', 'Sakit'])->count();
+        
+        // Monthly stats
+        $monthlyStats = $this->getMonthlyStats();
+        
+        // Get current month's schedule
+        $jadwalBulanIni = Hari::getForMonthYear(Carbon::now()->month, Carbon::now()->year);
+        $totalMasukHariNonProduktif = $this->getNonProductiveDaysCount($jadwalBulanIni);
+        
+        return view('Main.Data.PresenceDataSiswa', compact(
+            'total',
+            'totalHariIni',
+            'totalTidakHadir',
+            'dataPresensi',
+            'filter',
+            'tab',
+            'dayType',
+            'todayDayType',
+            'leaveDocuments',
+            'monthlyStats',
+            'totalMasukHariNonProduktif',
+            'dateFrom',
+            'dateTo'
+        ));
+    }
+
     protected function getDateRange(string $filter, Request $request): array
     {
         switch ($filter) {

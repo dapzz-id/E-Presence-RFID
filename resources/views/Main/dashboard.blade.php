@@ -227,8 +227,8 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">TOTAL
-                                        SISWA HARI INI</dt>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate uppercase">TOTAL
+                                        SISWA {{ $filter ?? 'HARI INI' }}</dt>
                                     <dd>
                                         <div class="text-3xl font-semibold text-gray-900 dark:text-white">
                                             {{ $totalHariIni ?? 0 }}
@@ -417,9 +417,9 @@
                             <svg class="mx-auto h-16 w-16 text-gray-400 dark:text-gray-600 animate-pulse-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 13.5V15m-6 4h12a2 2 0 002-2v-12a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">Hari Ini Libur</h3>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">{{ $filter ?? 'Hari ini' }} Libur</h3>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Tidak ada kegiatan belajar mengajar hari ini.
+                                Tidak ada kegiatan belajar mengajar {{ $filter ?? 'hari ini' }}
                             </p>
                         </div>
                     </div>
@@ -444,23 +444,30 @@
                                         class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                                         Tanggal Masuk</th>
                                     <th scope="col"
+                                        class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Status Masuk</th>
+                                    <th scope="col"
                                         class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                                         Tanggal Keluar</th>
                                     <th scope="col"
                                         class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status</th>
-                                    @if($tab === 'izin' || $tab === 'sakit')
-                                    <th scope="col"
-                                        class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-                                        Keterangan</th>
-                                    <th scope="col"
-                                        class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Dokumen</th>
+                                        Status Keluar</th>
+                                    @if ($tab !== 'izin' && $tab !== 'sakit')
+                                        <th scope="col"
+                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Keterangan Datang</th>
+
+                                        <th scope="col"
+                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Keterangan Pulang</th>
                                     @endif
-                                    @if($tab === 'produktif' || $tab === 'non_produktif' || $tab === 'all')
-                                    <th scope="col"
-                                        class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Tipe Hari</th>
+                                    @if($tab === 'izin' || $tab === 'sakit')
+                                        <th scope="col"
+                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
+                                            Keterangan Lainnya</th>
+                                        <th scope="col"
+                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Dokumen</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -468,7 +475,7 @@
                                 @foreach ($dataPresensi as $dataku)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {{ $loop->iteration }}</td>
+                                            {{ $loop->iteration }} .</td>
                                         <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {{ $dataku->nis }}</td>
                                         <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -477,8 +484,6 @@
                                             {{ $dataku->warga_tels->kelas }}</td>
                                         <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden md:table-cell">
                                             {{ $dataku->time_masuk ?? '-' }}</td>
-                                        <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden md:table-cell">
-                                            {{ $dataku->time_keluar ?? '-' }}</td>
                                         <td class="px-2 sm:px-6 py-4 whitespace-nowrap">
                                             @if ($dataku->status == 'Hadir')
                                                 <span
@@ -497,6 +502,30 @@
                                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">Terlambat</span>
                                             @endif
                                         </td>
+                                        <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden md:table-cell">
+                                            {{ $dataku->time_keluar ?? '-' }}</td>
+                                        <td class="px-2 sm:px-6 py-4 whitespace-nowrap">
+                                            @if ($dataku->status_keluar == 'Tepat Waktu')
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Tepat Waktu</span>
+                                            @elseif ($dataku->status_keluar == 'Belum Waktunya')
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Belum Waktunya</span>
+                                            @elseif ($dataku->status_keluar == 'Terlambat')
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">Terlambat</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        @if($tab !== 'izin' || $tab !== 'sakit')
+                                            <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                {{ $dataku->alasan_datang_telat ?? '-' }}
+                                            </td>
+                                            <td class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                {{ $dataku->alasan_pulang_telat ?? $dataku->alasan_pulang_duluan ?? '-' }}
+                                            </td>
+                                        @endif
                                         @if($tab === 'izin' || $tab === 'sakit')
                                         <td class="px-2 sm:px-6 py-4 text-sm text-gray-900 dark:text-gray-100 hidden sm:table-cell">
                                             @php
@@ -514,20 +543,6 @@
                                                 </button>
                                             @else
                                                 -
-                                            @endif
-                                        </td>
-                                        @endif
-                                        @if($tab === 'produktif' || $tab === 'non_produktif' || $tab === 'all')
-                                        <td class="px-2 sm:px-6 py-4 whitespace-nowrap">
-                                            @if ($dataku->status_hari == 'Hari Produktif')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Produktif</span>
-                                            @elseif ($dataku->status_hari == 'Hari Non-Produktif')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Non-Produktif</span>
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">Libur</span>
                                             @endif
                                         </td>
                                         @endif

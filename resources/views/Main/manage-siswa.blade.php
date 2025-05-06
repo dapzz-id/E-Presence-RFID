@@ -140,7 +140,14 @@
             </script>
             <div class="md:flex md:items-center md:justify-between mb-8">
                 <div class="min-w-0 flex-1">
-                    <h2 class="text-2xl font-bold leading-7 sm:truncate sm:text-3xl">Kelola Data Siswa</h2>
+                    <div class="flex flex-row items-center justify-between">
+                        <h2 class="max-md:text-xl font-bold leading-7 sm:truncate text-2xl">Kelola Data Siswa</h2>
+                        @if (request()->path() === 'admin/akun-siswa/getChart')
+                            <a href="{{ route('akun.siswa') }}" class="text-primary-600 hover:text-primary-700 mr-2 dark:text-primary-400 dark:hover:text-primary-300 flex items-center text-sm">
+                                <i class="bi bi-arrow-left mr-1"></i> Kembali
+                            </a>
+                        @endif
+                    </div>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         Kelola data siswa dan akun siswa
                     </p>

@@ -25,6 +25,7 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <div id="sidebar"
     class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full transition-transform duration-300 ease-in-out z-20">
@@ -75,16 +76,23 @@
     <div class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between items-center">
             <div class="flex items-center">
-                <button onclick="toggleSidebar()"
-                    class="p-2 mr-3 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    aria-label="Toggle sidebar">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <h1 class="text-xl font-semibold max-md:text-lg max-sm:text-sm">E-PRESENCE</h1>
+                @if (request()->path() !== 'dataHariIni')
+                    <button onclick="toggleSidebar()"
+                        class="p-2 mr-3 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        aria-label="Toggle sidebar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                @endif
+                <div class="flex items-center me-1">
+                    <a href="{{ route('view.main') }}" class="flex items-center cursor-pointer">
+                        <i class="bi bi-credit-card-2-front text-primary-400 text-2xl mr-2"></i>
+                        <span class="max-md:text-sm font-bold dark:text-white max-md:hidden text-black">E-PRESENCE</span>
+                    </a>
+                </div>
             </div>
             <div class="flex items-center space-x-4">
                 <span id="current-time" class="text-sm font-medium max-md:text-xs"></span>

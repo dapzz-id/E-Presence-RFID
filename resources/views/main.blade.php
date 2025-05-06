@@ -329,7 +329,7 @@
                 <div class="flex items-center">
                     <a href="{{ route('view.main') }}" class="flex items-center cursor-pointer">
                         <i class="bi bi-credit-card-2-front text-primary-400 text-2xl mr-2"></i>
-                        <span class="text-xl font-bold text-white">E-Presence</span>
+                        <span class="text-xl font-bold text-white">E-PRESENCE</span>
                     </a>
                 </div>
                 
@@ -338,7 +338,7 @@
                     <a href="#fitur" class="text-gray-300 hover:text-white transition-colors">Fitur</a>
                     <a href="#tentang" class="text-gray-300 hover:text-white transition-colors">Tentang</a>
                     <a href="#manfaat" class="text-gray-300 hover:text-white transition-colors">Manfaat</a>
-                    <a href="#kontak" class="text-gray-300 hover:text-white transition-colors">Kontak</a>
+                    <a href="#reviews" class="text-gray-300 hover:text-white transition-colors">Ulasan</a>
                 </div>
                 
                 <div class="flex items-center">

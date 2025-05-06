@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\EditAkunSiswaController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Mockery\Undefined;
 
@@ -85,8 +87,9 @@ Route::post('/sanctum/tap', function(Request $request){
     }
 });
 
-Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
+Route::get('/getMyAccount/{id}', function($id){
     $user = User::with('warga_tels')->where('id', $id)->first();
+    $presenceController = new AttendanceController();
     if($user){
         $absensi_per_bulan = Presence::where('nis', $user->nis)
             ->whereYear('time_masuk', Carbon::now()->year)
@@ -99,11 +102,25 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
 
         $fullData = [];
         for ($i = 1; $i <= 12; $i++) {
+            $hariMasuk = count($presenceController->getProductiveDays($i, Carbon::now()->year)['productive']);
+            $totalKehadiran = $absensi_per_bulan[$i]->total ?? 0;
+            $percentHadir = $hariMasuk > 0 ? ($totalKehadiran / $hariMasuk) * 100 : 0;
             $fullData[] = [
                 'bulan' => $i,
-                'total' => $absensi_per_bulan[$i]->total ?? 0
+                'total' => $absensi_per_bulan[$i]->total ?? 0,
+                'persentase' => round($percentHadir, 0),
             ];
         }
+        /** @var \Illuminate\Filesystem\AwsS3V3Adapter $disk */
+        $disk = Storage::disk('s3');
+        $url = $disk->temporaryUrl('profile/'.$user->warga_tels->foto_profile, now()->addMinutes(5));
+
+        $kehadiran = Presence::where('nis', $user->nis)
+            ->whereMonth('time_masuk', Carbon::now()->month)
+            ->whereYear('time_masuk', Carbon::now()->year)
+            ->whereNotIn('status', ['Izin', 'Sakit', 'Alpa']);
+
+        $hari = count($presenceController->getProductiveDays(Carbon::now()->month, Carbon::now()->year)['productive']);
 
         return response()->json([
             'status' => 'success',
@@ -111,21 +128,17 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
             'kelas' => $user->warga_tels->kelas,
             'nis' => $user->nis,
             'absensi_per_bulan' => $fullData,
-            'total_hadir_bulan_ini' => Presence::where('nis', $user->nis)
-                ->whereMonth('time_masuk', Carbon::now()->month)
-                ->whereYear('time_masuk', Carbon::now()->year)
-                ->whereNotIn('status', ['Izin', 'Sakit', 'Alpa'])
-                ->count(),
+            'total_hadir_bulan_ini' => $kehadiran->count(),
             'total_izin_bulan_ini' => Presence::where('nis', $user->nis)
                 ->whereMonth('time_masuk', Carbon::now()->month)
                 ->whereYear('time_masuk', Carbon::now()->year)
-                ->whereNotIn('status', ['Hadir', 'Terlambat'])
+                ->whereNotIn('status', ['Hadir', 'Terlambat', 'Alpa'])
                 ->count(),
             'absen_hari_ini_status' => Presence::where('nis', $user->nis)
                 ->whereDate('time_masuk', Carbon::today())
                 ->exists(),
             'rfid_status' => $user->rfid_id != "" || $user->rfid_id != null ? true : false,
-            'profile' => env('APP_URL') . 'storage/profile/' . $user->warga_tels->foto_profile,
+            'profile' => $url,
         ]);
     }
 

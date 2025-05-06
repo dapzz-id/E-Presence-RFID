@@ -123,6 +123,8 @@ Route::get('/get-reviews', function () {
 Route::patch('/akun-siswa/ban-akun/{id}', [AkunSiswaController::class, 'banAccount'])->name('akun.ban');
 Route::patch('/akun-siswa/unban-akun/{id}', [AkunSiswaController::class, 'unbanAccount'])->name('akun.unban');
 
+Route::get('/dataHariIni', [DashboardController::class, 'index2'])->name('check.hari.ini');
+
 Route::prefix('admin')->middleware('auth:admin')->group(function (){    
     // Route::get('/dashboard', function (Request $request) {
     //     if (Auth::guard('admin')->check()) {
@@ -301,6 +303,14 @@ Route::prefix('admin')->middleware('auth:admin')->group(function (){
     // })->name('dashboard');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', function(){
+        if (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user();
+            $user->update(['last_seen' => Carbon::now()]);
+        }
+
+        return redirect()->route('dashboard');
+    })->name('dashboard.redirect');
 
     Route::get('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'showForm'])->name('akun.siswa.create');
     Route::post('/akun-siswa/create-akun', [CreateAkunSiswaController::class, 'store'])->name('akun.siswa.create.post');

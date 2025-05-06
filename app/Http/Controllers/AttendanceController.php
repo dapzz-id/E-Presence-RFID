@@ -61,7 +61,7 @@ class AttendanceController extends Controller
     /**
      * Get productive days from hari table.
      */
-    private function getProductiveDays($month, $year)
+    public function getProductiveDays($month, $year)
     {
         $hari = DB::table('hari')
             ->where('bulan', $month)
@@ -142,7 +142,7 @@ class AttendanceController extends Controller
             $previousCount = $previousData[$result->id] ?? 0;
             $result->comparison = $result->productive_days - $previousCount;
             $result->percentage = $totalProductiveDays > 0 
-                ? round(($result->productive_days / $totalProductiveDays) * 100, 1) 
+                ? round(($result->productive_days / $totalProductiveDays) * 100, 0) 
                 : 0;
         }
         
