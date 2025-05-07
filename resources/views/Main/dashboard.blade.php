@@ -214,7 +214,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
                 <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -228,7 +228,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate uppercase">TOTAL
-                                        SISWA {{ $filter ?? 'HARI INI' }}</dt>
+                                        DATANG SISWA {{ $filter ?? 'HARI INI' }}</dt>
                                     <dd>
                                         <div class="text-3xl font-semibold text-gray-900 dark:text-white">
                                             {{ $totalHariIni ?? 0 }}
@@ -263,6 +263,30 @@
                                     <dd>
                                         <div class="text-3xl font-semibold text-gray-900 dark:text-white">
                                             {{ $totalTidakHadir ?? 0 }}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="cursor-pointer flex-shrink-0 rounded-md bg-red-100 dark:bg-red-900 p-3">
+                                <svg class="h-6 w-6 text-red-600 dark:text-red-300" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">TOTAL
+                                        SISWA ALPA</dt>
+                                    <dd>
+                                        <div class="text-3xl font-semibold text-gray-900 dark:text-white">
+                                            {{ $totalAlpa ?? 0 }}</div>
                                     </dd>
                                 </dl>
                             </div>
@@ -356,10 +380,10 @@
 
                 <!-- Tabs -->
                 <div class="border-b border-gray-200 dark:border-gray-700">
-                    <nav class="flex flex-col -mb-px px-2 sm:px-6 overflow-x-auto" aria-label="Tabs">
-                        <div class="flex flex-wrap overflow-x-auto">
+                    <nav class="flex flex-col -mb-px px-2 sm:px-6 overflow-hidden" aria-label="Tabs">
+                        <div class="flex flex-wrap -mb-px overflow-x-auto">
                             <a href="{{ route('dashboard', ['head-tabs' => 'produktif'] + request()->except('head-tabs')) }}"
-                                class="py-3 px-3 text-center border-b-2 font-medium text-sm mr-2 sm:mr-4 whitespace-nowrap 
+                                class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap 
                                 {{ $headTab === 'produktif' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}
                                 {{ ($filter === 'Hari ini' && $dayType === 'Hari Produktif') ? 'today-tab' : '' }}">
                                 Produktif
@@ -370,7 +394,7 @@
                                 @endif
                             </a>
                             <a href="{{ route('dashboard', ['head-tabs' => 'non_produktif'] + request()->except('head-tabs')) }}"
-                                class="py-3 px-3 text-center border-b-2 font-medium text-sm whitespace-nowrap 
+                                class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap 
                                 {{ $headTab === 'non_produktif' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}
                                 {{ ($filter === 'Hari ini' && $dayType === 'Hari Non-Produktif') ? 'today-tab' : '' }}">
                                 Non-Produktif
@@ -381,7 +405,7 @@
                                 @endif
                             </a>
                         </div>
-                        <div class="flex flex-wrap overflow-x-auto overflow-y-hidden">
+                        <div class="border-b border-gray-200 dark:border-gray-700">
                             <nav class="flex flex-wrap -mb-px px-2 sm:px-6 overflow-x-auto" aria-label="Tabs">
                                 @php
                                     $queryParams = request()->query();
@@ -391,27 +415,31 @@
                                 @endphp
                                 
                                 <a href="{{ route('dashboard', ['tab' => 'all'] + request()->except('tab')) }}"
-                                    class="py-3 px-3 text-center border-b-2 font-medium text-sm mr-2 sm:mr-4 whitespace-nowrap {{ $tab === 'all' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                    class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'all' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
                                     Semua
                                 </a>
                                 <a href="{{ route('dashboard', ['tab' => 'hadir'] + request()->except('tab')) }}"
-                                    class="py-3 px-3 text-center border-b-2 font-medium text-sm mr-2 sm:mr-4 whitespace-nowrap {{ $tab === 'hadir' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                    class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'hadir' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
                                     Hadir
                                 </a>
                                 <a href="{{ route('dashboard', ['tab' => 'izin'] + request()->except('tab')) }}"
-                                    class="py-3 px-3 text-center border-b-2 font-medium text-sm mr-2 sm:mr-4 whitespace-nowrap {{ $tab === 'izin' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                    class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'izin' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
                                     Izin
                                 </a>
                                 <a href="{{ route('dashboard', ['tab' => 'sakit'] + request()->except('tab')) }}"
-                                    class="py-3 px-3 text-center border-b-2 font-medium text-sm mr-2 sm:mr-4 whitespace-nowrap {{ $tab === 'sakit' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                    class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'sakit' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
                                     Sakit
+                                </a>
+                                <a href="{{ route('dashboard', ['tab' => 'alpa'] + request()->except('tab')) }}"
+                                    class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'alpa' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                    Alpa
                                 </a>
                             </nav>
                         </div>
                     </nav>
                 </div>
 
-                @if($dayType === 'Hari Libur' && !in_array($tab, ['izin', 'sakit', 'hadir']))
+                @if($dayType === 'Hari Libur')
                     <div class="flex flex-col items-center justify-center py-12 animate-fade-in">
                         <div class="text-center">
                             <svg class="mx-auto h-16 w-16 text-gray-400 dark:text-gray-600 animate-pulse-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">

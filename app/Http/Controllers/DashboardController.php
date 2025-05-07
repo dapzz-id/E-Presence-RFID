@@ -29,13 +29,18 @@ class DashboardController extends Controller
         $dateFrom = $dateRange['dateFrom'];
         $dateTo = $dateRange['dateTo'];
         
-        // Get day type for the filtered date (use first date for display purposes)
-        $dayType = $this->determineDayType($dateFrom);
+        // Get day type based on dateFrom and dateTo comparison
+        $dayType = ($dateFrom->toDateString() == $dateTo->toDateString()) 
+            ? $this->determineDayType($dateFrom) 
+            : null;
+        
         $todayDayType = $this->determineDayType(Carbon::today());
         
         // Main query
         $presencesQuery = Presence::whereBetween('time_masuk', [$dateFrom, $dateTo])
             ->with('warga_tels');
+
+        $getPresencesQuery = $presencesQuery->clone();
         
         // Apply head-tab filter (produktif/non-produktif)
         if ($headTab === 'produktif') {
@@ -45,11 +50,11 @@ class DashboardController extends Controller
         }
         
         // Apply status filter
-        if (in_array($tab, ['hadir', 'izin', 'sakit'])) {
+        if (in_array($tab, ['hadir', 'izin', 'sakit', 'alpa'])) {
             if ($tab === 'hadir') {
                 $presencesQuery->where(function($query) {
                     $query->where('status', 'Hadir')
-                          ->orWhere('status', 'Terlambat');
+                        ->orWhere('status', 'Terlambat');
                 });
             } else {
                 $presencesQuery->where('status', ucfirst($tab));
@@ -58,6 +63,7 @@ class DashboardController extends Controller
         
         // Get data
         $presences = $presencesQuery->get();
+        $dataPresences = $getPresencesQuery->get();
         $dataPresensi = $presencesQuery->paginate(10)->withQueryString();
         
         // Leave documents
@@ -65,8 +71,9 @@ class DashboardController extends Controller
         
         // Counts
         $total = (string)User::count();
-        $totalHariIni = (string)$presences->count();
-        $totalTidakHadir = (string)$presences->whereIn('status', ['Izin', 'Sakit'])->count();
+        $totalHariIni = (string)$dataPresences->whereNotIn('status', ['Alpa', 'Sakit', 'Izin'])->count();
+        $totalTidakHadir = (string)$dataPresences->whereIn('status', ['Izin', 'Sakit'])->count();
+        $totalAlpa = (string)$dataPresences->where('status', 'Alpa')->count();
         
         // Monthly stats
         $monthlyStats = $this->getMonthlyStats();
@@ -78,6 +85,7 @@ class DashboardController extends Controller
         return view('Main.dashboard', compact(
             'total',
             'totalHariIni',
+            'totalAlpa',
             'totalTidakHadir',
             'dataPresensi',
             'filter',
@@ -109,7 +117,9 @@ class DashboardController extends Controller
         $dateTo = $dateRange['dateTo'];
         
         // Get day type for the filtered date (use first date for display purposes)
-        $dayType = $this->determineDayType($dateFrom);
+        $dayType = ($dateFrom->toDateString() == $dateTo->toDateString()) 
+            ? $this->determineDayType($dateFrom) 
+            : null;
         $todayDayType = $this->determineDayType(Carbon::today());
         
         // Main query
@@ -118,9 +128,11 @@ class DashboardController extends Controller
             ->whereHas('warga_tels', function($query) use ($request) {
                 $query->where('kelas', $request->query('kelas'));
             });
+
+        $getPresencesQuery = $presencesQuery->clone();
         
         // Apply status filter
-        if (in_array($tab, ['hadir', 'izin', 'sakit'])) {
+        if (in_array($tab, ['hadir', 'izin', 'sakit', 'alpa'])) {
             if ($tab === 'hadir') {
                 $presencesQuery->where(function($query) {
                     $query->where('status', 'Hadir')
@@ -133,6 +145,7 @@ class DashboardController extends Controller
         
         // Get data
         $presences = $presencesQuery->get();
+        $dataPresences = $getPresencesQuery->get();
         $dataPresensi = $presencesQuery->paginate(10)->withQueryString();
         
         // Leave documents
@@ -142,8 +155,9 @@ class DashboardController extends Controller
         $total = User::whereHas('warga_tels', function($query) use ($request) {
             $query->where('kelas', $request->query('kelas'));
         })->count();        
-        $totalHariIni = (string)$presences->count();
-        $totalTidakHadir = (string)$presences->whereIn('status', ['Izin', 'Sakit'])->count();
+        $totalHariIni = (string)$dataPresences->whereNotIn('status', ['Alpa', 'Sakit', 'Izin'])->count();
+        $totalTidakHadir = (string)$dataPresences->whereIn('status', ['Izin', 'Sakit'])->count();
+        $totalAlpa = (string)$dataPresences->where('status', 'Alpa')->count();
         
         // Monthly stats
         $monthlyStats = $this->getMonthlyStats();
@@ -155,6 +169,7 @@ class DashboardController extends Controller
         return view('Main.Data.PresenceDataSiswa', compact(
             'total',
             'totalHariIni',
+            'totalAlpa',
             'totalTidakHadir',
             'dataPresensi',
             'filter',

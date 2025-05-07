@@ -308,7 +308,7 @@
 
             @if(request('kelas') || request()->has('filter'))
                 <!-- Statistics Cards -->
-                <div class="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6 sm:mb-8">
+                <div class="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
                     <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
                         <div class="p-4 sm:p-5">
                             <div class="flex items-center">
@@ -322,7 +322,7 @@
                                 <div class="ml-4 sm:ml-5 w-0 flex-1">
                                     <dl>
                                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate uppercase mobile-card-title">TOTAL
-                                            SISWA {{ $filter ?? 'HARI INI' }}</dt>
+                                            DATANG SISWA {{ $filter ?? 'HARI INI' }}</dt>
                                         <dd>
                                             <div class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mobile-card-value">
                                                 {{ $totalHariIni ?? 0 }}
@@ -357,6 +357,30 @@
                                         <dd>
                                             <div class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mobile-card-value">
                                                 {{ $totalTidakHadir ?? 0 }}</div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
+                        <div class="p-4 sm:p-5">
+                            <div class="flex items-center">
+                                <div class="cursor-pointer flex-shrink-0 rounded-md bg-red-100 dark:bg-red-900 p-2 sm:p-3">
+                                    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-red-600 dark:text-red-300" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-4 sm:ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate mobile-card-title">TOTAL
+                                            SISWA ALPA</dt>
+                                        <dd>
+                                            <div class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mobile-card-value">
+                                                {{ $totalAlpa ?? 0 }}</div>
                                         </dd>
                                     </dl>
                                 </div>
@@ -475,10 +499,14 @@
                                 class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'sakit' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
                                 Sakit
                             </a>
+                            <a href="{{ route('check.hari.ini', ['tab' => 'alpa', 'kelas' => request('kelas')] + request()->except('tab')) }}"
+                                class="py-2 sm:py-3 px-2 sm:px-3 text-center border-b-2 font-medium text-xs sm:text-sm mr-1 sm:mr-4 whitespace-nowrap {{ $tab === 'alpa' ? 'tab-active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600' }}">
+                                Alpa
+                            </a>
                         </nav>
                     </div>
 
-                    @if($dayType === 'Hari Libur' && !in_array($tab, ['izin', 'sakit', 'hadir']))
+                    @if($dayType === 'Hari Libur' && !in_array($tab, ['izin', 'sakit', 'hadir', 'alpa']))
                         <div class="flex flex-col items-center justify-center py-10 sm:py-12 animate-fade-in">
                             <div class="text-center">
                                 <svg class="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-600 animate-pulse-slow"
