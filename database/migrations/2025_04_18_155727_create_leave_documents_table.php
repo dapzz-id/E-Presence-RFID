@@ -20,7 +20,6 @@ return new class extends Migration
             $table->date('end_date');
             $table->text('reason')->nullable();
             $table->longText('document_path')->nullable();
-            $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Approved');
             $table->timestamps();
             
             // Add index for faster lookups

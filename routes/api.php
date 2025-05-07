@@ -146,44 +146,6 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
     ], 200);
 });
 
-Route::post('/send-notif', function(Request $request){
-    $request->validate([
-        'nis' => 'required|string',
-        'title' => 'required|string',
-        'message' => 'required|string',
-    ]);
-
-    // Simpan ke database
-    Notification::create([
-        'nis' => $request->nis,
-        'title' => $request->title,
-        'message' => $request->message,
-    ]);
-
-    // Kirim ke FCM
-    $topic = "user_{$request->nis}";
-    $response = Http::withToken(env('FCM_SERVER_KEY'))->post('https://fcm.googleapis.com/fcm/send', [
-        'to' => "/topics/{$topic}",
-        'notification' => [
-            'title' => $request->title,
-            'body' => $request->message,
-        ],
-        'data' => [
-            'nis' => $request->nis,
-        ]
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'fcm_response' => $response->json()
-    ]);
-});
-
-Route::middleware('auth:sanctum')->get('/notif/{nis}', function($nis){
-    $notifs = Notification::where('nis', $nis)->orderBy('created_at', 'desc')->get();
-    return response()->json($notifs);
-});
-
 Route::post('/validate-acc', function (Request $request) {
     $id = $request->input('id');
     $user = User::with('warga_tels')->where('rfid_id', $id)->first();
