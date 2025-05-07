@@ -25,4 +25,4 @@ List:
 7. Run `npm run dev` (Required for vite JS Axios)
 
 ## Contribute
-If you want to contribute to this project, then contact email raadeveloperz@gmail.com or WhatsApp +62 895-3831-07479
+If you want to contribute to this project, then contact email raadeveloperz@gmail.com or WhatsApp +62895383107479
