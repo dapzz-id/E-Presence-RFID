@@ -385,8 +385,8 @@
                         E-Presence memudahkan pengelolaan kehadiran siswa dengan teknologi kartu RFID. Pantau, analisis, dan tingkatkan kedisiplinan siswa dengan sistem yang terintegrasi.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#fitur" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium text-center transition-colors">
-                            Jelajahi Fitur
+                        <a href="{{ route('check.hari.ini') }}" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium text-center transition-colors">
+                            Cek Data Hari Ini
                         </a>
                     </div>
                 </div>
@@ -808,7 +808,7 @@
         <div class="text-center max-w-3xl mx-auto mb-10" data-aos="fade-up" data-aos-duration="1000">
             <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-white">Ulasan Pelanggan</h2>
             <p class="text-gray-400 text-base md:text-lg">
-            Lihat apa kata pelanggan kami tentang SMK Telekomunikasi Telesandi Bekasi
+            Lihat apa kata pelanggan kami tentang raadeveloperz
             </p>
         </div>
         
@@ -819,7 +819,7 @@
                     alt="Google" class="h-12 mt-3 mb-2">
             </div>
             
-            <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md flex items-center transition-all duration-300">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md flex items-center transition-all duration-300" onclick="window.open('https://g.page/r/CZp_ANlt6d-oEBM/review', '_blank')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
@@ -891,46 +891,56 @@
             .then(response => {
                 const data = response.data;
                 const container = document.getElementById("reviews-container");
-                container.innerHTML = data.result.reviews.slice(0, 8).map((review, index) => `
-                    <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-lg flex flex-col w-80 min-w-[320px]" 
-                        data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${400 + (index * 100)}">
-                    <!-- Header with profile, name, stars -->
-                    <div class="p-5">
-                        <div class="flex justify-between items-start">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-3 mb-2">
-                            <img src="${review.profile_photo_url}" 
-                                alt="${review.author_name}" 
-                                class="w-10 h-10 rounded-full object-cover">
-                            <h4 class="font-medium text-white">${review.author_name}</h4>
+
+                // Cek dulu data.result dan data.result.reviews ada gak
+                if (data.result && Array.isArray(data.result.reviews) && data.result.reviews.length > 0) {
+                    container.innerHTML = data.result.reviews.slice(0, 8).map((review, index) => `
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-lg flex flex-col w-80 min-w-[320px]" 
+                            data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${400 + (index * 100)}">
+                            <!-- Header with profile, name, stars -->
+                            <div class="p-5">
+                                <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-3 mb-2">
+                                    <img src="${review.profile_photo_url}" 
+                                        alt="${review.author_name}" 
+                                        class="w-10 h-10 rounded-full object-cover">
+                                    <h4 class="font-medium text-white">${review.author_name}</h4>
+                                    </div>
+                                    <div class="text-yellow-400 flex">
+                                    ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                                    </div>
+                                </div>
+                                <span class="text-2xl font-bold text-white">G</span>
+                                </div>
+                            
+                                <!-- Review Content -->
+                                <div class="mt-4">
+                                <p class="text-gray-300">
+                                    ${review.text || '-'}
+                                </p>
+                                </div>
                             </div>
-                            <div class="text-yellow-400 flex">
-                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                            
+                            <!-- Footer -->
+                            <div class="mt-auto px-5 py-3 border-t border-gray-700">
+                                <p class="text-xs text-gray-500">
+                                Diposting pada: ${new Date(review.time * 1000).toLocaleDateString('id-ID')}
+                                </p>
                             </div>
                         </div>
-                        <span class="text-2xl font-bold text-white">G</span>
-                        </div>
-                    
-                        <!-- Review Content -->
-                        <div class="mt-4">
-                        <p class="text-gray-300">
-                            ${review.text || '-'}
-                        </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div class="mt-auto px-5 py-3 border-t border-gray-700">
-                        <p class="text-xs text-gray-500">
-                        Diposting pada: ${new Date(review.time * 1000).toLocaleDateString('id-ID')}
-                        </p>
-                    </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-10 text-gray-400 w-full">
+                            Belum ada ulasan. Jadilah yang pertama memberikan ulasan di Google!
+                        </div>`;
+                }
+
             }).catch(err => {
                 document.getElementById("reviews-container").innerHTML = `
                     <div class="text-center py-10 text-red-400 w-full">
-                    Gagal memuat ulasan. Silakan refresh halaman.
+                    Gagal memuat ulasan. Silakan coba lagi nanti.
                     </div>`;
                 console.error("Error:", err);
             });

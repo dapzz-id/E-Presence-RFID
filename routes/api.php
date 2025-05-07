@@ -87,7 +87,7 @@ Route::post('/sanctum/tap', function(Request $request){
     }
 });
 
-Route::get('/getMyAccount/{id}', function($id){
+Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
     $user = User::with('warga_tels')->where('id', $id)->first();
     $presenceController = new AttendanceController();
     if($user){
@@ -119,8 +119,6 @@ Route::get('/getMyAccount/{id}', function($id){
             ->whereMonth('time_masuk', Carbon::now()->month)
             ->whereYear('time_masuk', Carbon::now()->year)
             ->whereNotIn('status', ['Izin', 'Sakit', 'Alpa']);
-
-        $hari = count($presenceController->getProductiveDays(Carbon::now()->month, Carbon::now()->year)['productive']);
 
         return response()->json([
             'status' => 'success',

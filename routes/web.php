@@ -31,7 +31,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 
 Route::get('/', function () {
-    $place_id = "ChIJyYc-qv-NaS4RHRrpF29RtnD38";
+    $place_id = "ChIJt-mKVACPaS4R4LAJ9G-9f1I";
     $api_key = env('GOOGLE_MAPS_API_KEY');
 
     $response = Http::get("https://maps.googleapis.com/maps/api/place/details/json", [
@@ -110,7 +110,7 @@ Route::get('/early-departure', [LateController::class, 'showEarlyDepartureForm']
 Route::post('/early-departure', [LateController::class, 'storeEarlyDeparture'])->name('early-departure.store');
 
 Route::get('/get-reviews', function () {
-    $place_id = "ChIJyYc-qv-NaS4RrpF29RtnD38"; // Ganti dengan milikmu
+    $place_id = "ChIJt-mKVACPaS4R4LAJ9G-9f1I"; // Ganti dengan milikmu
     $api_key = env('GOOGLE_MAPS_API_KEY'); // Ganti dengan API key-mu
 
     $url = "https://maps.googleapis.com/maps/api/place/details/json?place_id={$place_id}&fields=rating,reviews,user_ratings_total&key={$api_key}";
