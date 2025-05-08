@@ -6,6 +6,7 @@ use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\EditAkunSiswaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Models\LateEntry;
+use App\Models\LeaveDocument;
 use App\Models\Notification;
 use App\Models\Presence;
 use App\Models\User;
@@ -94,6 +95,17 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
         $absensi_per_bulan = Presence::where('nis', $user->nis)
             ->whereYear('time_masuk', Carbon::now()->year)
             ->whereIn('status', ['Hadir', 'Terlambat'])
+            ->where('status_hari', 'Hari Produktif')
+            ->select(DB::raw('MONTH(time_masuk) as bulan'), DB::raw('COUNT(*) as total'))
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->keyBy('bulan');
+
+        $absensi_per_bulan_non = Presence::where('nis', $user->nis)
+            ->whereYear('time_masuk', Carbon::now()->year)
+            ->whereIn('status', ['Hadir', 'Terlambat'])
+            ->where('status_hari', 'Hari Non-Produktif')
             ->select(DB::raw('MONTH(time_masuk) as bulan'), DB::raw('COUNT(*) as total'))
             ->groupBy('bulan')
             ->orderBy('bulan')
@@ -101,6 +113,7 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
             ->keyBy('bulan');
 
         $fullData = [];
+        $fullNonData = [];
         for ($i = 1; $i <= 12; $i++) {
             $hariMasuk = count($presenceController->getProductiveDays($i, Carbon::now()->year)['productive']);
             $totalKehadiran = $absensi_per_bulan[$i]->total ?? 0;
@@ -109,6 +122,15 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
                 'bulan' => $i,
                 'total' => $absensi_per_bulan[$i]->total ?? 0,
                 'persentase' => round($percentHadir, 0),
+            ];
+
+            $hariMasukNon = count($presenceController->getProductiveDays($i, Carbon::now()->year)['non_productive']);
+            $totalKehadiranNon = $absensi_per_bulan_non[$i]->total ?? 0;
+            $percentHadirNon = $hariMasukNon > 0 ? ($totalKehadiranNon / $hariMasukNon) * 100 : 0;
+            $fullNonData[] = [
+                'bulan' => $i,
+                'total' => $absensi_per_bulan_non[$i]->total ?? 0,
+                'persentase' => round($percentHadirNon, 0),
             ];
         }
         /** @var \Illuminate\Filesystem\AwsS3V3Adapter $disk */
@@ -120,13 +142,20 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
             ->whereYear('time_masuk', Carbon::now()->year)
             ->whereNotIn('status', ['Izin', 'Sakit', 'Alpa']);
 
+        $alpa = Presence::where('nis', $user->nis)
+            ->whereMonth('time_masuk', Carbon::now()->month)
+            ->whereYear('time_masuk', Carbon::now()->year)
+            ->where('status', 'Alpa');
+
         return response()->json([
             'status' => 'success',
             'name' => $user->warga_tels->name,
             'kelas' => $user->warga_tels->kelas,
             'nis' => $user->nis,
             'absensi_per_bulan' => $fullData,
+            'absensi_per_bulan_non_productive' => $fullNonData,
             'total_hadir_bulan_ini' => $kehadiran->count(),
+            'total_alpa_bulan_ini' => $alpa->count(),
             'total_izin_bulan_ini' => Presence::where('nis', $user->nis)
                 ->whereMonth('time_masuk', Carbon::now()->month)
                 ->whereYear('time_masuk', Carbon::now()->year)
@@ -160,6 +189,60 @@ Route::post('/validate-acc', function (Request $request) {
         return response()->json([
             'status' => 'failed',
             'message' => 'Data kartu Anda tidak terdaftar...'
+        ]);
+    }
+});
+
+Route::post('/send-leave-document', function(Request $request){
+    try {
+        $request->validate([
+            'nis' => 'required|exists:users,nis',
+            'type' => 'required|in:izin,sakit',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string',
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png,mp4,mov,avi|max:10240',
+        ], [
+            'nis.required' => 'NIS tidak boleh kosong',
+            'nis.exists' => 'NIS tidak terdaftar',
+            'type.required' => 'Tipe izin tidak boleh kosong',
+            'type.in' => 'Tipe izin tidak valid',
+            'start_date.required' => 'Tanggal mulai tidak boleh kosong',
+            'end_date.required' => 'Tanggal selesai tidak boleh kosong',
+            'end_date.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai',
+            'reason.required' => 'Alasan tidak boleh kosong',
+            'document.required' => 'Dokumen tidak boleh kosong',
+            'document.file' => 'Dokumen harus berupa file',
+            'document.mimes' => 'Dokumen harus berupa file dengan format pdf, jpg, jpeg, png, mp4',
+            'document.max' => 'Dokumen tidak boleh lebih dari 10MiB',
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => collect($e->errors())->flatten()->first()
+        ], 200);
+    }
+
+    $user = User::where('nis', $request->nis)->first();
+
+    if($user){
+        LeaveDocument::create([
+            'nis' => $user->nis,
+            'type' => ucwords($request->type),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'reason' => $request->reason,
+            'document_path' => Storage::disk('s3')->put('surat/'.$user->nis, $request->file('document')),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dokumen izin berhasil dikirim...'
+        ]);
+    }else{
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Pengiriman dokumen izin gagal...'
         ]);
     }
 });
@@ -364,8 +447,6 @@ Route::get('/totalUsers', function(){
     $total = User::count();
     return response()->json(['total' => $total]);
 });
-
-Route::post('/send-whatsapp', [WhatsAppController::class, 'send']);
 
 Route::post('/daftar-akun', function(Request $request){
     try{
