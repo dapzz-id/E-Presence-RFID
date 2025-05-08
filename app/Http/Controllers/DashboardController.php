@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -81,6 +82,8 @@ class DashboardController extends Controller
         // Get current month's schedule
         $jadwalBulanIni = Hari::getForMonthYear(Carbon::now()->month, Carbon::now()->year);
         $totalMasukHariNonProduktif = $this->getNonProductiveDaysCount($jadwalBulanIni);
+
+        $disk = Storage::disk('s3');
         
         return view('Main.dashboard', compact(
             'total',
@@ -89,6 +92,7 @@ class DashboardController extends Controller
             'totalTidakHadir',
             'dataPresensi',
             'filter',
+            'disk',
             'tab',
             'headTab',
             'dayType',
@@ -166,12 +170,15 @@ class DashboardController extends Controller
         $jadwalBulanIni = Hari::getForMonthYear(Carbon::now()->month, Carbon::now()->year);
         $totalMasukHariNonProduktif = $this->getNonProductiveDaysCount($jadwalBulanIni);
         
+        $disk = Storage::disk('s3');
+
         return view('Main.Data.PresenceDataSiswa', compact(
             'total',
             'totalHariIni',
             'totalAlpa',
             'totalTidakHadir',
             'dataPresensi',
+            'disk',
             'filter',
             'tab',
             'dayType',

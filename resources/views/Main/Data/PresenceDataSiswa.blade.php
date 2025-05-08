@@ -562,6 +562,13 @@
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach($dataPresensi as $dataku)
+                                        @php
+                                            $disk = Storage::disk('s3');
+                                            $leaveDoc = $leaveDocuments
+                                                ->where('nis', $dataku->nis)
+                                                ->where('type', $dataku->status)
+                                                ->first();
+                                        @endphp
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td
                                                 class="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-100 mobile-table-data">
@@ -618,19 +625,13 @@
                                             @if($tab === 'izin' || $tab === 'sakit')
                                                 <td
                                                     class="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 hidden sm:table-cell mobile-table-data">
-                                                    @php
-                                                        $leaveDoc = $leaveDocuments
-                                                            ->where('nis', $dataku->nis)
-                                                            ->where('type', $dataku->status)
-                                                            ->first();
-                                                    @endphp
                                                     {{ $leaveDoc->reason ?? '-' }}
                                                 </td>
                                                 <td
                                                     class="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-100 mobile-table-data">
                                                     @if(isset($leaveDoc) && $leaveDoc->document_path)
                                                         <button
-                                                            onclick="showDocument('{{ asset($leaveDoc->document_path) }}')"
+                                                            onclick="showDocument('{{ $disk->temporaryUrl($leaveDoc->document_path, now()->addMinutes(5)) }}')"
                                                             class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                                                             <i class="fa-solid fa-file-image mr-1"></i> Lihat
                                                         </button>

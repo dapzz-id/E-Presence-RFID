@@ -90,13 +90,13 @@
                                 Jumlah Presensi
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Perbandingan
+                                Persentase M<span class="lowercase">o</span>M
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Hari Non-Produktif
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Persentase
+                                Persentase Bulan Ini
                             </th>
                         </tr>
                     </thead>
@@ -117,11 +117,11 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     @if ($student->comparison > 0)
-                                        <span class="text-green-600 dark:text-green-400">+{{ $student->comparison }}</span>
+                                        <span class="text-green-600 dark:text-green-400">+{{ $student->comparison }}%</span>
                                     @elseif ($student->comparison < 0)
-                                        <span class="text-red-600 dark:text-red-400">{{ $student->comparison}}</span>
+                                        <span class="text-red-600 dark:text-red-400">{{ $student->comparison}}%</span>
                                     @else
-                                        <span>0</span>
+                                        <span>0%</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">

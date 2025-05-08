@@ -64,8 +64,8 @@ class CheckDailyPresence extends Command
 
             } elseif ($today->greaterThan($limit) && $today->lessThan($skippingSchool) && $isProductive) {
                 $leave = LeaveDocument::where('nis', $nis)
-                    ->whereDate('start_date', '>=', $today->toDateString())
-                    ->whereDate('end_date', '<=', $today->toDateString())
+                    ->whereDate('start_date', '<=', $today->toDateString())
+                    ->whereDate('end_date', '>=', $today->toDateString())
                     ->first();
 
                 if ($leave) {

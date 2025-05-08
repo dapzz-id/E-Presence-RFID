@@ -229,8 +229,8 @@ Route::post('/send-leave-document', function(Request $request){
         LeaveDocument::create([
             'nis' => $user->nis,
             'type' => ucwords($request->type),
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+            'start_date' => Carbon::createFromFormat('d/m/Y', $request->start_date)->format('Y-m-d'),
+            'end_date' => Carbon::createFromFormat('d/m/Y', $request->end_date)->format('Y-m-d'),
             'reason' => $request->reason,
             'document_path' => Storage::disk('s3')->put('surat/'.$user->nis, $request->file('document')),
         ]);

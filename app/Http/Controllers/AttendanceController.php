@@ -86,6 +86,7 @@ class AttendanceController extends Controller
      */
     private function getAttendanceData($month, $year, $class, $search)
     {
+        // Query utama: data bulan ini
         $query = DB::table('presences')
             ->join('users', 'presences.nis', '=', 'users.nis')
             ->join('warga_tels', 'users.nis', '=', 'warga_tels.nis')
@@ -101,26 +102,29 @@ class AttendanceController extends Controller
             ->whereIn('presences.status', ['Hadir', 'Terlambat'])
             ->groupBy('users.id', 'warga_tels.name', 'warga_tels.kelas')
             ->orderBy('presences.nis', 'asc');
-            
+
+        // Filter kelas
         if ($class !== 'all') {
             $query->where('warga_tels.kelas', $class);
         }
-        
+
+        // Filter nama
         if (!empty($search)) {
             $query->where('warga_tels.name', 'like', "%{$search}%");
         }
-        
+
+        // Ambil hasil paginated
         $results = $query->paginate(10);
-        
-        // Get previous month data for comparison
+
+        // Hitung bulan sebelumnya
         $previousMonth = $month - 1;
         $previousYear = $year;
-        
         if ($previousMonth < 1) {
             $previousMonth = 12;
             $previousYear--;
         }
-        
+
+        // Data bulan sebelumnya
         $previousData = DB::table('presences')
             ->join('users', 'presences.nis', '=', 'users.nis')
             ->select(
@@ -133,19 +137,32 @@ class AttendanceController extends Controller
             ->groupBy('users.id')
             ->pluck('productive_days', 'users.id')
             ->toArray();
-            
-        // Calculate total productive days in the month
+
+        // Hitung total productive days bulan ini & bulan lalu
         $totalProductiveDays = count($this->getProductiveDays($month, $year)['productive']);
-        
-        // Process the results to add comparison and percentage
+        $totalProductiveDaysLastMonth = count($this->getProductiveDays($previousMonth, $previousYear)['productive']);
+
+        // Tambahkan comparison & percentage ke hasil
         foreach ($results as $result) {
             $previousCount = $previousData[$result->id] ?? 0;
-            $result->comparison = $result->productive_days - $previousCount;
-            $result->percentage = $totalProductiveDays > 0 
-                ? round(($result->productive_days / $totalProductiveDays) * 100, 0) 
+
+            // Persentase bulan ini
+            $percentageNow = $totalProductiveDays > 0
+                ? round(($result->productive_days / $totalProductiveDays) * 100, 0)
                 : 0;
+
+            // Persentase bulan lalu
+            $percentageLast = $totalProductiveDaysLastMonth > 0
+                ? round(($previousCount / $totalProductiveDaysLastMonth) * 100, 0)
+                : 0;
+
+            // Selisih persentase antar bulan
+            $result->comparison = $percentageNow - $percentageLast;
+
+            // Simpan percentage bulan ini
+            $result->percentage = $percentageNow;
         }
-        
+
         return $results;
     }
     
