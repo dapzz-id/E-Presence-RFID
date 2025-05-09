@@ -22,14 +22,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="RtlSymmetry">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/profileImage"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="31dp"
+            android:layout_height="40dp"
             android:layout_marginStart="16dp"
+            android:contentDescription="TODO"
             android:scaleType="centerCrop"
-            android:src="@drawable/co_profile"
-            app:civ_border_overlay="true"
             tools:ignore="ImageContrastCheck" />
 
         <LinearLayout
@@ -72,112 +71,155 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Attendance Cards -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardAttendance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/cardLeave"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TOTAL KEHADIRAN"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/poppins_bold"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tvAttendanceCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="10"
-                    android:textColor="@android:color/black"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/poppins_bold"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardLeave"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/cardAttendance"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TOTAL IZIN &amp; SAKIT"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/poppins_bold"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tvLeaveCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="20"
-                    android:textColor="@android:color/black"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/poppins_bold"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardAttendance">
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <!-- Attendance Cards in a horizontal layout -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="30dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardAttendance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:background="@color/white"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TOTAL KEHADIRAN"
+                                android:textAlignment="center"
+                                android:textColor="@android:color/black"
+                                android:textSize="12sp"
+                                android:fontFamily="@font/poppins_bold"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvAttendanceCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="@android:color/black"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/poppins_bold"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardLeave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:background="@color/white"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TOTAL IZIN &amp; SAKIT"
+                                android:textAlignment="center"
+                                android:textColor="@android:color/black"
+                                android:textSize="12sp"
+                                android:fontFamily="@font/poppins_bold"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvLeaveCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="@android:color/black"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/poppins_bold"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardAlpa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="22dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:background="@color/white"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TOTAL TANPA KETERANGAN"
+                            android:textAlignment="center"
+                            android:textColor="@android:color/black"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/poppins_bold"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/tvAlpaCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="0"
+                            android:textColor="@android:color/black"
+                            android:textSize="20sp"
+                            android:fontFamily="@font/poppins_bold"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardCurrentTime"
@@ -187,8 +229,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    tools:ignore="MissingConstraints">
+                    app:cardElevation="4dp">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -232,8 +273,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    tools:ignore="MissingConstraints">
+                    app:cardElevation="4dp">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -428,7 +468,6 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="26dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp">
 
@@ -442,23 +481,11 @@
                             android:id="@+id/tvChartTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="GRAFIK ABSEN PER-BULAN"
+                            android:text="GRAFIK PRESENSI DATANG - PRODUKTIF"
                             android:textColor="@android:color/black"
                             android:textSize="12sp"
                             android:fontFamily="@font/poppins_bold"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="HardcodedText" />
-
-                        <TextView
-                            android:id="@+id/tvShowAll"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tampilkan Semua"
-                            android:textColor="#0000FF"
-                            android:textSize="12sp"
-                            android:fontFamily="@font/poppins_regular"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             tools:ignore="HardcodedText" />
 
@@ -470,6 +497,46 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/tvChartTitle" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardChartNonProduktif"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="26dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:id="@+id/tvChartNonProduktifTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GRAFIK PRESENSI DATANG - NON PRODUKTIF"
+                            android:textColor="@android:color/black"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/poppins_bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/barNonProduktifChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="16dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tvChartNonProduktifTitle" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -560,17 +627,18 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
         <ImageView
             android:id="@+id/profileImageLarge"
             android:layout_width="110dp"
             android:layout_height="143dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="28dp"
             android:contentDescription="Your Face"
             android:scaleType="centerCrop"
-            android:src="@drawable/co_profile"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -719,7 +787,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:elevation="0.45dp"
+        app:itemRippleColor="@color/transparent_ripple"
         app:itemIconTint="@color/nav_icon_color"
         app:itemTextColor="@color/nav_icon_color"
         app:layout_constraintBottom_toBottomOf="parent"

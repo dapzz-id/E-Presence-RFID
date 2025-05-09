@@ -26,7 +26,7 @@
             android:padding="8dp">
 
             <ImageView
-                android:id="@+id/fileTypeIcon"
+                android:id="@+id/attachmentIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_file"
@@ -42,7 +42,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/fileName"
+                android:id="@+id/attachmentName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
@@ -52,20 +52,10 @@
                 android:textSize="14sp"
                 tools:text="document.pdf" />
 
-            <TextView
-                android:id="@+id/fileSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:fontFamily="@font/dmsans_regular"
-                android:textColor="#757575"
-                android:textSize="12sp"
-                tools:ignore="TextContrastCheck"
-                tools:text="1.2 MB" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRemove"
+            android:id="@+id/removeButton"
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="40dp"
             android:layout_height="40dp"

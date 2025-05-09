@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     android:background="#F8F9FF"
     tools:context=".LeaveFormActivity"
-    tools:ignore="ExtraText">
+    tools:ignore="ExtraText"
+    android:fitsSystemWindows="true">
 
     <!-- Fixed Top App Bar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +17,9 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:elevation="0dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_gravity="top"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -25,7 +28,7 @@
             android:background="#F8F9FF"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="#2B2BE8"
-            app:title="Pembuatan Surat Izin/Sakit"
+            app:title="Permohonan Izin/Sakit"
             app:titleCentered="true"
             app:titleTextAppearance="@style/ToolbarTitle"
             app:titleTextColor="#2B2BE8" />
@@ -44,7 +47,8 @@
         app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -75,7 +79,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dmsans_medium"
-                        android:text="Jenis Surat"
+                        android:text="Jenis Permohonan"
                         android:textColor="#1A1A1A"
                         android:textSize="16sp"
                         tools:ignore="HardcodedText" />
@@ -143,7 +147,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dmsans_medium"
-                        android:text="Periode Surat"
+                        android:text="Periode Permohonan"
                         android:textColor="#1A1A1A"
                         android:textSize="16sp"
                         tools:ignore="HardcodedText" />
@@ -399,7 +403,7 @@
                         android:id="@+id/emptyAttachmentView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="22dp"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:visibility="gone"

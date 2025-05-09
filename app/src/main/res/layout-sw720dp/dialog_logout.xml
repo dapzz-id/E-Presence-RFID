@@ -99,7 +99,7 @@
                 android:paddingEnd="20dp"
                 android:text="Batal"
                 android:textAllCaps="false"
-                android:textColor="#64748B"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:ignore="ButtonStyle,HardcodedText,TouchTargetSizeCheck" />
 

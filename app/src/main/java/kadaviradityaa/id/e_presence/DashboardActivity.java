@@ -1,5 +1,7 @@
 package kadaviradityaa.id.e_presence;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -14,23 +16,27 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Environment;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import android.Manifest;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -39,6 +45,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -53,18 +60,22 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import kadaviradityaa.id.e_presence.Library.Module;
 
+@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class DashboardActivity extends AppCompatActivity {
-    private CircleImageView profileImage;
-    private ImageView profileImageLarge;
-    private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, btnAllowAccess, txtTimeNow, btnBuatSurat ,txtProfileName, txtClass, txtNIS;
+    private static final String TAG = "DashboardActivity";
+
+    // UI Components
+    private ImageView profileImageLarge, profileImage;
+    private TextView txtNama, txtTotalHadir, txtIzinSakit, btnLinkCard, txtTotalAlpa, btnAllowAccess, txtTimeNow, btnBuatSurat, txtProfileName, txtClass, txtNIS;
     private ImageView statusAbsensiBadge, statusAccessBadge, statusLinkCardBadge;
     private LinearLayout layoutWarningNFC;
     private final Handler handler = new Handler();
@@ -72,12 +83,52 @@ public class DashboardActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private ConstraintLayout btnAbout;
 
+    // Permission Handling
+    private static final int PERMISSION_REQUEST_CODE = 1001;
+    private static final int PERMISSION_REQUEST_CODE_GROUP_1 = 1002;
+    private static final int PERMISSION_REQUEST_CODE_GROUP_2 = 1003;
+    private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> checkPermissionStatus()
+    );
+
+    // Permission lists
+    private final List<String> basePermissions = Arrays.asList(
+            Manifest.permission.CAMERA,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.NFC
+    );
+
+    private final List<String> storagePermissionsPreQ = Arrays.asList(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    );
+
+    private final List<String> storagePermissionsPostQ = Arrays.asList(
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    );
+
+    private final List<String> storagePermissionsTiramisu = Arrays.asList(
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO
+    );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_dashboard);
 
+        setupWindowConfig();
+        initializeViews();
+        initBottomNavigation();
+        LogicApps();
+        checkPermissionStatus();
+    }
+
+    private void setupWindowConfig() {
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -91,9 +142,42 @@ public class DashboardActivity extends AppCompatActivity {
             return insets;
         });
 
-        initialitaion();
-        initBottomNavigation();
-        LogicApps();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Objects.requireNonNull(getWindow().getInsetsController()).setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            );
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+    }
+
+    private void initializeViews() {
+        profileImage = findViewById(R.id.profileImage);
+        txtNama = findViewById(R.id.tvName);
+        txtTotalHadir = findViewById(R.id.tvAttendanceCount);
+        txtIzinSakit = findViewById(R.id.tvLeaveCount);
+        statusAbsensiBadge = findViewById(R.id.btnTodayAttendance);
+        statusAccessBadge = findViewById(R.id.btnGiveAccess);
+        statusLinkCardBadge = findViewById(R.id.btnConnectCard);
+        layoutWarningNFC = findViewById(R.id.textWarningNFC);
+        btnLinkCard = findViewById(R.id.tvConnectCardActions);
+        btnAllowAccess = findViewById(R.id.tvAllowAccess);
+        txtTimeNow = findViewById(R.id.tvCurrentTime);
+        btnBuatSurat = findViewById(R.id.tvCreateLetter);
+        btnAbout = findViewById(R.id.layoutAbout);
+        profileImageLarge = findViewById(R.id.profileImageLarge);
+        txtProfileName = findViewById(R.id.tvProfileName);
+        txtClass = findViewById(R.id.tvClass);
+        txtNIS = findViewById(R.id.tvStudentId);
+        txtTotalAlpa = findViewById(R.id.tvAlpaCount);
+
+        isAbsensi = false;
+        sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+
+        findViewById(R.id.viewDashboard).setVisibility(LinearLayout.VISIBLE);
+        findViewById(R.id.viewNotification).setVisibility(LinearLayout.GONE);
+        findViewById(R.id.viewProfile).setVisibility(LinearLayout.GONE);
     }
 
     private void initBottomNavigation() {
@@ -122,104 +206,255 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void initialitaion(){
-        profileImage = findViewById(R.id.profileImage);
-        txtNama = findViewById(R.id.tvName);
-        txtTotalHadir = findViewById(R.id.tvAttendanceCount);
-        txtIzinSakit = findViewById(R.id.tvLeaveCount);
-        statusAbsensiBadge = findViewById(R.id.btnTodayAttendance);
-        statusAccessBadge = findViewById(R.id.btnGiveAccess);
-        statusLinkCardBadge = findViewById(R.id.btnConnectCard);
-        layoutWarningNFC = findViewById(R.id.textWarningNFC);
-        btnLinkCard = findViewById(R.id.tvConnectCardActions);
-        btnAllowAccess = findViewById(R.id.tvAllowAccess);
-        txtTimeNow = findViewById(R.id.tvCurrentTime);
-        btnBuatSurat = findViewById(R.id.tvCreateLetter);
-        btnAbout = findViewById(R.id.layoutAbout);
-
-        isAbsensi = false;
-        sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Objects.requireNonNull(getWindow().getInsetsController()).setSystemBarsAppearance(
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            );
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-
-        profileImageLarge = findViewById(R.id.profileImageLarge);
-        txtProfileName = findViewById(R.id.tvProfileName);
-        txtClass = findViewById(R.id.tvClass);
-        txtNIS = findViewById(R.id.tvStudentId);
-
-        findViewById(R.id.viewDashboard).setVisibility(LinearLayout.VISIBLE);
-        findViewById(R.id.viewNotification).setVisibility(LinearLayout.GONE);
-        findViewById(R.id.viewProfile).setVisibility(LinearLayout.GONE);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-        ArrayList<Object> permissions2 = new ArrayList<>();
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions2.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                permissions2.add(Manifest.permission.READ_MEDIA_IMAGES);
-            }
-        }
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions2.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            permissions2.add(Manifest.permission.INTERNET);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions2.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions2.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
-            permissions2.add(Manifest.permission.NFC);
-        }
-
-        if (permissions2.isEmpty()) {
-            btnAllowAccess.setEnabled(false);
-            btnAllowAccess.setVisibility(View.GONE);
-            Glide.with(this)
-                    .load(R.drawable.ix_success_filled)
-                    .placeholder(R.drawable.ic_sharp_do_disturb_on)
-                    .error(R.drawable.ic_sharp_do_disturb_on)
-                    .into(statusAccessBadge);
-        }
+        checkPermissionStatus();
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         loadUserData();
     }
 
-    private void loadUserData(){
+    private void checkPermissionStatus() {
+        if (areAllRequiredPermissionsGranted()) {
+            runOnUiThread(() -> {
+                btnAllowAccess.setEnabled(false);
+                btnAllowAccess.setVisibility(View.GONE);
+                Glide.with(this)
+                        .load(R.drawable.ix_success_filled)
+                        .placeholder(R.drawable.ic_sharp_do_disturb_on)
+                        .error(R.drawable.ic_sharp_do_disturb_on)
+                        .into(statusAccessBadge);
+            });
+        } else {
+            runOnUiThread(() -> {
+                btnAllowAccess.setEnabled(true);
+                btnAllowAccess.setVisibility(View.VISIBLE);
+                Glide.with(this)
+                        .load(R.drawable.ic_sharp_do_disturb_on)
+                        .into(statusAccessBadge);
+            });
+        }
+    }
+
+    private boolean areAllRequiredPermissionsGranted() {
+        // Check base permissions
+        for (String permission : basePermissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permission not granted: " + permission);
+                return false;
+            }
+        }
+
+        // Check storage permissions based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            for (String permission : storagePermissionsTiramisu) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Permission not granted (Tiramisu+): " + permission);
+                    return false;
+                }
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            for (String permission : storagePermissionsPostQ) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Permission not granted (Q+): " + permission);
+                    return false;
+                }
+            }
+        } else {
+            for (String permission : storagePermissionsPreQ) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Permission not granted (Pre-Q): " + permission);
+                    return false;
+                }
+            }
+        }
+
+        // For Android 11+ check MANAGE_EXTERNAL_STORAGE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Log.d(TAG, "MANAGE_EXTERNAL_STORAGE not granted");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void requestAllPermissions() {
+        // For Android 11+ (R) we need special permission first
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                manageAllFilesPermissionLauncher.launch(intent);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                manageAllFilesPermissionLauncher.launch(intent);
+            }
+            return;
+        }
+
+        // Group 1: Camera and Location permissions
+        List<String> group1Permissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            group1Permissions.add(Manifest.permission.CAMERA);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            group1Permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            group1Permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+
+        // Group 2: NFC and Storage permissions
+        List<String> group2Permissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
+            group2Permissions.add(Manifest.permission.NFC);
+        }
+
+        // Add storage permissions based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            for (String permission : storagePermissionsTiramisu) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    group2Permissions.add(permission);
+                }
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            for (String permission : storagePermissionsPostQ) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    group2Permissions.add(permission);
+                }
+            }
+        } else {
+            for (String permission : storagePermissionsPreQ) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    group2Permissions.add(permission);
+                }
+            }
+        }
+
+        // Request permissions in logical groups
+        if (!group1Permissions.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    group1Permissions.toArray(new String[0]),
+                    PERMISSION_REQUEST_CODE_GROUP_1
+            );
+        } else if (!group2Permissions.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    group2Permissions.toArray(new String[0]),
+                    PERMISSION_REQUEST_CODE_GROUP_2
+            );
+        } else {
+            checkPermissionStatus();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        boolean allGranted = true;
+        boolean shouldShowRationale = false;
+
+        for (int i = 0; i < permissions.length; i++) {
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                allGranted = false;
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
+                    showPermissionDeniedDialog(permissions[i]);
+                    return;
+                } else {
+                    shouldShowRationale = true;
+                }
+            }
+        }
+
+        if (allGranted) {
+            // Check if there are more permissions to request
+            if (requestCode == PERMISSION_REQUEST_CODE_GROUP_1) {
+                // Now request group 2 permissions
+                requestAllPermissions();
+            } else {
+                checkPermissionStatus();
+                Toast.makeText(this, "Semua izin telah diizinkan", Toast.LENGTH_SHORT).show();
+            }
+        } else if (shouldShowRationale) {
+            showRationaleDialog();
+        }
+    }
+
+    private void showRationaleDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Izin Diperlukan")
+                .setMessage("Aplikasi membutuhkan izin berikut untuk berfungsi dengan baik:\n\n" +
+                        "- Kamera: Untuk memindai kartu NFC\n" +
+                        "- Lokasi: Untuk verifikasi kehadiran\n" +
+                        "- Penyimpanan: Untuk menyimpan dokumen\n" +
+                        "- NFC: Untuk berkomunikasi dengan kartu siswa\n\n" +
+                        "Mohon berikan izin yang diminta untuk pengalaman terbaik.")
+                .setPositiveButton("Berikan Izin", (dialog, which) -> requestAllPermissions())
+                .setNegativeButton("Nanti", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void showPermissionDeniedDialog(String permission) {
+        new AlertDialog.Builder(this)
+                .setTitle("Izin Ditolak")
+                .setMessage("Anda telah memblokir izin " + getPermissionName(permission) + " secara permanen. " +
+                        "Anda perlu memberikan izin ini melalui Pengaturan Aplikasi untuk menggunakan fitur terkait.")
+                .setPositiveButton("Buka Pengaturan", (dialog, which) -> openAppSettings())
+                .setNegativeButton("Tutup", null)
+                .show();
+    }
+
+    private String getPermissionName(String permission) {
+        switch (permission) {
+            case Manifest.permission.CAMERA:
+                return "Kamera";
+            case Manifest.permission.READ_EXTERNAL_STORAGE:
+            case Manifest.permission.READ_MEDIA_IMAGES:
+                return "Akses Penyimpanan";
+            case Manifest.permission.ACCESS_FINE_LOCATION:
+                return "Lokasi Presisi";
+            case Manifest.permission.NFC:
+                return "NFC";
+            default:
+                return "yang diperlukan";
+        }
+    }
+
+    private void openAppSettings() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
+            startActivity(intent);
+        }
+    }
+
+    private void loadUserData() {
         Module.init(this);
         Module.getObjectWithToken(this, Module.urlKoneksi + "api/getMyAccount/" + sharedPreferences.getString("uid", ""), sharedPreferences.getString("token", ""), response -> {
             try {
-                if (response.getString("status").equals("success")){
+                if (response.getString("status").equals("success")) {
                     txtNama.setText(response.getString("name"));
                     txtProfileName.setText(response.getString("name"));
                     txtClass.setText(response.getString("kelas"));
                     txtNIS.setText(response.getString("nis"));
                     txtTotalHadir.setText(response.getString("total_hadir_bulan_ini"));
+                    txtTotalAlpa.setText(response.getString("total_alpa_bulan_ini"));
                     txtIzinSakit.setText(response.getString("total_izin_bulan_ini"));
                     Glide.with(this)
                             .load(response.getString("profile"))
@@ -253,28 +488,46 @@ public class DashboardActivity extends AppCompatActivity {
                     btnBuatSurat.setVisibility(response.getBoolean("absen_hari_ini_status") ? View.GONE : View.VISIBLE);
 
                     JSONArray absensiArray = response.getJSONArray("absensi_per_bulan");
+                    JSONArray absensiNonProdArray = response.getJSONArray("absensi_per_bulan_non_productive");
 
                     HashMap<Integer, Integer> absensiMap = new HashMap<>();
+                    HashMap<Integer, Integer> absensiNonProdMap = new HashMap<>();
                     for (int i = 1; i <= 12; i++) {
                         absensiMap.put(i, 0);
+                        absensiNonProdMap.put(i, 0);
                     }
 
                     for (int i = 0; i < absensiArray.length(); i++) {
                         JSONObject data = absensiArray.getJSONObject(i);
                         int bulan = data.getInt("bulan");
-                        int total = data.getInt("total");
+                        int total = data.getInt("persentase");
                         absensiMap.put(bulan, total);
                     }
 
+                    for (int i = 0; i < absensiNonProdArray.length(); i++) {
+                        JSONObject datas = absensiNonProdArray.getJSONObject(i);
+                        int bulan = datas.getInt("bulan");
+                        int total = datas.getInt("persentase");
+                        absensiNonProdMap.put(bulan, total);
+                    }
+
                     ArrayList<BarEntry> entries = new ArrayList<>();
+                    ArrayList<BarEntry> entriesNonProd = new ArrayList<>();
 
                     for (int i = 1; i <= 12; i++) {
                         int total = absensiMap.get(i);
                         entries.add(new BarEntry(i, total));
+
+                        int totalNonProd = absensiNonProdMap.get(i);
+                        entriesNonProd.add(new BarEntry(i, totalNonProd));
                     }
 
                     if (!entries.isEmpty()) {
                         setupBarChart(entries);
+                    }
+
+                    if (!entriesNonProd.isEmpty()) {
+                        setupBarChart2(entriesNonProd);
                     }
                 }
             } catch (JSONException e) {
@@ -283,7 +536,7 @@ public class DashboardActivity extends AppCompatActivity {
         }, error -> Snackbar.make(findViewById(android.R.id.content), "Tidak ada tanggapan dari server. Silahkan coba lagi nanti...", Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show());
     }
 
-    private void LogicApps(){
+    private void LogicApps() {
         boolean checkNFCSupport = isNfcSupported(this);
         layoutWarningNFC.setVisibility(checkNFCSupport ? View.GONE : View.VISIBLE);
         btnLinkCard.setEnabled(checkNFCSupport);
@@ -295,7 +548,11 @@ public class DashboardActivity extends AppCompatActivity {
         btnAllowAccess.setOnClickListener(v -> requestAllPermissions());
         btnLinkCard.setOnClickListener(v -> startActivity(new Intent(this, NFCActivity.class)));
 
-        btnBuatSurat.setOnClickListener(v -> startActivity(new Intent(this, LeaveFormActivity.class)));
+        btnBuatSurat.setOnClickListener(v -> {
+            Intent intent = new Intent(this, LeaveFormActivity.class);
+            intent.putExtra("nis", txtNIS.getText());
+            startActivity(intent);
+        });
 
         btnAbout.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
@@ -378,92 +635,20 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    private static final int PERMISSION_REQUEST_CODE = 100;
-
-    private void requestAllPermissions() {
-        ArrayList<Object> permissions = new ArrayList<>();
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_MEDIA_IMAGES);
-            }
-        }
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.INTERNET);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.NFC);
-        }
-
-        if (!permissions.isEmpty()) {
-            ActivityCompat.requestPermissions(this, (String[]) permissions.toArray(new Object[0]), PERMISSION_REQUEST_CODE);
-        } else {
-            btnAllowAccess.setEnabled(false);
-            btnAllowAccess.setVisibility(View.GONE);
-            Glide.with(this)
-                    .load(R.drawable.ix_success_filled)
-                    .placeholder(R.drawable.ic_sharp_do_disturb_on)
-                    .error(R.drawable.ic_sharp_do_disturb_on)
-                    .into(statusAccessBadge);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            boolean allGranted = true;
-
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
-            }
-
-            if (allGranted) {
-                btnAllowAccess.setEnabled(false);
-                btnAllowAccess.setVisibility(View.GONE);
-                Glide.with(this)
-                        .load(R.drawable.ix_success_filled)
-                        .placeholder(R.drawable.ic_sharp_do_disturb_on)
-                        .error(R.drawable.ic_sharp_do_disturb_on)
-                        .into(statusAccessBadge);
-            } else {
-                Toast.makeText(this, "Beberapa izin ditolak. Aplikasi mungkin tidak berfungsi dengan baik.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private static boolean isNfcSupported(Context context) {
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-        return nfcAdapter != null;
-    }
-
     private void setupBarChart(ArrayList<BarEntry> entries) {
         BarChart barChart = findViewById(R.id.barChart);
 
-        BarDataSet barDataSet = new BarDataSet(entries, "Absensi Per Bulan");
+        BarDataSet barDataSet = new BarDataSet(entries, "Presensi Produktif Per Bulan");
         barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
         barDataSet.setValueTextSize(12f);
+
+        barDataSet.setValueFormatter(new ValueFormatter() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("%.1f%%", value);
+            }
+        });
 
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
@@ -489,10 +674,70 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
+        YAxis yAxis = barChart.getAxisLeft();
+        yAxis.setAxisMinimum(0f);
+        yAxis.setGranularity(20f);
+        yAxis.setGranularityEnabled(true);
+        yAxis.setAxisMaximum(100f);
+
         barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisLeft().setAxisMinimum(0f);
         barChart.setFitBars(true);
         barChart.invalidate();
+    }
+
+    private void setupBarChart2(ArrayList<BarEntry> entries) {
+        BarChart barChart = findViewById(R.id.barNonProduktifChart);
+
+        BarDataSet barDataSet = new BarDataSet(entries, "Presensi Non-Produktif Per Bulan");
+        barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        barDataSet.setValueTextSize(12f);
+
+        barDataSet.setValueFormatter(new ValueFormatter() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("%.1f%%", value);
+            }
+        });
+
+        BarData barData = new BarData(barDataSet);
+        barChart.setData(barData);
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(12, true);
+        xAxis.setAxisMinimum(1f);
+        xAxis.setAxisMaximum(12f);
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            private final String[] months = {"Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"};
+
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value - 1;
+                if (index >= 0 && index < months.length) {
+                    return months[index];
+                } else {
+                    return "";
+                }
+            }
+        });
+
+        YAxis yAxis = barChart.getAxisLeft();
+        yAxis.setAxisMinimum(0f);
+        yAxis.setGranularity(20f);
+        yAxis.setGranularityEnabled(true);
+        yAxis.setAxisMaximum(100f);
+
+        barChart.getAxisRight().setEnabled(false);
+        barChart.setFitBars(true);
+        barChart.invalidate();
+    }
+
+    private static boolean isNfcSupported(Context context) {
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
+        return nfcAdapter != null;
     }
 
     @Override
@@ -517,40 +762,38 @@ public class DashboardActivity extends AppCompatActivity {
                 Typeface poppinsSemiBold = ResourcesCompat.getFont(DashboardActivity.this, R.font.poppins_semibold);
 
                 if (hour <= 6) {
-                    btnBuatSurat.setEnabled(false);
-                    btnBuatSurat.setVisibility(View.GONE);
-                    if(isAbsensi){
+                    if (isAbsensi) {
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
-                    }else{
+                    } else {
                         txtTimeNow.setTextColor(Color.BLACK);
-                        if(hour == 6){
+                        if (hour == 6) {
                             btnBuatSurat.setVisibility(View.VISIBLE);
                             btnBuatSurat.setEnabled(true);
                         }
                     }
                     txtTimeNow.setTypeface(poppinsRegular);
                 } else if (hour <= 8) {
-                    if(isAbsensi){
+                    if (isAbsensi) {
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         btnBuatSurat.setVisibility(View.GONE);
                         btnBuatSurat.setEnabled(false);
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
                         txtTimeNow.setTypeface(poppinsRegular);
-                    }else{
+                    } else {
                         btnBuatSurat.setEnabled(true);
                         btnBuatSurat.setVisibility(View.VISIBLE);
                         txtTimeNow.setTextColor(Color.parseColor("#CBCE2F"));
                         txtTimeNow.setTypeface(poppinsSemiBold);
                     }
                 } else {
-                    if(isAbsensi){
+                    if (isAbsensi) {
                         statusAbsensiBadge.setImageDrawable(ContextCompat.getDrawable(DashboardActivity.this, R.drawable.ix_success_filled));
                         btnBuatSurat.setVisibility(View.GONE);
                         btnBuatSurat.setEnabled(false);
                         txtTimeNow.setTextColor(Color.parseColor("#18BA66"));
                         txtTimeNow.setTypeface(poppinsRegular);
-                    }else{
+                    } else {
                         btnBuatSurat.setEnabled(true);
                         btnBuatSurat.setVisibility(View.VISIBLE);
                         txtTimeNow.setTextColor(Color.parseColor("#FF0000"));

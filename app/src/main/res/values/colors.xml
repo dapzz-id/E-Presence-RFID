@@ -16,4 +16,5 @@
     <color name="colorBoxStrokeFocused">#2B2BE8</color>
     <color name="colorBoxStrokeDefault">#E0E0E0</color>
     <color name="custom_blue">#2B2BE8</color>
+    <color name="transparent_ripple">#00000000</color>
 </resources>
