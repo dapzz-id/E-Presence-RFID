@@ -23,10 +23,19 @@ namespace PresenceApps
         [JsonPropertyName("Waktu Masuk")]
         public string WaktuMasuk { get; set; }
 
+        [JsonPropertyName("Status Masuk")]
+        public string StatusMasuk { get; set; }
+
         [JsonPropertyName("Waktu Keluar")]
         public string WaktuKeluar { get; set; }
 
-        [JsonPropertyName("Status")]
-        public string Status { get; set; }
+        [JsonPropertyName("Status Keluar")]
+        public string StatusKeluar { get; set; }
+
+        [JsonPropertyName("Alasan Datang")]
+        public string AlasanDatang { get; set; }
+
+        [JsonPropertyName("Alasan Pulang")]
+        public string AlasanPulang { get; set; }
     }
 }

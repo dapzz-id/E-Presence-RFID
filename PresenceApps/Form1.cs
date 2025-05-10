@@ -12,11 +12,17 @@ using System.Windows.Forms;
 using PresenceApps;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using ZXing;
+using ZXing.QrCode;
+using ZXing.Windows.Compatibility;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace PresenceApps
 {
-    public partial class Form1: Form
+    public partial class Form1 : Form
     {
+        int countdown = 20;
         private StringBuilder cardUID = new StringBuilder();
         private static readonly HttpClient client = new HttpClient();
         private readonly BindingSource bindingSource = new BindingSource();
@@ -109,6 +115,10 @@ namespace PresenceApps
                             dataGridView1.Columns["WaktuMasuk"].HeaderText = "Waktu Masuk";
                             dataGridView1.Columns["WaktuKeluar"].HeaderText = "Waktu Keluar";
                             dataGridView1.Columns["NamaLengkap"].HeaderText = "Nama Lengkap";
+                            dataGridView1.Columns["StatusMasuk"].HeaderText = "Status Masuk";
+                            dataGridView1.Columns["StatusKeluar"].HeaderText = "Status Keluar";
+                            dataGridView1.Columns["AlasanDatang"].HeaderText = "Alasan Datang";
+                            dataGridView1.Columns["AlasanPulang"].HeaderText = "Alasan Pulang";
                         });
                     }
                 }
@@ -155,7 +165,7 @@ namespace PresenceApps
                     cardUID.Append(e.KeyChar);
                 }
             }
-            catch (FormatException ex)
+            catch (System.FormatException ex)
             {
                 MessageBox.Show("Terjadi kesalahan format angka: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -201,6 +211,87 @@ namespace PresenceApps
             }
         }
 
+        private void ShowQRCodeDialog(string url)
+        {
+            try
+            {
+                // Create a new form for the QR code
+                Form qrForm = new Form
+                {
+                    Text = "Scan QR Code",
+                    Size = new Size(350, 400),
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    StartPosition = FormStartPosition.CenterScreen,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+
+                // Create QR code writer
+                var writer = new ZXing.BarcodeWriter
+                {
+                    Format = BarcodeFormat.QR_CODE,
+                    Options = new QrCodeEncodingOptions
+                    {
+                        Height = 300,
+                        Width = 300,
+                        Margin = 1
+                    }
+                };
+
+                // Generate QR code bitmap
+                var qrBitmap = writer.Write(url);
+
+                // Create PictureBox to display QR code
+                PictureBox pictureBox = new PictureBox
+                {
+                    Image = qrBitmap,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Dock = DockStyle.Top,
+                    Height = 300
+                };
+
+                // Create label with instructions
+                Label label = new Label
+                {
+                    Text = "Scan QR code untuk melengkapi absensi Anda\nJendela ini akan tertutup dalam 20 detik",
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Bottom,
+                    Height = 50
+                };
+
+                // Add controls to form
+                qrForm.Controls.Add(pictureBox);
+                qrForm.Controls.Add(label);
+
+                // Create timer to close the form after 20 seconds
+                System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer
+                {
+                    Interval = 1000, // 20 seconds
+                    Enabled = true
+                };
+
+                timer.Tick += (sender, e) => {
+                    countdown--;
+                    label.Text = $"Scan QR code untuk melengkapi absensi Anda\nTutup dalam {countdown} detik...";
+
+                    if (countdown <= 0)
+                    {
+                        timer.Stop();
+                        qrForm.Close();
+                    }
+                    //timer.Stop();
+                    //qrForm.Close();
+                };
+
+                // Show the form as non-modal dialog
+                qrForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saat membuat QR Code: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private async Task SendCardUID(string uid)
         {
             try
@@ -216,17 +307,26 @@ namespace PresenceApps
 
                 if (jsonResponse["status"].ToString() == "success")
                 {
-                    var data2 = new {
+                    var data2 = new
+                    {
                         nis = jsonResponse["data"]["nis"].ToString(),
                         id = uid
                     };
                     string json2 = Newtonsoft.Json.JsonConvert.SerializeObject(data2);
-                    var content2 = new StringContent(json, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response2 = await client.PostAsync("http://127.0.0.1:8000/api/absensiMasuk", content2);
+                    var content2 = new StringContent(json2, Encoding.UTF8, "application/json");
+
+                    // Determine which API endpoint to call based on positionPresence
+                    string apiEndpoint = positionPresence == 0 ?
+                        "http://127.0.0.1:8000/api/absensiMasuk" :
+                        "http://127.0.0.1:8000/api/absensiKeluar";
+
+                    HttpResponseMessage response2 = await client.PostAsync(apiEndpoint, content2);
                     string responseString2 = await response2.Content.ReadAsStringAsync();
                     JObject jsonResponse2 = JObject.Parse(responseString2);
 
-                    if (jsonResponse2["status"].ToString() == "success")
+                    string status = jsonResponse2["status"].ToString();
+
+                    if (status == "success")
                     {
                         await LoadDataAsync();
                         lbl_nama.Text = jsonResponse["data"]["name"].ToString();
@@ -247,18 +347,38 @@ namespace PresenceApps
                         roundedPanel5.Visible = false;
                         roundedPanel1.Visible = true;
                     }
-                    else if (jsonResponse2["status"].ToString() == "failed")
+                    else if (status == "failed")
                     {
                         roundedPanel5.Visible = true;
                         roundedPanel1.Visible = false;
-                        MessageBox.Show(jsonResponse2["message"].ToString());
+                        MessageBox.Show(jsonResponse2["message"].ToString(), "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    // Special handling for "libur" status - only show message, no QR code
+                    else if (status == "libur")
+                    {
+                        roundedPanel5.Visible = true;
+                        roundedPanel1.Visible = false;
+                        MessageBox.Show(jsonResponse2["message"].ToString(), "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    // Handle other redirect URL statuses (late, early, non_productive)
+                    else if (status == "late" || status == "early" || status == "non_productive")
+                    {
+                        // Check if redirect_url exists in the response
+                        if (jsonResponse2["redirect_url"] != null)
+                        {
+                            string redirectUrl = jsonResponse2["redirect_url"].ToString();
+                            ShowQRCodeDialog(redirectUrl);
+                        }
+
+                        roundedPanel5.Visible = true;
+                        roundedPanel1.Visible = false;
                     }
                 }
                 else
                 {
                     roundedPanel5.Visible = true;
                     roundedPanel1.Visible = false;
-                    MessageBox.Show(jsonResponse["message"].ToString());
+                    MessageBox.Show(jsonResponse["message"].ToString(), "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -288,7 +408,6 @@ namespace PresenceApps
             }
         }
 
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             TimeZoneInfo indonesiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -303,7 +422,7 @@ namespace PresenceApps
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if(positionPresence == 0)
+            if (positionPresence == 0)
             {
                 button2.Text = "Absensi Masuk";
                 positionPresence = 1;

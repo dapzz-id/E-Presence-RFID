@@ -49,3 +49,13 @@ D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.Text.Json.xml
 D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.Threading.Tasks.Extensions.xml
 D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.ValueTuple.xml
 D:\MS Visual Studio\PresenceApps-KP\PresenceApps\obj\Debug\PresenceApps.Form1.resources
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.Drawing.Common.dll
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\zxing.dll
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\zxing.presentation.dll
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\ZXing.Windows.Compatibility.dll
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.Drawing.Common.pdb
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\System.Drawing.Common.xml
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\zxing.xml
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\zxing.presentation.xml
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\ZXing.Windows.Compatibility.pdb
+D:\MS Visual Studio\PresenceApps-KP\PresenceApps\bin\Debug\ZXing.Windows.Compatibility.xml
