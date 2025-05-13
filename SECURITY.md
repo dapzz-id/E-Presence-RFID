@@ -1,6 +1,5 @@
 # 🔐 E-Presence Application Security Policy
-#### Developed by: raadeveloperz 
-#### Founder & Startup Leader: Kadavi Raditya Alvino
+#### Developed by: raadeveloperz <br> Founder & Startup Leader: Kadavi Raditya Alvino
 <br>
 
 ## 1. Introduction <br>
