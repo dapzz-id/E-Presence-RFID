@@ -11,6 +11,7 @@ You can download the ZIP or clone using this Github URL. I state that this is on
 List:
 - **Java 11+ version**
 - **Supports C#.NET**
+- **NodeJS**
 - **Docker (You don't need to install the required version of php or composer or etc, just install docker, and I have isolated it in a container and run it on localhost port 2025.)**
 
 ### Items Included in Docker
@@ -23,10 +24,10 @@ List:
 ### Installing Web
 1. Download this project
 2. Extract this project
-3. Run `composer install && npm install`
-4. Run `php artisan key:generate`
-5. Run `docker compose build` (If you want to use Docker)
-6. Run `docker compose up` (If you want to use Docker)
+3. Run `docker compose build` (If you want to use Docker)
+4. Run `docker compose up` (If you want to use Docker)
+5. Run `composer install && npm install`
+6. Run `php artisan key:generate`
 7. Run `php artisan migrate --seed`
 8. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
 9. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
