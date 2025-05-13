@@ -87,10 +87,11 @@
                                         <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $wargaku->foto_profile, now()->addMinutes(5)) }}" alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button title="Edit Button"
-                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
-                                            onclick="window.location.href = '{{ route('siswa.edit', $wargaku->nis) }}'"><i
-                                                class="bi bi-pencil text-orange-300"></i></button>
+                                        <a href="{{ route('siswa.edit', $wargaku->nis) }}" 
+                                           title="Edit Button"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
+                                            <i class="bi bi-pencil text-orange-300"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

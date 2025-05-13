@@ -215,14 +215,21 @@
                     },
                     scales: {
                         x: {
-                            stacked: true,
+                            stacked: false,
                             title: {
                                 display: true,
                                 text: 'Nama Siswa'
-                            }
+                            },
+                            grid: {
+                                display: false
+                            },
+                            // Mengatur agar bar lebih rapat
+                            barThickness: 20,
+                            categoryPercentage: 0.5, // Mengatur lebar grup kategori (0-1)
+                            barPercentage: 0.8 // Mengatur lebar bar dalam grup (0-1)
                         },
                         y: {
-                            stacked: true,
+                            stacked: false,
                             beginAtZero: true,
                             max: 100,
                             title: {
@@ -234,6 +241,21 @@
                                     return value + '%';
                                 }
                             }
+                        }
+                    },
+                    // Mengatur spacing antar bar lebih rapat
+                    elements: {
+                        bar: {
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10
                         }
                     }
                 }

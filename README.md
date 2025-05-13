@@ -10,10 +10,15 @@ You can download the ZIP or clone using this Github URL. I state that this is on
 ### Prerequisites
 
 List:
-- **PHP 8.3 version**
 - **Java 11+ version**
 - **Supports C#.NET**
-- **Composer installed**
+- **Docker (You don't need to install the required version of php or composer or etc, just install docker, and I have isolated it in a container and run it on localhost port 2025.)**
+
+### Items Included in Docker
+1. MySQL (8.4.5)
+2. PHP (8.3 Latest)
+3. PHPMyAdmin (Latest)
+4. Nginx Alpine
 
 ### Installing Web
 1. Download this project

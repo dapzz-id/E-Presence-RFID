@@ -63,39 +63,19 @@ class LateController extends Controller
                 'nis' => $lateEntry->nis,
                 'time_masuk' => $lateEntry->time,
                 'status' => 'Terlambat',
+                'status_hari' => 'Hari Produktif',
                 'alasan_datang_telat' => $validated['alasan'],
             ]);
 
             $lateEntry->delete();
             return redirect('/');
         } else {
+            $lateEntry->delete();
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda sudah melakukan absensi masuk hari ini...'
             ]);
-            $lateEntry->delete();
         }
     }
-
-    /**
-     * Menyimpan data keterlambatan datang
-     */
-    // public function storeArrival(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'nis' => 'required|exists:students,nis',
-    //         'current_time' => 'required|date_format:H:i',
-    //         'reason' => 'required|string|max:500',
-    //         'type' => 'required|in:arrival'
-    //     ]);
-
-    //     // Tambahkan tipe keterlambatan
-    //     $validated['type'] = 'arrival';
-
-    //     LateAttendance::create($validated);
-
-    //     return redirect()->back()
-    //         ->with('success', 'Laporan keterlambatan datang berhasil dikirim!');
-    // }
 
     /**
      * Menampilkan form keterlambatan pulang
@@ -114,6 +94,72 @@ class LateController extends Controller
         $user = User::where('nis', $lateEntry->nis)->first();
 
         return view('Main.late-departure', compact('user', 'lateEntry'));
+    }
+
+    /**
+     * Menampilkan form datang di hari non-productive
+     * * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function showReasonForm(Request $request)
+    {
+        $token = $request->query('token');
+        $lateEntry = LateEntry::where('token', $token)->first();
+
+        if (!$lateEntry || $lateEntry->type != 'Presensi Masuk') {
+            abort(404);
+        }
+
+        $user = User::where('nis', $lateEntry->nis)->first();
+        $reasonEntry = $lateEntry;
+
+        return view('Main.reason-coming', compact('user', 'reasonEntry'));
+    }
+
+    /**
+     * Menyimpan data datang di hari non-productive
+     * * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeReason(Request $request)
+    {
+        $validated = $request->validate([
+            'alasan' => 'required',
+            'token' => 'required'
+        ],[
+            'alasan.required' => 'Alasan datang hari ini tidak boleh kosong!',
+            'token.required' => 'Token tidak valid atau sudah kadaluwarsa!'
+        ]);
+
+        $lateEntry = LateEntry::where('token', $request->token)->first();
+
+        if (!$lateEntry) {
+            return redirect()->back()->withErrors([
+                'token' => 'Token tidak valid atau sudah kadaluwarsa!'
+            ]);
+        }
+        // Cek apakah sudah ada data presensi untuk hari ini
+        $presence = Presence::where('nis', $lateEntry->nis)
+            ->whereDate('time_masuk', Carbon::today())
+            ->first();
+
+        if (!$presence) {
+            Presence::create([
+                'nis' => $lateEntry->nis,
+                'time_masuk' => $lateEntry->time,
+                'status' => 'Hadir',
+                'status_hari' => 'Hari Non-Produktif',
+                'alasan_datang' => $validated['alasan'],
+            ]);
+
+            $lateEntry->delete();
+            return redirect('/');
+        } else {
+            $lateEntry->delete();
+            return redirect()->back()->withErrors([
+                'current_time' => 'Anda sudah melakukan absensi masuk hari ini...'
+            ]);
+        }
     }
 
     /**
@@ -154,6 +200,7 @@ class LateController extends Controller
             $lateEntry->delete();
             return redirect('/');
         } else {
+            $lateEntry->delete();
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda belum melakukan absensi masuk hari ini...'
             ]);
@@ -215,6 +262,7 @@ class LateController extends Controller
             $lateEntry->delete();
             return redirect('/');
         } else {
+            $lateEntry->delete();
             return redirect()->back()->withErrors([
                 'current_time' => 'Anda belum melakukan absensi masuk hari ini...'
             ]);

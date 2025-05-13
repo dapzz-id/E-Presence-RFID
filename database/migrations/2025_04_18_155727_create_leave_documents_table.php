@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('leave_documents', function (Blueprint $table) {
             $table->id();
             $table->string('nis');
-            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade');
+            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade')->onDelete('cascade');
             $table->enum('type', ['Izin', 'Sakit']);
             $table->date('start_date');
             $table->date('end_date');

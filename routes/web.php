@@ -103,6 +103,9 @@ Route::prefix('superadmin')->middleware('auth:superadmin')->group(function (){
 Route::get('/late-arrival', [LateController::class, 'showArrivalForm']);
 Route::post('/late-arrival', [LateController::class, 'storeArrival'])->name('late-arrival.store');
 
+Route::get('/reason-coming', [LateController::class, 'showReasonForm']);
+Route::post('/reason-coming', [LateController::class, 'storeReason'])->name('reason-coming.store');
+
 Route::get('/late-departure', [LateController::class, 'showDepartureForm']);
 Route::post('/late-departure', [LateController::class, 'storeDeparture'])->name('late-departure.store');
 

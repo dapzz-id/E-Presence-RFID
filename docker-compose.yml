@@ -1,0 +1,64 @@
+version: '3'
+services:
+  app:
+    build: .
+    image: e-presence
+    container_name: e-presence
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+    working_dir: /var/www/e-presence
+    volumes:
+      - .:/var/www/e-presence
+      - ./storage/php.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - e-presence
+  webserver:
+    image: nginx:alpine
+    container_name: nginxepresence
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "2025:80"
+    volumes:
+      - .:/var/www/e-presence
+      - ./storage/:/etc/nginx/conf.d/
+    networks:
+      - e-presence
+
+  db:
+    image: mysql:8.4.5
+    container_name: dbepresence
+    restart: always
+    tty: true
+    ports:
+      - "2007:3306"
+    volumes:
+      - lbdata:/var/lib/mysql
+    environment:
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - e-presence
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pmaepresence
+    links:
+      - db
+    restart: always
+    ports:
+      - "7000:80"
+    networks:
+      - e-presence
+
+networks:
+  e-presence:
+    driver: bridge
+
+volumes:
+  lbdata:
+    driver: local

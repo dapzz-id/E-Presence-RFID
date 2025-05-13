@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('nis')->unique();
-            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade');
+            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade')->onDelete('cascade');
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password')->index();

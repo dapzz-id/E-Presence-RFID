@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        WargaTels::factory(18)->create();
-        AdminAccount::factory(2)->create();
+        // WargaTels::factory(18)->create();
+        AdminAccount::factory(1)->create();
         SuperAdmin::factory(2)->create();
 
         $wargaTels1 = WargaTels::factory()->create([

@@ -31,7 +31,7 @@ class PresenceObserver
      * @param string|null $alasan
      * @return array
      */
-    protected function formatEmailMessageDatang(string $nama, string $alasan = null, string $status = null): array
+    protected function formatEmailMessageDatang(string $nama, string $alasan = null, string $status = null, string $typeHari, string $alasanNonProd = null): array
     {
         $greeting = $this->getGreeting();
         $waktu = now()->format('d-m-Y H:i');
@@ -39,12 +39,14 @@ class PresenceObserver
         $alasan = $alasan ?? '-';
 
         $pesanAlasan = '';
-        if ($jamSekarang >= 7 && $alasan !== '-' && $alasan !== '' && $alasan !== null && $status !== 'Hadir' && $status !== 'Izin' && $status !== 'Sakit' && $status !== 'Alpa' && $status === 'Terlambat' && $status !== null) {
+        if ($jamSekarang >= 7 && $alasan !== '-' && $alasan !== '' && $alasan !== null && $status !== 'Hadir' && $status !== 'Izin' && $status !== 'Sakit' && $status !== 'Alpa' && $status === 'Terlambat' && $status !== null && $typeHari == 'Hari Produktif') {
             $pesanAlasan = "<b>Alasan telat datang:</b> {$alasan} <br><br>";
-        }else if ($status === 'Alpa'){
+        }else if ($status === 'Alpa' && $typeHari == 'Hari Produktif'){
             $pesanAlasan = "<b>{$nama} DINYATAKAN TIDAK HADIR HARI INI TANPA KETERANGAN!</b> <br><br>";
-        }else if ($status === 'Izin' || $status === 'Sakit'){
+        }else if (($status === 'Izin' || $status === 'Sakit') && $typeHari == 'Hari Produktif'){
             $pesanAlasan = "<b>{$nama}, Anda telah berhasil mengirimkan surat permohonan Izin/Sakit untuk hari ini!</b> <br><br>";
+        }else if($typeHari == 'Hari Non-Produktif' && $alasanNonProd !== null){
+            $pesanAlasan = "<b>Alasan datang:</b> {$alasanNonProd} <br><br>";
         }
 
         return [
@@ -67,7 +69,7 @@ class PresenceObserver
      * @param string|null $alasan
      * @return array
      */
-    protected function formatEmailMessagePulang(string $nama, string $alasan = null): array
+    protected function formatEmailMessagePulang(string $nama, string $alasan = null, string $typeHari): array
     {
         $greeting = $this->getGreeting();
         $waktu = now()->format('d-m-Y H:i');
@@ -75,19 +77,18 @@ class PresenceObserver
         $alasan = $alasan ?? '-';
 
         $pesanAlasan = '';
-        if (now()->greaterThan(Carbon::createFromTime(16, 30)) && $alasan !== '-' && $alasan !== '' && $alasan !== null) {
+        if (now()->greaterThan(Carbon::createFromTime(16, 30)) && $alasan !== '-' && $alasan !== '' && $alasan !== null && $typeHari == 'Hari Produktif') {
             $pesanAlasan = "<b>Alasan telat pulang:</b> {$alasan} <br><br>";
-        }else if (now()->lessThan(Carbon::createFromTime(16, 30)) && now()->lessThan(Carbon::createFromTime(15, 29, 59)) && $alasan !== '-' && $alasan !== '' && $alasan !== null){
+        }else if (now()->lessThan(Carbon::createFromTime(16, 30)) && now()->lessThan(Carbon::createFromTime(15, 29, 59)) && $alasan !== '-' && $alasan !== '' && $alasan !== null && $typeHari == 'Hari Produktif'){
             $pesanAlasan = "<b>Alasan pulang lebih awal:</b> {$alasan} <br><br>";
         }
 
         return [
             'subject' => "Laporan Presensi Pulang - {$nama}",
             'body' => <<<MSG
-                Halo, {$greeting} bapak/ibu!
-                Berikut adalah laporan presensi harian untuk siswa/i {$nama}, bahwasanya telah berhasil melakukan presensi pulang!
-                
-                <b>Tanggal & Waktu:</b> {$waktu}
+                Halo, {$greeting} bapak/ibu! <br>
+                Berikut adalah laporan presensi harian untuk siswa/i {$nama}, bahwasanya telah berhasil melakukan presensi pulang! <br><br>   
+                <b>Tanggal & Waktu:</b> {$waktu}<br>
                 <b>Lokasi:</b> SMKS Telekomunikasi Telesandi Bekasi<br>
                 {$pesanAlasan}
                 Pesan ini dikirim otomatis oleh sistem presensi digital raadeveloperz.
@@ -105,7 +106,7 @@ class PresenceObserver
         $status = $presence->status;
 
         if ($siswa && $user->email) {
-            $messageData = $this->formatEmailMessageDatang($siswa->name, $presence->alasan_datang_telat ?? null, $status);
+            $messageData = $this->formatEmailMessageDatang($siswa->name, $presence->alasan_datang_telat ?? null, $status, $presence->status_hari, $presence->alasan_datang);
             
             Mail::to($user->email)
             ->send(new PresenceNotification(
@@ -124,7 +125,7 @@ class PresenceObserver
         $user = $presence->users;
 
         if ($siswa && $user->email) {
-            $messageData = $this->formatEmailMessagePulang($siswa->name, $presence->alasan_pulang_telat != null ? $presence->alasan_pulang_telat : $presence->alasan_pulang_duluan ?? null);
+            $messageData = $this->formatEmailMessagePulang($siswa->name, $presence->alasan_pulang_telat ?? $presence->alasan_pulang_duluan ?? null, $presence->status_hari);
             
             Mail::to($user->email)
             ->send(new PresenceNotification(

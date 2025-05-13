@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CreateAkunSiswaController;
 use App\Http\Controllers\EditAkunSiswaController;
 use App\Http\Controllers\WhatsAppController;
+use App\Models\Hari;
 use App\Models\LateEntry;
 use App\Models\LeaveDocument;
 use App\Models\Notification;
@@ -44,6 +45,13 @@ Route::post('/sanctum/token', function (Request $request) {
         return response()->json([
             'status' => 'failed',
             'message' => 'Username atau password salah. '
+        ], 200);
+    }
+
+    if($user->status_ban == 'inactive'){
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Akun Anda telah dibekukan, silahkan hubungi admin untuk mengaktifkan kembali...'
         ], 200);
     }
 
@@ -260,7 +268,7 @@ Route::get('/allAbsensi', function(){
                 'Waktu Keluar' => $item->time_keluar ?? '-',
                 'Status Masuk' => $item->status,
                 'Status Keluar' => $item->status_keluar ?? '-',
-                'Alasan Datang' => $item->alasan_datang_telat ?? '-',
+                'Alasan Datang' => $item->alasan_datang_telat ?? $item->alasan_datang ?? '-',
                 'Alasan Pulang' => $item->alasan_pulang_telat ?? $item->alasan_pulang_duluan ?? '-',
                 'Nama Lengkap' => $item->warga_tels->name ? ucwords(strtolower($item->warga_tels->name)) : '-',
                 'Kelas' => $item->warga_tels->kelas ?? '-',
@@ -318,87 +326,231 @@ Route::middleware('auth:sanctum')->patch('/linkedCard/{id}', function(Request $r
     }
 });
 
-Route::post('/absensiMasuk', function(Request $request){
+// Route::post('/absensiMasuk', function(Request $request){
+//     $user = User::where('rfid_id', $request->id)->first();
+
+//     if($user){
+//         $presences = Presence::where('nis', $user->nis)
+//             ->whereDate('time_masuk', Carbon::today())
+//             ->first();
+        
+//         if(!$presences){
+//             if(Carbon::now()->greaterThan(Carbon::today()->addHours(7)->addMinutes(00)->addSeconds(00))){
+//                 $token = Illuminate\Support\Str::random(40);
+
+//                 LateEntry::create([
+//                     'nis' => $user->nis,
+//                     'rfid_id' => $user->rfid_id,
+//                     'time' => Carbon::now(),
+//                     'type' => 'Presensi Masuk',
+//                     'token' => $token
+//                 ]);
+
+//                 return response()->json([
+//                     'status' => 'late',
+//                     'redirect_url' => url('/late-arrival?token=' . $token),
+//                     'message' => 'Anda terlambat, silakan isi form keterlambatan.'
+//                 ]);
+//             }else{
+//                 Presence::create([
+//                     'nis' => $user->nis,
+//                     'time_masuk' => Carbon::now(),
+//                     'status' => 'Hadir'
+//                 ]);
+
+//                 return response()->json([
+//                     'status' => 'success',
+//                     'message' => 'Absensi masuk berhasil...'
+//                 ]);
+//             }
+//         }else{
+//             return response()->json([
+//                 'status' => 'failed',
+//                 'message' => 'Anda sudah melakukan absensi masuk...'
+//             ]);
+//         }
+//     }else{
+//         return response()->json([
+//             'status' => 'failed',
+//             'message' => 'Absensi masuk gagal...'
+//         ]);
+//     }
+// });
+
+Route::post('/absensiMasuk', function(Request $request) {
     $user = User::where('rfid_id', $request->id)->first();
 
-    if($user){
-        $presences = Presence::where('nis', $user->nis)
-            ->whereDate('time_masuk', Carbon::today())
-            ->first();
-        
-        if(!$presences){
-            if(Carbon::now()->greaterThan(Carbon::today()->addHours(7)->addMinutes(00)->addSeconds(00))){
-                $token = Illuminate\Support\Str::random(40);
-
-                LateEntry::create([
-                    'nis' => $user->nis,
-                    'rfid_id' => $user->rfid_id,
-                    'time' => Carbon::now(),
-                    'type' => 'Presensi Masuk',
-                    'token' => $token
-                ]);
-
-                return response()->json([
-                    'status' => 'late',
-                    'redirect_url' => url('/late-arrival?token=' . $token),
-                    'message' => 'Anda terlambat, silakan isi form keterlambatan.'
-                ]);
-            }else{
-                Presence::create([
-                    'nis' => $user->nis,
-                    'time_masuk' => Carbon::now(),
-                    'status' => 'Hadir'
-                ]);
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Absensi masuk berhasil...'
-                ]);
-            }
-        }else{
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Anda sudah melakukan absensi masuk...'
-            ]);
-        }
-    }else{
+    if (!$user) {
         return response()->json([
             'status' => 'failed',
-            'message' => 'Absensi masuk gagal...'
+            'message' => 'Absensi masuk gagal, user tidak ditemukan.'
         ]);
     }
-});
 
-Route::post('/absensiKeluar', function(Request $request){
-    $user = User::where('rfid_id', $request->id)->first();
+    $today = Carbon::today()->toDateString();
 
-    if($user){
-        $presences = Presence::where('nis', $user->nis)
-            ->whereDate('time_masuk', Carbon::today())
-            ->whereNotNull('time_masuk')
-            ->first();
+    // Ambil data hari untuk bulan dan tahun ini
+    $hari = Hari::where('bulan', Carbon::now()->month)
+        ->where('tahun', Carbon::now()->year)
+        ->first();
 
-        if (!$presences) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Anda belum melakukan absensi masuk hari ini...'
-            ]);
-        }
-        
-        if($presences->time_keluar !== null){
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Anda sudah melakukan absensi keluar hari ini...'
-            ]);
-        }
+    if (!$hari) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Data hari untuk bulan ini tidak ditemukan.'
+        ]);
+    }
 
-        if (Carbon::now()->greaterThan(Carbon::today()->addHours(16)->addMinutes(30))) {
-            $token = Illuminate\Support\Str::random(40);
+    // Ubah ke array
+    $libur = $hari->hari_libur;
+    $produktif = $hari->hari_produktif;
+    $tambahan = $hari->hari_tambahan;
 
+    // Cek apakah hari ini libur
+    if (in_array($today, $libur)) {
+        return response()->json([
+            'status' => 'libur',
+            'message' => 'Hari ini adalah hari libur.'
+        ]);
+    }
+
+    // Cek apakah sudah absen masuk
+    $presence = Presence::where('nis', $user->nis)
+        ->whereDate('time_masuk', $today)
+        ->first();
+
+    if ($presence) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Anda sudah melakukan absensi masuk.'
+        ]);
+    }
+
+    $now = Carbon::now();
+    $token = Illuminate\Support\Str::random(40);
+
+    // Jika hari produktif
+    if (in_array($today, $produktif)) {
+        $batasTerlambat = Carbon::today()->addHours(7);
+
+        if ($now->greaterThan($batasTerlambat)) {
             LateEntry::create([
                 'nis' => $user->nis,
                 'rfid_id' => $user->rfid_id,
-                'time' => Carbon::now(),
+                'time' => $now,
+                'type' => 'Presensi Masuk',
+                'token' => $token
+            ]);
+
+            return response()->json([
+                'status' => 'late',
+                'redirect_url' => url('/late-arrival?token=' . $token),
+                'message' => 'Anda terlambat, silakan isi form keterlambatan.'
+            ]);
+        } else {
+            Presence::create([
+                'nis' => $user->nis,
+                'time_masuk' => $now,
+                'status' => 'Hadir'
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Absensi masuk berhasil.'
+            ]);
+        }
+    }
+
+    // Jika hari tambahan
+    if (in_array($today, $tambahan)) {
+        LateEntry::create([
+            'nis' => $user->nis,
+            'rfid_id' => $user->rfid_id,
+            'time' => $now,
+            'type' => 'Presensi Masuk',
+            'token' => $token
+        ]);
+
+        return response()->json([
+            'status' => 'non_productive',
+            'redirect_url' => url('/reason-coming?token=' . $token),
+            'message' => 'Silakan isi form alasan hadir di hari Non-Produktif.'
+        ]);
+    }
+
+    // Kalau tanggal ga masuk ke kategori apapun
+    return response()->json([
+        'status' => 'failed',
+        'message' => 'Hari ini tidak terdaftar sebagai hari produktif, tambahan, atau libur.'
+    ]);
+});
+
+Route::post('/absensiKeluar', function(Request $request) {
+    $user = User::where('rfid_id', $request->id)->first();
+
+    if (!$user) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Absensi pulang gagal, pengguna tidak ditemukan.'
+        ]);
+    }
+
+    $today = Carbon::today()->toDateString();
+
+    // Ambil data hari
+    $hari = Hari::where('bulan', Carbon::now()->month)
+        ->where('tahun', Carbon::now()->year)
+        ->first();
+
+    if (!$hari) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Data hari untuk bulan ini tidak ditemukan.'
+        ]);
+    }
+
+    $libur = $hari->hari_libur;
+    $produktif = $hari->hari_produktif;
+    $tambahan = $hari->hari_tambahan;
+
+    if (in_array($today, $libur)) {
+        return response()->json([
+            'status' => 'libur',
+            'message' => 'Hari ini adalah hari libur.'
+        ]);
+    }
+
+    $presence = Presence::where('nis', $user->nis)
+        ->whereDate('time_masuk', $today)
+        ->whereNotNull('time_masuk')
+        ->first();
+
+    if (!$presence) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Anda belum melakukan absensi masuk hari ini.'
+        ]);
+    }
+
+    if ($presence->time_keluar !== null) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Anda sudah melakukan absensi keluar hari ini.'
+        ]);
+    }
+
+    $now = Carbon::now();
+    $token = Illuminate\Support\Str::random(40);
+
+    if (in_array($today, $produktif)) {
+        $jamPulang = Carbon::today()->addHours(16)->addMinutes(30);
+        $jamPulangCepat = Carbon::today()->addHours(15)->addMinutes(30);
+
+        if ($now->greaterThan($jamPulang)) {
+            LateEntry::create([
+                'nis' => $user->nis,
+                'rfid_id' => $user->rfid_id,
+                'time' => $now,
                 'type' => 'Presensi Keluar',
                 'token' => $token
             ]);
@@ -408,13 +560,11 @@ Route::post('/absensiKeluar', function(Request $request){
                 'redirect_url' => url('/late-departure?token=' . $token),
                 'message' => 'Anda terlambat pulang, silakan isi form keterlambatan.'
             ]);
-        }else if (Carbon::now()->lessThan(Carbon::today()->addHours(16)->addMinutes(30)) && Carbon::now()->lessThan(Carbon::today()->addHours(15)->addMinutes(29)->addSeconds(59))) {
-            $token = Illuminate\Support\Str::random(40);
-
+        } elseif ($now->lessThan($jamPulangCepat)) {
             LateEntry::create([
                 'nis' => $user->nis,
                 'rfid_id' => $user->rfid_id,
-                'time' => Carbon::now(),
+                'time' => $now,
                 'type' => 'Presensi Keluar',
                 'token' => $token
             ]);
@@ -424,23 +574,36 @@ Route::post('/absensiKeluar', function(Request $request){
                 'redirect_url' => url('/early-departure?token=' . $token),
                 'message' => 'Anda pulang lebih awal, silakan isi form alasan pulang lebih awal.'
             ]);
-        }else if(Carbon::now()->lessThan(Carbon::today()->addHours(16)->addMinutes(30)) && Carbon::now()->greaterThan(Carbon::today()->addHours(15)->addMinutes(29)->addSeconds(59))){
-            $presences->update([
-                'time_keluar' => Carbon::now(),
+        } else {
+            $presence->update([
+                'time_keluar' => $now,
+                'status_hari' => 'Hari Produktif',
                 'status_keluar' => 'Tepat Waktu'
             ]);
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Absensi pulang tepat waktu...'
+                'message' => 'Absensi pulang tepat waktu.'
             ]);
         }
-    }else{
+    } elseif (in_array($today, $tambahan)) {
+        // Langsung update tanpa form
+        $presence->update([
+            'time_keluar' => $now,
+            'status_hari' => 'Hari Non-Produktif',
+            'status_keluar' => 'Tepat Waktu'
+        ]);
+
         return response()->json([
-            'status' => 'failed',
-            'message' => 'Absensi pulang gagal...'
+            'status' => 'success',
+            'message' => 'Absensi pulang di hari Non-Produktif berhasil.'
         ]);
     }
+
+    return response()->json([
+        'status' => 'failed',
+        'message' => 'Hari ini tidak terdaftar sebagai hari produktif, tambahan, atau libur.'
+    ]);
 });
 
 Route::get('/totalUsers', function(){

@@ -623,11 +623,11 @@
                                         @if ($tab != 'izin' && $tab != 'sakit')
                                             <td
                                                 class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $dataku->alasan_datang_telat ?? '-' }}
+                                                {{ $dataku->alasan_datang_telat ?? $dataku->alasan_datang ?? '-' }}
                                             </td>
                                             <td
                                                 class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $dataku->alasan_pulang_telat ?? ($dataku->alasan_pulang_duluan ?? '-') }}
+                                                {{ $dataku->alasan_pulang_telat ?? $dataku->alasan_pulang_duluan ?? '-' }}
                                             </td>
                                         @endif
                                         @if ($tab === 'izin' || $tab === 'sakit')
@@ -644,12 +644,24 @@
                                                             ->where('nis', $dataku->nis)
                                                             ->where('type', $dataku->status)
                                                             ->first();
+                                                        $path = $doc->document_path;
+                                                        $extension = pathinfo($path, PATHINFO_EXTENSION);
                                                     @endphp
-                                                    <button
-                                                        onclick="showDocument('{{ $disk->temporaryUrl($doc->document_path, now()->addMinutes(5)) }}')"
-                                                        class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
-                                                        <i class="fa-solid fa-file-image mr-1"></i> Lihat
-                                                    </button>
+                                                    @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                                        <button onclick="showDocument('{{ $disk->temporaryUrl($doc->document_path, now()->addMinutes(5)) }}')">
+                                                            <i class="fa-solid fa-file-image mr-1"></i> Lihat Gambar
+                                                        </button>
+                                                    @elseif (in_array(strtolower($extension), ['pdf']))
+                                                        <a href="{{ $disk->temporaryUrl($doc->document_path, now()->addMinutes(5)) }}" target="_blank">
+                                                            <i class="fa-solid fa-file-pdf mr-1"></i> Lihat PDF
+                                                        </a>
+                                                    @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'avi']))
+                                                        <button onclick="showVideo('{{ $disk->temporaryUrl($doc->document_path, now()->addMinutes(5)) }}')">
+                                                            <i class="fa-solid fa-file-video mr-1"></i> Lihat Video
+                                                        </button>
+                                                    @else
+                                                        <span>File tidak dikenali</span>
+                                                    @endif
                                                 @else
                                                     -
                                                 @endif
@@ -947,6 +959,40 @@
         </div>
     </div>
 
+    <!-- Video Viewer Modal -->
+    <div id="videoModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                                Video Dokumen
+                            </h3>
+                            <div class="mt-4 flex justify-center">
+                                <video id="document-video" controls class="max-w-full max-h-[70vh]">
+                                    <source src="/placeholder.svg" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="close-video-modal"
+                        class="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('Cert.foot')
 
     <script>
@@ -1144,6 +1190,14 @@
                 document.body.classList.add('modal-active');
             }
 
+            function showVideo(url) {
+                const videoPlayer = document.getElementById("document-video");
+                videoPlayer.src = url;
+                document.getElementById("videoModal").classList.remove("hidden");
+                document.body.classList.add("modal-active");
+            }
+
+
             if (closeDocumentModalBtn) {
                 closeDocumentModalBtn.addEventListener('click', function() {
                     documentModal.classList.add('hidden');
@@ -1151,7 +1205,29 @@
                 });
             }
 
+            // Add these new functions and event listeners
+            const videoModal = document.getElementById('videoModal');
+            const closeVideoModalBtn = document.getElementById('close-video-modal');
+            const documentVideo = document.getElementById('document-video');
+
+            function showVideo(url) {
+                documentVideo.src = url;
+                videoModal.classList.remove('hidden');
+                document.body.classList.add('modal-active');
+            }
+
+            if (closeVideoModalBtn) {
+                closeVideoModalBtn.addEventListener('click', function() {
+                    videoModal.classList.add('hidden');
+                    document.body.classList.remove('modal-active');
+                    // Stop video playback when modal is closed
+                    documentVideo.pause();
+                    documentVideo.currentTime = 0;
+                });
+            }
+
             window.showDocument = showDocument;
+            window.showVideo = showVideo;
         });
     </script>
 </body>

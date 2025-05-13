@@ -96,17 +96,17 @@ class PresenceExport implements FromView, WithStyles, WithDrawings, WithTitle
     public function styles(Worksheet $sheet)
     {
         // Mengatur style untuk header
-        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:J1')->getFont()->setSize(14);
-        $sheet->getStyle('A2:J2')->getFont()->setSize(12);
-        $sheet->getStyle('A3:J3')->getFont()->setSize(12);
-        $sheet->getStyle('A4:J4')->getFont()->setSize(12);
+        $sheet->getStyle('A1:K1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:K1')->getFont()->setSize(14);
+        $sheet->getStyle('A2:K2')->getFont()->setSize(12);
+        $sheet->getStyle('A3:K3')->getFont()->setSize(12);
+        $sheet->getStyle('A4:K4')->getFont()->setSize(12);
         
         // Mengatur style untuk judul tabel
-        $sheet->getStyle('A6:J6')->getFont()->setBold(true);
-        $sheet->getStyle('A6:J6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A6:J6')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $sheet->getStyle('A6:J6')->getFill()->getStartColor()->setRGB('CCCCCC');
+        $sheet->getStyle('A6:K6')->getFont()->setBold(true);
+        $sheet->getStyle('A6:K6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A6:K6')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $sheet->getStyle('A6:K6')->getFill()->getStartColor()->setRGB('CCCCCC');
         
         // Mengatur lebar kolom
         $sheet->getColumnDimension('A')->setWidth(5);  // No
@@ -119,6 +119,7 @@ class PresenceExport implements FromView, WithStyles, WithDrawings, WithTitle
         $sheet->getColumnDimension('H')->setWidth(15); // Status Keluar
         $sheet->getColumnDimension('I')->setWidth(30); // Alasan Masuk Telat
         $sheet->getColumnDimension('J')->setWidth(30); // Alasan Pulang
+        $sheet->getColumnDimension('K')->setWidth(30); // Keterangan Lainnya
         
         // Mengatur tinggi baris header
         $sheet->getRowDimension(1)->setRowHeight(30);
@@ -128,7 +129,7 @@ class PresenceExport implements FromView, WithStyles, WithDrawings, WithTitle
         
         // Mengatur border untuk tabel data
         $lastRow = count($this->presences) + 6;
-        $sheet->getStyle('A6:J' . $lastRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A6:K' . $lastRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
         
         return $sheet;
     }

@@ -25,7 +25,7 @@
         
         <!-- Baris 5: Spasi -->
         <tr>
-            <th colspan="10"></th>
+            <th colspan="11"></th>
         </tr>
         
         <!-- Baris 6: Header Tabel -->
@@ -40,21 +40,35 @@
             <th style="background-color: #CCCCCC; font-weight: bold; text-align: center;">Status Keluar</th>
             <th style="background-color: #CCCCCC; font-weight: bold; text-align: center;">Alasan Masuk Telat</th>
             <th style="background-color: #CCCCCC; font-weight: bold; text-align: center;">Alasan Pulang</th>
+            <th style="background-color: #CCCCCC; font-weight: bold; text-align: center;">Keterangan Lainnya</th>
         </tr>
     </thead>
     <tbody>
         @foreach($presences as $index => $presence)
+        @php
+            // Ensure the dates are properly formatted for comparison
+            $tanggalPresensi = \Carbon\Carbon::parse($presence->tanggal_presensi)->format('Y-m-d');
+            
+            $izin = App\Models\LeaveDocument::where('nis', $presence->nis)
+                ->where(function($query) use ($tanggalPresensi) {
+                    $query->where('start_date', '<=', $tanggalPresensi)
+                          ->where('end_date', '>=', $tanggalPresensi);
+                })
+                ->first();
+        @endphp
         <tr>
+            <!-- Your table cells remain the same -->
             <td>{{ $index + 1 }}</td>
             <td>{{ $presence->nis }}</td>
-            <td>{{ $presence->warga_tels->name ?? 'N/A' }}</td>
-            <td>{{ $presence->warga_tels->kelas ?? 'N/A' }}</td>
-            <td>{{ $presence->time_masuk ?? 'N/A' }}</td>
-            <td>{{ $presence->status ?? 'N/A' }}</td>
-            <td>{{ $presence->time_keluar ?? 'N/A' }}</td>
-            <td>{{ $presence->status_pulang ?? 'N/A' }}</td>
-            <td>{{ $presence->alasan_datang_telat ?? '-' }}</td>
-            <td>{{ $presence->alasan_pulang_telat ?? '-' }}</td>
+            <td>{{ $presence->warga_tels->name ?? '-' }}</td>
+            <td>{{ $presence->warga_tels->kelas ?? '-' }}</td>
+            <td>{{ $presence->time_masuk ?? '-' }}</td>
+            <td>{{ $presence->status ?? '-' }}</td>
+            <td>{{ $presence->time_keluar ?? '-' }}</td>
+            <td>{{ $presence->status_keluar ?? '-' }}</td>
+            <td>{{ $presence->alasan_datang_telat ?? $presence->alasan_datang ?? '-' }}</td>
+            <td>{{ $presence->alasan_pulang_telat ?? $presence->alasan_pulang_duluan ?? '-' }}</td>
+            <td>{{ $izin->reason ?? '-' }}</td>
         </tr>
         @endforeach
     </tbody>

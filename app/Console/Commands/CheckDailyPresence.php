@@ -62,7 +62,7 @@ class CheckDailyPresence extends Command
 
                 $this->info("NIS {$nis} status Alpa (karena lewat 15:00).");
 
-            } elseif ($today->greaterThan($limit) && $today->lessThan($skippingSchool) && $isProductive) {
+            } elseif ($today->greaterThan($limit) && $isProductive) {
                 $leave = LeaveDocument::where('nis', $nis)
                     ->whereDate('start_date', '<=', $today->toDateString())
                     ->whereDate('end_date', '>=', $today->toDateString())
