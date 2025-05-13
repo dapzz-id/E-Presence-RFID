@@ -10,8 +10,8 @@
 
 ## 2. Platform Overview <br>
 <ul>
-  <li>EN: <b>Web</b> (Admin Panel), <b>Windows</b> (Attendance Logger), <b>Android</b> (Student App).</li>
-  <li>ID: <b>Web</b> (Panel Admin), <b>Windows</b> (Pencatatan Absensi), <b>Android</b> (Aplikasi Siswa).</li>
+  <li>EN: <b>Web</b> (Admin Panel), <b>Windows</b> (Attendance Logger), <b>Android</b> (Parent App).</li>
+  <li>ID: <b>Web</b> (Panel Admin), <b>Windows</b> (Pencatatan Absensi), <b>Android</b> (Aplikasi Orang Tua).</li>
 </ul>
 
 ## 3. User Authentication and Authorization <br>
