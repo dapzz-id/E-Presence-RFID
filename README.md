@@ -8,7 +8,6 @@ With the implementation of this E-Presence system, it is expected to improve stu
 You can download the ZIP or clone using this Github URL. I state that this is only the first release version that I have implemented open source!
 
 ### Prerequisites
-
 List:
 - **Java 11+ version**
 - **Supports C#.NET**
@@ -17,17 +16,20 @@ List:
 ### Items Included in Docker
 1. MySQL (8.4.5)
 2. PHP (8.3 Latest)
-3. PHPMyAdmin (Latest)
-4. Nginx Alpine
+3. Composer (Latest)
+4. PHPMyAdmin (Latest)
+5. Nginx Alpine
 
 ### Installing Web
 1. Download this project
 2. Extract this project
 3. Run `composer install && npm install`
 4. Run `php artisan key:generate`
-5. Run `php artisan migrate --seed`
-6. Run `php artisan serve`
-7. Run `npm run dev` (Required for vite JS Axios)
+5. Run `docker compose build` (If you want to use Docker)
+6. Run `docker compose up` (If you want to use Docker)
+7. Run `php artisan migrate --seed`
+8. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
+9. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
 
 ## Contribute
 If you want to contribute to this project, then contact email raadeveloperz@gmail.com or WhatsApp +62895383107479
