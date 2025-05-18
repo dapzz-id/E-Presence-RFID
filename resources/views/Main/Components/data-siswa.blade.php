@@ -84,7 +84,7 @@
                                         {{ $wargaku->kelas }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $wargaku->alamat }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $wargaku->foto_profile, now()->addMinutes(5)) }}" alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
+                                        <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $wargaku->foto_profile, now()->addMinutes(5)) }}" loading="lazy" alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('siswa.edit', $wargaku->nis) }}" 

@@ -420,7 +420,7 @@
                     'border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden cursor-pointer hover:border-primary-500 dark:hover:border-primary-500 transition-colors';
                 photoElement.innerHTML = `
           <div class="aspect-[3/4] relative">
-            <img src="${photo.url}" alt="${photo.name}" class="w-full h-full object-cover">
+            <img src="${photo.url}" alt="${photo.name}" loading="lazy" class="w-full h-full object-cover">
           </div>
           <div class="p-2 text-xs truncate" title="${photo.name}">
             ${photo.name}

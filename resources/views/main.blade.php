@@ -405,7 +405,7 @@
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center">
                                                     <div class="w-10 h-10 md:w-12 lg:w-16 lg:h-16 md:h-12 mr-2 md:mr-3 flex-shrink-0">
-                                                        <img src="{{ asset('src/logotelesandi.png') }}" alt="" class="w-full h-full object-contain">
+                                                        <img src="{{ asset('src/logotelesandi.png') }}" alt="" loading="lazy" class="w-full h-full object-contain">
                                                     </div>
                                                     <div>
                                                         <p class="text-blue-400 id-card-micro">Sekolah Standar Nasional (SSN)</p>
@@ -449,7 +449,7 @@
                                                 <!-- Student photo -->
                                                 <div class="w-1/3 pl-2 flex-shrink-0">
                                                     <div class="bg-red-500">
-                                                        <img src="{{ asset('src/8b98c84e-7b27-4b03-a9bf-963af9b378b7.png') }}" alt="Student Photo" class="w-full aspect-[3/4] object-cover rounded">
+                                                        <img src="{{ asset('src/8b98c84e-7b27-4b03-a9bf-963af9b378b7.png') }}" loading="lazy" alt="Student Photo" class="w-full aspect-[3/4] object-cover rounded">
                                                     </div>
                                                 </div>
                                             </div>

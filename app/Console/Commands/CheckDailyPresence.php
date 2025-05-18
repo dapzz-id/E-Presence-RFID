@@ -41,9 +41,10 @@ class CheckDailyPresence extends Command
 
         $isProductive = in_array($today->toDateString(), $productiveDays);
         !$isProductive ? $this->info('Hari ini bukan hari produktif.') : $this->info('Hari ini adalah hari produktif.');
-        $users = User::pluck('nis');
+        $users = User::select('nis', 'status_ban')->get();
 
-        foreach ($users as $nis) {
+        foreach ($users as $user) {
+            $nis = $user->nis;
             $presence = Presence::where('nis', $nis)
                 ->whereDate('time_masuk', $today->toDateString())
                 ->first();
@@ -52,7 +53,7 @@ class CheckDailyPresence extends Command
                 continue;
             }
 
-            if ($today->greaterThan($skippingSchool) && $isProductive) {
+            if ($today->greaterThan($skippingSchool) && $isProductive && !$user->status_ban == 'inactive') {
                 Presence::create([
                     'nis'            => $nis,
                     'time_masuk'     => $today,
@@ -62,7 +63,7 @@ class CheckDailyPresence extends Command
 
                 $this->info("NIS {$nis} status Alpa (karena lewat 15:00).");
 
-            } elseif ($today->greaterThan($limit) && $isProductive) {
+            } elseif ($today->greaterThan($limit) && $isProductive && !$user->status_ban == 'inactive') {
                 $leave = LeaveDocument::where('nis', $nis)
                     ->whereDate('start_date', '<=', $today->toDateString())
                     ->whereDate('end_date', '>=', $today->toDateString())

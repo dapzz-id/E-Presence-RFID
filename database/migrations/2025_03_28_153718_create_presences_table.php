@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status_hari', ['Hari Produktif', 'Hari Non-Produktif']);
             $table->enum('status_keluar', ['Belum Waktunya', 'Tepat Waktu', 'Terlambat'])->nullable();
             $table->longText('alasan_datang_telat')->nullable();
+            $table->longText('alasan_datang')->nullable();
             $table->longText('alasan_pulang_telat')->nullable();
             $table->longText('alasan_pulang_duluan')->nullable();
         });

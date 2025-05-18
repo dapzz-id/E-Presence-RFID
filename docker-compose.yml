@@ -36,8 +36,8 @@ services:
     volumes:
       - lbdata:/var/lib/mysql
     environment:
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: raadeveloperz
+      MYSQL_ROOT_PASSWORD: raadeveloperz
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     networks:

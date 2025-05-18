@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="aspect-[3/4] w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                        <img src="{{ asset('storage/profile/' . $photo) }}" alt="{{ $photo }}"
+                        <img src="{{ asset('storage/profile/' . $photo) }}" loading="lazy" alt="{{ $photo }}"
                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             onerror="this.src='{{ asset('images/file-not-found.png') }}'; this.onerror=null;">
                     </div>
