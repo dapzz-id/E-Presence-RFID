@@ -27,7 +27,7 @@ services:
       - e-presence
 
   db:
-    image: mysql:8.4.5
+    image: mysql
     container_name: dbepresence
     restart: always
     tty: true

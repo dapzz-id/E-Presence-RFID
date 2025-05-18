@@ -904,6 +904,7 @@
                                     <div class="flex items-center gap-3 mb-2">
                                     <img src="${review.profile_photo_url}" 
                                         alt="${review.author_name}" 
+                                        loading="lazy"
                                         class="w-10 h-10 rounded-full object-cover">
                                     <h4 class="font-medium text-white">${review.author_name}</h4>
                                     </div>

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password')->index();
             $table->enum('status_ban', ['active', 'inactive'])->default('active');
             $table->string('rfid_id')->nullable()->unique();
+            $table->bigInteger('point')->default(0);
             $table->rememberToken();
             $table->timestamps(false);
         });

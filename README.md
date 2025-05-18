@@ -15,22 +15,23 @@ List:
 - **Docker (You don't need to install the required version of php or composer or etc, just install docker, and I have isolated it in a container and run it on localhost port 2025.)**
 
 ### Items Included in Docker
-1. MySQL (8.4.5)
-2. PHP (8.3 Latest)
+1. MySQL (Latest)
+2. PHP (8.3.*)
 3. Composer (Latest)
 4. PHPMyAdmin (Latest)
-5. Nginx Alpine
+5. Nginx (Alpine)
 
 ### Installing Web
 1. Download this project
 2. Extract this project
 3. Run `docker compose build` (If you want to use Docker)
-4. Run `docker compose up` (If you want to use Docker)
+4. Run `docker compose up -d` (If you want to use Docker)
 5. Run `composer install && npm install`
-6. Run `php artisan key:generate`
-7. Run `php artisan migrate --seed`
-8. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
-9. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
+6. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
+7. Run `php artisan key:generate`
+8. Run `docker compose exec app bash` (If you want to use Docker)
+9. Run `php artisan migrate --seed`
+10. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
 
 ## Contribute
 If you want to contribute to this project, then contact email raadeveloperz@gmail.com or WhatsApp +62895383107479
