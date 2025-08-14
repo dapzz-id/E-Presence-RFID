@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('rfid_id')->nullable()->unique();
             $table->bigInteger('point')->default(0);
             $table->rememberToken();
+            $table->enum('role', ['admin', 'siswa'])->default('siswa');
+            $table->timestamp('email_verified_at')->nullable();
             $table->timestamps(false);
         });
 

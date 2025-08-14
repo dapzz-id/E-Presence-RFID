@@ -359,7 +359,12 @@
             const selectedAccount = document.querySelector('input[name="account"]:checked');
 
             if (selectedAccount) {
-                const accountNIS = selectedAccount.closest('label').querySelector('p').textContent;
+                const accountNIS = selectedAccount
+                    .closest('label')
+                    .querySelector('.account-nis')
+                    .textContent
+                    .replace('NIS:', '')
+                    .trim();
 
                 Swal.fire({
                     title: "Are you sure?",
@@ -382,7 +387,7 @@
         function kirimData(rfid_id, nis) {
             axios.post("{{ route('rfid.store') }}", {
                     uid: rfid_id,
-                    nis: nis.split(' ')[1]
+                    nis: nis
                 })
                 .then(function(response) {
                     if (response.data?.success) {

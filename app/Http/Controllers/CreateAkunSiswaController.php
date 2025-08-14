@@ -78,7 +78,6 @@ class CreateAkunSiswaController extends Controller
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->nis = $request->nis;
-            $user->role = 'siswa';
             $user->status_ban = 'active';
             $user->email_verified_at = Carbon::now();
             $user->save();

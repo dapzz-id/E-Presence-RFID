@@ -320,7 +320,10 @@ class SiswaController extends Controller
                 
                 $photos[] = [
                     'name' => $fileName,
-                    'url' => asset('storage/profile/' . $fileName),
+                    'url' => Storage::disk('s3')->temporaryUrl(
+                        'profile/' . $fileName,
+                        now()->addMinutes(5)
+                    ),
                     'size' => $formattedSize
                 ];
             }

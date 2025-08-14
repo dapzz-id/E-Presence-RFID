@@ -65,10 +65,24 @@ Route::get('/login', function(){
 
 
 Route::post('/', function (Request $request) {
+    // Key unik dengan IP
+    $key = $request->ip();
+    $maxAttempts = 3; // maksimal 3 percobaan
+    $decaySeconds = 60; // 1 menit
+
+    if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+        $seconds = RateLimiter::availableIn($key);
+        return back()->withErrors([
+            'login' => "Terlalu banyak percobaan login. Silakan coba lagi dalam {$seconds} detik."
+        ])->withInput();
+    }
+
+    RateLimiter::hit($key, $decaySeconds);
+
     $credentials = $request->validate([
         'username' => 'required|string|min:6',
         'password' => 'required|string|min:6'
-    ],[
+    ], [
         'username.required' => 'Kolom username wajib diisi',
         'username.min' => 'Panjang username minimal 6 karakter',
         'password.required' => 'Kolom password wajib diisi',
@@ -76,13 +90,19 @@ Route::post('/', function (Request $request) {
     ]);
 
     if (Auth::guard('admin')->attempt($credentials)) {
-        return redirect()->route('dashboard')->with('success', 'Login sebagai Admin berhasil!');
+        $user = Auth::guard('admin')->user();
+
+        if ($user->membership == 1) {
+            return redirect()->route('dashboard')->with('success', 'Login sebagai Admin berhasil!');
+        }
+
+        Auth::guard('admin')->logout();
+        return back()->withErrors(['login' => 'Akun Anda belum berlangganan pada layanan ini'])->withInput();
     }
-    
+
     if (Auth::guard('superadmin')->attempt($credentials)) {
         return redirect()->route('dashboard.sa')->with('success', 'Login sebagai Superadmin berhasil!');
     }
-    
 
     return back()->withErrors(['login' => 'Username atau password salah'])->withInput();
 })->name('login.submit');

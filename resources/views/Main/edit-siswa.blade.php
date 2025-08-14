@@ -200,11 +200,15 @@
                                 </div>
                                 <div class="relative w-full h-full {{ $siswa->foto_profile ? '' : 'hidden' }}"
                                     id="photo-preview-container">
-                                    <img src="{{ $siswa->foto_profile ? asset('storage/profile/' . $siswa->foto_profile) : '/placeholder.svg' }}"
-                                        alt="Preview" id="photo-preview"
+                                    <img src="{{ $siswa->foto_profile 
+                                        ? Storage::disk('s3')->temporaryUrl('profile/' . $siswa->foto_profile, now()->addMinutes(5)) 
+                                        : '/placeholder.svg' }}"
+                                        alt="Preview"
+                                        id="photo-preview"
                                         loading="lazy"
                                         class="w-full h-full object-cover rounded-lg cursor-pointer"
                                         onclick="openPhotoBrowser()" />
+
                                     <button type="button" id="remove-photo"
                                         class="absolute top-2 right-2 bg-black text-white p-1 rounded-full">
                                         ×

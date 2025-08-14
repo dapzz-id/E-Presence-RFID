@@ -30,7 +30,11 @@
 
             <form action="{{ route('login.submit') }}" method="POST">
                 @csrf
-
+                @if ($errors->has('login'))
+                    <div class="mb-4 text-sm text-red-600 dark:text-red-400">
+                        {{ $errors->first('login') }}
+                    </div>
+                @endif
                 <div class="mb-6">
                     <label for="username"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>

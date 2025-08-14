@@ -18,7 +18,7 @@ class AdminAccountFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => fake()->userName(),
+            'username' => "adminproject",
             'email' => fake()->safeEmail(),
             'name' => fake()->name(),
             'password' => Hash::make('password')
