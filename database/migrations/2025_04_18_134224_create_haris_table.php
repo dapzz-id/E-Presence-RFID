@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('hari', function (Blueprint $table) {
             $table->id();
-            $table->string('bulan');
-            $table->string('tahun');
+            $table->string('bulan', 50);
+            $table->string('tahun', 4);
             $table->json('hari_produktif');
             $table->json('hari_tambahan')->nullable();
             $table->json('hari_libur')->nullable();
@@ -23,6 +23,7 @@ return new class extends Migration
             // Memastikan kombinasi bulan dan tahun unik
             $table->unique(['bulan', 'tahun']);
         });
+
     }
 
     public function down()

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('name');
             $table->string('email');
             $table->boolean('membership')->default(false);
-            $table->dateTime('last_membership')->useCurrent();
+            $table->dateTime('last_membership')->nullable();
             $table->string('password')->index();
             $table->timestamp('last_seen')->nullable();
             $table->timestamps();
