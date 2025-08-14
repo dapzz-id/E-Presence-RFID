@@ -32,9 +32,9 @@
                     </div>
 
                     <div class="aspect-[3/4] w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                        <img src="{{ asset('storage/profile/' . $photo) }}" loading="lazy" alt="{{ $photo }}"
+                        <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $photo, now()->addMinutes(5)) }}" loading="lazy" alt="{{ $photo }}"
                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            onerror="this.src='{{ asset('images/file-not-found.png') }}'; this.onerror=null;">
+                            onerror="this.src='{{ asset('src/file-not-found.jpg') }}'; this.onerror=null;">
                     </div>
 
                     <div class="px-2 py-1 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">

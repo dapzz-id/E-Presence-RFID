@@ -26,52 +26,56 @@ class SiswaImport implements ToCollection, WithHeadingRow, WithValidation
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            // Check if all required fields have values
-            if (empty($row['nis']) || empty($row['nama']) || empty($row['kelas']) || empty($row['alamat'])) {
-                continue; // Skip rows with empty required fields
+            // Pastikan field utama NIS, Nama, Kelas terisi
+            if (empty($row['nis']) || empty($row['nama']) || empty($row['kelas'])) {
+                continue;
             }
             
-            // Set default foto_profile if not provided
+            // Jika alamat kosong, isi dengan strip (-)
+            $alamat = trim($row['alamat'] ?? '');
+            if ($alamat === '') {
+                $alamat = '-';
+            }
+            
+            // Default foto_profile
             $fotoProfile = 'default.jpg';
             
-            // Check if photo exists in the photo map or already in storage
+            // Cek jika ada foto di Excel
             if (!empty($row['foto_profile'])) {
                 $photoName = $row['foto_profile'];
                 
-                // Check if photo exists in the uploaded ZIP
+                // Cek di ZIP upload
                 if (isset($this->photoMap[$photoName])) {
                     $fotoProfile = $photoName;
                     $this->photosProcessed++;
                 }
-                // Check if photo already exists in storage
-                elseif (Storage::disk('public')->exists('profile/' . $photoName)) {
+                // Cek di S3
+                elseif (Storage::disk('s3')->exists('profile/' . $photoName)) {
                     $fotoProfile = $photoName;
                 }
             }
             
-            // Check if student with this NIS already exists
+            // Cari siswa berdasarkan NIS
             $existingStudent = WargaTels::where('nis', $row['nis'])->first();
             
             if ($existingStudent) {
-                // Update existing student (only specific fields)
+                // Update data
                 $existingStudent->update([
                     'name' => $row['nama'],
                     'kelas' => $row['kelas'],
-                    'alamat' => $row['alamat'],
+                    'alamat' => $alamat,
                     'foto_profile' => $fotoProfile
                 ]);
-                
                 $this->rowsUpdated++;
             } else {
-                // Create new student
+                // Insert data baru
                 WargaTels::create([
                     'nis' => $row['nis'],
                     'name' => $row['nama'],
                     'kelas' => $row['kelas'],
-                    'alamat' => $row['alamat'],
+                    'alamat' => $alamat,
                     'foto_profile' => $fotoProfile
                 ]);
-                
                 $this->rowsInserted++;
             }
             
@@ -85,7 +89,7 @@ class SiswaImport implements ToCollection, WithHeadingRow, WithValidation
             'nis' => 'required|numeric',
             'nama' => 'required|string|max:255',
             'kelas' => 'required|string|max:50',
-            'alamat' => 'required|string',
+            'alamat' => 'nullable|string',
             'foto_profile' => 'nullable|string|max:255',
         ];
     }
@@ -97,11 +101,9 @@ class SiswaImport implements ToCollection, WithHeadingRow, WithValidation
             'nis.numeric' => 'NIS harus berupa angka',
             'nama.required' => 'Nama wajib diisi',
             'kelas.required' => 'Kelas wajib diisi',
-            'alamat.required' => 'Alamat wajib diisi',
         ];
     }
     
-    // Getter methods for statistics
     public function getRowsProcessed()
     {
         return $this->rowsProcessed;
