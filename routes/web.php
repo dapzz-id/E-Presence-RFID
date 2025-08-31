@@ -150,7 +150,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/dataHariIni', [DashboardController::class, 'index2'])->name('check.hari.ini');
 
-Route::prefix('admin')->middleware('auth:admin')->group(function (){
+Route::prefix('admin')->middleware(['auth:admin', 'check.admin.membership'])->group(function (){
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', function(){
         if (Auth::guard('admin')->check()) {
