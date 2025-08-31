@@ -11,59 +11,57 @@ use Illuminate\Console\Command;
 
 class CheckDailyPresence extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:check-daily-presence';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Cek presensi harian, set Alpa & Izin/Sakit jika sesuai ketentuan.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $this->info('Checking daily presence...');
 
         $presenceController = new AttendanceController();
-        $productiveDays = $presenceController->getProductiveDays(Carbon::now()->month, Carbon::now()->year)['productive'];
+        $productiveDays = $presenceController
+            ->getProductiveDays(Carbon::now()->month, Carbon::now()->year)['productive'];
 
         $today = Carbon::now();
-        $limit = Carbon::createFromTime(8, 0, 0);
-        $skippingSchool = Carbon::createFromTime(15, 0, 0);
+
+        // ambil waktu dari .env
+        $limitTime = env('MAX_MORNING_ENTRY', '08:00');
+        $endTime   = env('MAX_SCHOOL_END', '15:00');
+
+        $limit = Carbon::createFromFormat('H:i', $limitTime);
+        $skippingSchool = Carbon::createFromFormat('H:i', $endTime);
 
         $isProductive = in_array($today->toDateString(), $productiveDays);
-        !$isProductive ? $this->info('Hari ini bukan hari produktif.') : $this->info('Hari ini adalah hari produktif.');
+        $this->info($isProductive ? 'Hari ini adalah hari produktif.' : 'Hari ini bukan hari produktif.');
+
         $users = User::select('nis', 'status_ban')->get();
 
         foreach ($users as $user) {
             $nis = $user->nis;
+
             $presence = Presence::where('nis', $nis)
                 ->whereDate('time_masuk', $today->toDateString())
                 ->first();
 
             if ($presence) {
+                $this->info("NIS {$nis} sudah ada presensi hari ini, skip.");
                 continue;
             }
 
-            if ($today->greaterThan($skippingSchool) && $isProductive && !$user->status_ban == 'inactive') {
+            $this->info("Debug: NIS={$nis}, now={$today->toTimeString()}, productive={$isProductive}, banStatus={$user->status_ban}");
+
+            // Alpa jika lewat jam pulang
+            if ($today->greaterThan($skippingSchool) && $isProductive && $user->status_ban !== 'inactive') {
                 Presence::create([
-                    'nis'            => $nis,
-                    'time_masuk'     => $today,
-                    'status'         => 'Alpa',
-                    'status_hari'    => 'Hari Produktif',
+                    'nis'         => $nis,
+                    'time_masuk'  => $today,
+                    'status'      => 'Alpa',
+                    'status_hari' => 'Hari Produktif',
                 ]);
-
-                $this->info("NIS {$nis} status Alpa (karena lewat 15:00).");
-
-            } elseif ($today->greaterThan($limit) && $isProductive && !$user->status_ban == 'inactive') {
+                $this->info("NIS {$nis} status Alpa (karena lewat {$endTime}).");
+            }
+            // Cek izin/sakit setelah jam masuk pagi
+            elseif ($today->greaterThan($limit) && $isProductive && $user->status_ban !== 'inactive') {
                 $leave = LeaveDocument::where('nis', $nis)
                     ->whereDate('start_date', '<=', $today->toDateString())
                     ->whereDate('end_date', '>=', $today->toDateString())
@@ -71,13 +69,14 @@ class CheckDailyPresence extends Command
 
                 if ($leave) {
                     Presence::create([
-                        'nis'            => $nis,
-                        'time_masuk'     => Carbon::createFromTime(6, 0, 0),
-                        'status'         => $leave->type,
-                        'status_hari'    => 'Hari Produktif',
+                        'nis'         => $nis,
+                        'time_masuk'  => $today,
+                        'status'      => $leave->type,
+                        'status_hari' => 'Hari Produktif',
                     ]);
-
                     $this->info("NIS {$nis} status {$leave->type}.");
+                } else {
+                    $this->info("NIS {$nis} belum presensi, tapi tidak ada dokumen izin/sakit.");
                 }
             }
         }

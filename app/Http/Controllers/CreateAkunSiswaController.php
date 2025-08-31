@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Carbon\Carbon;
+use App\Mail\AccountCreatedMail;
 
 class CreateAkunSiswaController extends Controller
 {
@@ -41,7 +42,7 @@ class CreateAkunSiswaController extends Controller
             'username' => 'required|string|min:5|max:20|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', Password::min(8)],
-            'verification_code' => 'required|string',
+            // 'verification_code' => 'required|string',
         ], [
             'nis.required' => 'NIS harus dipilih',
             'nis.exists' => 'NIS tidak ditemukan dalam database',
@@ -53,18 +54,18 @@ class CreateAkunSiswaController extends Controller
             'email.unique' => 'Email sudah digunakan',
             'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
-            'verification_code.required' => 'Kode verifikasi harus diisi',
+            // 'verification_code.required' => 'Kode verifikasi harus diisi',
         ]);
         
         // Verifikasi kode
-        $verificationCode = VerificationCode::where('email', $request->email)
-            ->where('code', $request->verification_code)
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
+        // $verificationCode = VerificationCode::where('email', $request->email)
+        //     ->where('code', $request->verification_code)
+        //     ->where('expires_at', '>', Carbon::now())
+        //     ->first();
             
-        if (!$verificationCode) {
-            return back()->withInput()->with('error', 'Kode verifikasi tidak valid atau sudah kadaluarsa');
-        }
+        // if (!$verificationCode) {
+        //     return back()->withInput()->with('error', 'Kode verifikasi tidak valid atau sudah kadaluarsa');
+        // }
         
         try {
             DB::beginTransaction();
@@ -79,17 +80,17 @@ class CreateAkunSiswaController extends Controller
             $user->password = Hash::make($request->password);
             $user->nis = $request->nis;
             $user->status_ban = 'active';
-            $user->email_verified_at = Carbon::now();
+            // $user->email_verified_at = Carbon::now();
             $user->save();
             
             // Hapus kode verifikasi
-            $verificationCode->delete();
+            // $verificationCode->delete();
             
             DB::commit();
             
             // Kirim email notifikasi
-            $this->sendAccountCreationNotification($user, $siswa);
-            
+            $user->email ? $this->sendAccountCreationNotification($user, $siswa) : null;
+
             return redirect()->route('akun.siswa')->with('success', 'Akun siswa berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -181,9 +182,6 @@ class CreateAkunSiswaController extends Controller
             'email' => $user->email
         ];
         
-        Mail::send('emails.account-created', $data, function($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Akun Siswa Berhasil Dibuat');
-        });
+        Mail::to($user->email)->send(new AccountCreatedMail($data));
     }
 }

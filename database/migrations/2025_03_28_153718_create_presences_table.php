@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
             $table->string('nis');
-            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade');
+            $table->foreign('nis')->references('nis')->on('warga_tels')->onUpdate('cascade')->onDelete('cascade');
             $table->dateTime('time_masuk')->default(now());
             $table->dateTime('time_keluar')->nullable();
             $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa', 'Terlambat'])->default('Hadir');

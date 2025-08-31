@@ -26,7 +26,7 @@ class AdminAccount extends Authenticatable implements CanResetPassword
         return [
             'password' => 'hashed',
             'last_seen' => 'datetime',
-            'membership' => 'integer',
+            'last_membership' => 'datetime',
         ];
     }
 

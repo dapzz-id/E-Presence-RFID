@@ -141,6 +141,7 @@ Route::middleware('auth:sanctum')->get('/getMyAccount/{id}', function($id){
                 'persentase' => round($percentHadirNon, 0),
             ];
         }
+        
         /** @var \Illuminate\Filesystem\AwsS3V3Adapter $disk */
         $disk = Storage::disk('s3');
         $url = $disk->temporaryUrl('profile/'.$user->warga_tels->foto_profile, now()->addMinutes(5));

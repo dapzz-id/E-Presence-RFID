@@ -15,5 +15,6 @@ Artisan::command('inspire', function () {
 
 app()->booted(function () {
     $schedule = app(Schedule::class);
-    $schedule->command('app:check-daily-presence')->everyMinute();
+    $schedule->command('app:check-daily-presence')->everyMinute()->appendOutputTo(storage_path('logs/check_daily_presence.log'));
+    $schedule->command('membership:check')->everyTenMinutes()->appendOutputTo(storage_path('logs/check_membership.log'));
 });

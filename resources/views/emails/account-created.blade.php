@@ -150,12 +150,11 @@
 <body>
     <div class="email-wrapper">
         <div class="header">
-            <img src="{{ asset('src/LOGO RAADEVELOPERZ (SUPER HD).png') }}" style="max-width: 180px; max-height: 180px;" alt="raadeveloperz Logo" class="logo">
+            <img src="{{ asset('src/logo_raadeveloperz.png') }}" style="max-width: 180px; max-height: 180px;" alt="raadeveloperz Logo" class="logo">
         </div>
         
         <div class="content">
-            <h1>Akun Siswa Berhasil Dibuat</h1>
-            
+            <h1>Akun Siswa Berhasil Dibuat</h1>            
             <p>Halo, <strong>{{ $name }}</strong>!</p>
             
             <div class="success-icon">
@@ -194,7 +193,7 @@
                 <a href="https://youtube.com/@DitzzTechID" class="social-link">Youtube</a>
             </div>
             <p>&copy; {{ date('Y') }} raadeveloperz. Seluruh hak cipta dilindungi.</p>
-            <p>Jika Anda memiliki pertanyaan, silakan hubungi kami di <a href="mailto:raadeveloperz@gmail.com">raadeveloperz@gmail.com</a></p>
+            <p>Jika Anda memiliki pertanyaan, silakan hubungi kami di <a href="mailto:raadeveloperz@gmail.com">raadeveloperz@gmail.com</a> | <a href="https://wa.me/+62895383107479">+62 895-3831-07479</a></p>
         </div>
     </div>
 </body>

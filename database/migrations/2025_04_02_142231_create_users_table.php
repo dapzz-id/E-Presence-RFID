@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('password')->index();
             $table->enum('status_ban', ['active', 'inactive'])->default('active');
             $table->string('rfid_id')->nullable()->unique();
-            $table->bigInteger('point')->default(0);
+            $table->enum('membership', ['true', 'false'])->default('false');
+            $table->dateTime('last_membership')->nullable();
             $table->rememberToken();
             $table->enum('role', ['admin', 'siswa'])->default('siswa');
             $table->timestamp('email_verified_at')->nullable();

@@ -304,12 +304,12 @@ class SiswaController extends Controller
     {
         $photos = [];
         $files = Storage::disk('s3')->files('profile');
-        
+
         foreach ($files as $file) {
             if (in_array(pathinfo($file, PATHINFO_EXTENSION), ['jpg', 'jpeg', 'png'])) {
                 $fileName = basename($file);
                 $fileSize = Storage::disk('s3')->size($file);
-                
+
                 if ($fileSize < 1024) {
                     $formattedSize = $fileSize . ' B';
                 } elseif ($fileSize < 1024 * 1024) {
@@ -317,7 +317,7 @@ class SiswaController extends Controller
                 } else {
                     $formattedSize = round($fileSize / (1024 * 1024), 2) . ' MB';
                 }
-                
+
                 $photos[] = [
                     'name' => $fileName,
                     'url' => Storage::disk('s3')->temporaryUrl(
@@ -328,7 +328,7 @@ class SiswaController extends Controller
                 ];
             }
         }
-        
+
         return response()->json($photos);
     }
 

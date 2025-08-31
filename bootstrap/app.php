@@ -18,4 +18,5 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })->withCommands([
         App\Console\Commands\CheckDailyPresence::class,
+        App\Console\Commands\CheckMembership::class
     ])->create();
