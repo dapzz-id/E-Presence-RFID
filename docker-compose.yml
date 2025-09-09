@@ -10,7 +10,7 @@ services:
         working_dir: /var/www/e-presence
         volumes:
             - '.:/var/www/e-presence'
-            - './storage/php.ini:/usr/local/etc/php/conf.d/local.ini'
+            - './backend/storage/php.ini:/usr/local/etc/php/conf.d/local.ini'
         networks:
             - e-presence
     webserver:
@@ -22,7 +22,7 @@ services:
             - '2025:80'
         volumes:
             - '.:/var/www/e-presence'
-            - './storage/:/etc/nginx/conf.d/'
+            - './backend/storage/:/etc/nginx/conf.d/'
         networks:
             - e-presence
     db:
@@ -65,7 +65,7 @@ services:
             MYSQL_EXTRA_OPTIONS: '${MYSQL_EXTRA_OPTIONS}'
         volumes:
             - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - './backend/vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
             - sail
         healthcheck:

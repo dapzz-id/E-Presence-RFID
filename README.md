@@ -26,12 +26,22 @@ List:
 2. Extract this project
 3. Run `docker compose build` (If you want to use Docker)
 4. Run `docker compose up -d` (If you want to use Docker)
-5. Run `composer install && npm install`
-6. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
-7. Run `php artisan key:generate`
-8. Run `docker compose exec app bash` (If you want to use Docker)
-9. Run `php artisan migrate --seed`
-10. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
+5. Go into the `backend` folder
+6. Create a Symlink between Frontend and Backend using the code
+    > for Linux: `ln -s ../frontend/public public`
+    > for PowerShell (Administrator): `New-Item -ItemType SymbolicLink -Path "public" -Target "..\frontend\public"`
+7. Run `composer install && npm install`
+8. Run `php artisan key:generate`
+9. Go into the `root` folder
+10. Run `docker compose exec app bash` (If you want to use Docker)
+11. Go back into the `backend` folder
+12. Run `php artisan migrate --seed`
+13. Run `php artisan serve` (Not required if you want to use Docker, just run the container and open in browser `http://localhost:2025/`)
+14. Go into the `frontend` folder
+15. Run `npm run dev` or `npm run build` (Required for vite JS Axios)
 
 ## Contribute
 If you want to contribute to this project, then contact email raadeveloperz@gmail.com or WhatsApp +62895383107479
+
+## *NOTE
+To get the backend folder, contact the administrator to establish a project collaboration relationship.
