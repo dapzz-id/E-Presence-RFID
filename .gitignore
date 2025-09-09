@@ -4,6 +4,3 @@
 /frontend/public/storage
 /frontend/npm-debug.log
 /frontend/yarn-error.log
-
-/backend/*
-!/backend/server.php
