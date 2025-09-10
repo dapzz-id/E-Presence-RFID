@@ -19,7 +19,8 @@ import java.util.Map;
 
 public class Module {
 
-    public static String urlKoneksi = "http://urlmu:8000/";
+    public static String urlKoneksi = "https://e-presence.smktelekomunikasitelesandi.sch.id/";
+//    public static String urlKoneksi = "http://192.168.37.165:8001/"; // Localhost
     private static RequestQueue requestQueue;
 
     public static void init(Context context) {

@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+-dontwarn io.ktor.client.engine.mock.MockEngine$Companion
+-dontwarn io.ktor.client.engine.mock.MockEngine
+-dontwarn io.ktor.client.engine.mock.MockRequestHandleScope
+-dontwarn io.ktor.client.engine.mock.MockUtilsKt

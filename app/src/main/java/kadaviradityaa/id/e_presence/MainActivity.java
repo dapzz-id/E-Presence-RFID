@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     },
                     error -> {
-                        salinKeClipboard(this, error.toString());
                         Snackbar.make(findViewById(android.R.id.content), error.toString(), Snackbar.LENGTH_INDEFINITE).setAction("OK", view -> finishAffinity()).show();
                     }
                 );

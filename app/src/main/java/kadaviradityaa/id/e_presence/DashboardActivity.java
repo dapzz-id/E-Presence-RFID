@@ -273,35 +273,10 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
 
-        // For Android 11+ check MANAGE_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Log.d(TAG, "MANAGE_EXTERNAL_STORAGE not granted");
-                return false;
-            }
-        }
-
         return true;
     }
 
     private void requestAllPermissions() {
-        // For Android 11+ (R) we need special permission first
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-            try {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                manageAllFilesPermissionLauncher.launch(intent);
-            } catch (Exception e) {
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                manageAllFilesPermissionLauncher.launch(intent);
-            }
-            return;
-        }
-
         // Group 1: Camera and Location permissions
         List<String> group1Permissions = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -358,6 +333,7 @@ public class DashboardActivity extends AppCompatActivity {
             checkPermissionStatus();
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

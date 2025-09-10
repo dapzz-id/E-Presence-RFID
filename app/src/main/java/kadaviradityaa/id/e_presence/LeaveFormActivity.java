@@ -304,6 +304,7 @@ public class LeaveFormActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("IntentReset")
     private void openVideoPicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         intent.setType("video/*");

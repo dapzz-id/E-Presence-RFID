@@ -5,15 +5,16 @@ plugins {
 
 android {
     namespace 'kadaviradityaa.id.e_presence'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "kadaviradityaa.id.e_presence"
         minSdk 26
+        //noinspection OldTargetApi
         targetSdk 35
         vectorDrawables.useSupportLibrary = true
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "1.0.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
