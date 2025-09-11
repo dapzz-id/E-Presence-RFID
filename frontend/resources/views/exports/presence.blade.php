@@ -45,17 +45,6 @@
     </thead>
     <tbody>
         @foreach($presences as $index => $presence)
-        @php
-            // Ensure the dates are properly formatted for comparison
-            $tanggalPresensi = \Carbon\Carbon::parse($presence->tanggal_presensi)->format('Y-m-d');
-            
-            $izin = App\Models\LeaveDocument::where('nis', $presence->nis)
-                ->where(function($query) use ($tanggalPresensi) {
-                    $query->where('start_date', '<=', $tanggalPresensi)
-                          ->where('end_date', '>=', $tanggalPresensi);
-                })
-                ->first();
-        @endphp
         <tr>
             <!-- Your table cells remain the same -->
             <td>{{ $index + 1 }}</td>
@@ -68,7 +57,7 @@
             <td>{{ $presence->status_keluar ?? '-' }}</td>
             <td>{{ $presence->alasan_datang_telat ?? $presence->alasan_datang ?? '-' }}</td>
             <td>{{ $presence->alasan_pulang_telat ?? $presence->alasan_pulang_duluan ?? '-' }}</td>
-            <td>{{ $izin->reason ?? '-' }}</td>
+            <td>{{ $presence->izin_reason ?? '-' }}</td>
         </tr>
         @endforeach
     </tbody>
