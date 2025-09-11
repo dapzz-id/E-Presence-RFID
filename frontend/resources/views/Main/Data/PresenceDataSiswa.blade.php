@@ -678,89 +678,123 @@
                     @endif
 
                     @if(count($dataPresensi) > 0)
+                        <!-- Pagination -->
                         <div
                             class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
                             <div class="flex-1 flex justify-between sm:hidden">
-                                @if($dataPresensi->onFirstPage())
+                                {{-- Tombol Previous Mobile --}}
+                                @if ($dataPresensi->onFirstPage())
                                     <span
-                                        class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700">
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700">
                                         Previous
                                     </span>
                                 @else
-                                    <a href="{{ $dataPresensi->previousPageUrl() }}&kelas={{ request('kelas') }}"
-                                        class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <a href="{{ $dataPresensi->previousPageUrl() }}"
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         Previous
                                     </a>
                                 @endif
-
-                                @if($dataPresensi->hasMorePages())
-                                    <a href="{{ $dataPresensi->nextPageUrl() }}&kelas={{ request('kelas') }}"
-                                        class="ml-3 relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                
+                                {{-- Tombol Next Mobile --}}
+                                @if ($dataPresensi->hasMorePages())
+                                    <a href="{{ $dataPresensi->nextPageUrl() }}"
+                                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         Next
                                     </a>
                                 @else
                                     <span
-                                        class="ml-3 relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700">
+                                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700">
                                         Next
                                     </span>
                                 @endif
                             </div>
-
+                
                             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                                 <div>
-                                    <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mobile-text-adjust">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
                                         Showing <span class="font-medium">{{ $dataPresensi->firstItem() }}</span>
                                         to <span class="font-medium">{{ $dataPresensi->lastItem() }}</span>
                                         of <span class="font-medium">{{ $dataPresensi->total() }}</span> results
                                     </p>
                                 </div>
                                 <div>
-                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                                        aria-label="Pagination">
-                                        {{-- Previous Button --}}
-                                        @if($dataPresensi->onFirstPage())
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        {{-- Tombol Previous --}}
+                                        @if ($dataPresensi->onFirstPage())
                                             <span
                                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                <svg class="h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
                                         @else
-                                            <a href="{{ $dataPresensi->previousPageUrl() }}&kelas={{ request('kelas') }}"
+                                            <a href="{{ $dataPresensi->previousPageUrl() }}"
                                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <svg class="h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </a>
                                         @endif
-
-                                        {{-- Page Numbers --}}
-                                        @foreach($dataPresensi->links()->elements[0] as $page => $url)
-                                            @if($page == $dataPresensi->currentPage())
+                
+                                        {{-- Nomor Halaman dengan Ellipses --}}
+                                        @php
+                                            $currentPage = $dataPresensi->currentPage();
+                                            $lastPage = $dataPresensi->lastPage();
+                                            $start = max($currentPage - 2, 1);
+                                            $end = min($currentPage + 2, $lastPage);
+                                        @endphp
+                
+                                        {{-- Halaman pertama --}}
+                                        @if ($start > 1)
+                                            <a href="{{ $dataPresensi->url(1) }}"
+                                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium {{ $currentPage == 1 ? 'bg-primary-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600' }}">
+                                                1
+                                            </a>
+                                            @if ($start > 2)
                                                 <span
-                                                    class="z-10 bg-primary-50 dark:bg-primary-900 border-primary-500 dark:border-primary-500 text-primary-600 dark:text-primary-200 relative inline-flex items-center px-3 py-2 border text-xs sm:text-sm font-medium">
+                                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400">…</span>
+                                            @endif
+                                        @endif
+                
+                                        {{-- Halaman di sekitar current --}}
+                                        @for ($page = $start; $page <= $end; $page++)
+                                            @if ($page == $currentPage)
+                                                <span
+                                                    class="z-10 bg-primary-50 dark:bg-primary-900 border-primary-500 dark:border-primary-500 text-primary-600 dark:text-primary-200 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                                                     {{ $page }}
                                                 </span>
                                             @else
-                                                <a href="{{ $url }}&kelas={{ request('kelas') }}"
-                                                    class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-3 py-2 border text-xs sm:text-sm font-medium">
+                                                <a href="{{ $dataPresensi->url($page) }}"
+                                                    class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                                                     {{ $page }}
                                                 </a>
                                             @endif
-                                        @endforeach
-
-                                        {{-- Next Button --}}
-                                        @if($dataPresensi->hasMorePages())
-                                            <a href="{{ $dataPresensi->nextPageUrl() }}&kelas={{ request('kelas') }}"
+                                        @endfor
+                
+                                        {{-- Halaman terakhir --}}
+                                        @if ($end < $lastPage)
+                                            @if ($end < $lastPage - 1)
+                                                <span
+                                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400">…</span>
+                                            @endif
+                                            <a href="{{ $dataPresensi->url($lastPage) }}"
+                                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium {{ $currentPage == $lastPage ? 'bg-primary-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600' }}">
+                                                {{ $lastPage }}
+                                            </a>
+                                        @endif
+                
+                                        {{-- Tombol Next --}}
+                                        @if ($dataPresensi->hasMorePages())
+                                            <a href="{{ $dataPresensi->nextPageUrl() }}"
                                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                                <svg class="h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                                                         clip-rule="evenodd" />
@@ -769,8 +803,8 @@
                                         @else
                                             <span
                                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                <svg class="h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                                                         clip-rule="evenodd" />
