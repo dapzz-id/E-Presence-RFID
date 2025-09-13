@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${window.env.APP_NAME}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="../src/icon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#ffffff',
+                        foreground: '#374151',
+                        card: '#fefce8',
+                        'card-foreground': '#374151',
+                        primary: '#d97706',
+                        'primary-foreground': '#ffffff',
+                        secondary: '#f59e0b',
+                        'secondary-foreground': '#ffffff',
+                        muted: '#fefce8',
+                        'muted-foreground': '#6b7280',
+                        accent: '#f59e0b',
+                        'accent-foreground': '#ffffff',
+                        destructive: '#dc2626',
+                        'destructive-foreground': '#ffffff',
+                        border: '#e5e7eb'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    },
+                    borderRadius: {
+                        'lg': '0.75rem',
+                        'xl': '1rem',
+                        '2xl': '1.5rem'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html, body {
+            overflow-y: scroll; /* masih bisa discroll */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Edge, Safari */
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans min-h-screen">
+    <!-- Modern header with gradient and better typography -->
+    <header class="w-full bg-gradient-to-r top-0 fixed from-primary to-secondary shadow-lg z-50 pt-4">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="../src/icon.png" alt="E-Presence Logo" class="w-12 h-12">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">E-Presence</h1>
+                        <p class="text-amber-100 text-sm">raadeveloperz - v2.0.0</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div id="timeDisplay" class="text-3xl font-mono font-bold text-white">12:11:39</div>
+                    <div id="dateDisplay" class="text-amber-100 text-sm">Kamis, 12 September 2024</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modern main content with improved spacing and cards -->
+    <main class="container mx-auto px-6 py-8 space-y-8 pt-52">
+        <!-- Statistics Cards Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+            <!-- NFC Scanning Panel -->
+            <div class="xl:col-span-2 bg-card rounded-2xl border border-border shadow-lg p-8 min-h-[400px]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-card-foreground">Scan Kartu Pelajar</h2>
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                
+                <!-- Student Info (Hidden by default, shown when card is scanned) -->
+                <div id="studentInfo" class="hidden">
+                    <div class="bg-white rounded-xl p-6 border border-border">
+                        <div class="flex items-start space-x-6">
+                            <img id="studentPhoto" src="/placeholder.svg?height=120&width=100" alt="Student Photo" class="w-24 h-32 object-cover rounded-lg border-2 border-border shadow-sm">
+                            <div class="flex-1 space-y-3">
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm font-medium text-muted-foreground min-w-[60px]">NIS:</span>
+                                        <span id="studentNIS" class="text-lg font-bold text-foreground">232410012</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm font-medium text-muted-foreground min-w-[60px]">Nama:</span>
+                                        <span id="studentName" class="text-lg font-bold text-foreground">DIRTANDRA PUTRA TAUFIQ</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm font-medium text-muted-foreground min-w-[60px]">Kelas:</span>
+                                        <span id="studentClass" class="text-lg font-bold text-foreground">XI RPL 2</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <p class="text-blue-800 font-medium text-sm">✓ Kartu berhasil dikenali</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NFC Scanning Area (Default view) -->
+                <div id="nfcScanning" class="text-center">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-card-foreground mb-2">Tempelkan Kartu Pelajar</h3>
+                    <p class="text-muted-foreground text-sm">Dekatkan kartu ke area NFC untuk mencatat kehadiran</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="flex space-x-2">
+                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Students Today -->
+            <div class="bg-card rounded-2xl border border-border shadow-lg p-6 min-h-[400px] flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Siswa Hari Ini</h3>
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col justify-center">
+                    <div class="text-center">
+                        <span id="totalToday" class="text-5xl font-bold text-card-foreground">127</span>
+                        <p class="text-muted-foreground text-sm mt-2">siswa hadir</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Students Sick/Permission -->
+            <div class="bg-card rounded-2xl border border-border shadow-lg p-6 min-h-[400px] flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Izin/Sakit</h3>
+                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col justify-center">
+                    <div class="text-center">
+                        <span id="totalSickPermission" class="text-5xl font-bold text-card-foreground">8</span>
+                        <p class="text-muted-foreground text-sm mt-2">siswa tidak hadir</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Overall Students -->
+            <div class="bg-card rounded-2xl border border-border shadow-lg p-6 min-h-[300px] flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Total Siswa</h3>
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col justify-center">
+                    <div class="text-center">
+                        <span id="totalOverall" class="text-5xl font-bold text-card-foreground">150</span>
+                        <p class="text-muted-foreground text-sm mt-2">siswa terdaftar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Data Table -->
+            <div class="xl:col-span-3">
+                <div class="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-card-foreground">Riwayat Absensi Terbaru</h3>
+                        <p class="text-muted-foreground text-sm">Data kehadiran siswa hari ini</p>
+                    </div>
+                    <!-- Table wrapper agar bisa discroll -->
+                    <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+                        <table class="w-full">
+                            <thead class="bg-muted sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">No</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">NIS</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kelas</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Masuk</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Keluar</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTable" class="bg-white divide-y divide-border">
+                                <!-- Data absensi akan dimasukkan dari index.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tambahkan ini sebelum penutup body -->
+            <script src="index.js"></script>
+        </div>
+
+        <!-- Modern bottom controls with better styling -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-2xl border border-border shadow-lg p-6">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-sm font-medium text-muted-foreground">Mode Aktif:</span>
+                    <span id="attendanceMode" class="text-lg font-bold text-card-foreground">Absensi Masuk</span>
+                </div>
+            </div>
+            
+            <button id="checkOutBtn" class="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Absensi Keluar</span>
+                </div>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('dateDisplay').textContent = dateString;
+        }
+
+        // Update time every second
+        setInterval(updateTime, 1000);
+        updateTime(); // Initial call
+
+        // Mock data for demonstration
+        let attendanceMode = 'Absensi Masuk';
+        let totalTodayCount = 127;
+        let totalSickPermissionCount = 8;
+        let totalOverallCount = 150;
+
+        // Update display values
+        document.getElementById('totalToday').textContent = totalTodayCount;
+        document.getElementById('totalSickPermission').textContent = totalSickPermissionCount;
+        document.getElementById('totalOverall').textContent = totalOverallCount;
+
+        // Check out button functionality
+        document.getElementById('checkOutBtn').addEventListener('click', function() {
+            const icon = this.querySelector('svg');
+            const text = this.querySelector('span');
+            
+            if (attendanceMode === 'Absensi Masuk') {
+                attendanceMode = 'Absensi Keluar';
+                text.textContent = 'Absensi Masuk';
+                this.classList.remove('bg-primary', 'hover:bg-primary/90');
+                this.classList.add('bg-destructive', 'hover:bg-destructive/90');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>';
+            } else {
+                attendanceMode = 'Absensi Masuk';
+                text.textContent = 'Absensi Keluar';
+                this.classList.remove('bg-destructive', 'hover:bg-destructive/90');
+                this.classList.add('bg-primary', 'hover:bg-primary/90');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>';
+            }
+            document.getElementById('attendanceMode').textContent = attendanceMode;
+        });
+
+        // Simulate NFC card scanning (for demonstration)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                // Simulate card scan - show student info
+                document.getElementById('nfcScanning').classList.add('hidden');
+                document.getElementById('studentInfo').classList.remove('hidden');
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('studentInfo').classList.add('hidden');
+                    document.getElementById('nfcScanning').classList.remove('hidden');
+                }, 5000);
+            }
+        });
+
+        // Add some interactive animations
+        document.querySelectorAll('.bg-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

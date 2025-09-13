@@ -1,0 +1,20 @@
+PresenceApps License Agreement
+
+1. Aplikasi ini hanya untuk keperluan internal.
+2. Dilarang mendistribusikan ulang tanpa izin.
+3. Tidak ada jaminan kerusakan hardware atau software akibat penggunaan aplikasi ini.
+
+Dengan menggunakan aplikasi ini, Anda setuju dengan syarat dan ketentuan berikut.
+
+=== Kebijakan Privasi ===
+
+Kami mengumpulkan informasi berikut melalui aplikasi E-Presence:
+- Identitas siswa: nama, NIS, kelas, foto, email.
+- Data kartu RFID.
+- Data presensi.
+- Data sekolah.
+- Data penggunaan aplikasi.
+
+Selengkapnya dapat dibaca di: https://e-presence.smktelekomunikasitelesandi.sch.id/privacy
+
+Dengan mengklik "I accept", Anda menyetujui perjanjian lisensi dan kebijakan privasi ini.

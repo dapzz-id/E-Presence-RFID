@@ -1,0 +1,54 @@
+{
+  "name": "presenceapps",
+  "version": "2.0.0",
+  "description": "E-Presence is an attendance application that utilizes NFC technology to facilitate quick and efficient attendance recording. This application is designed to streamline the attendance process, making it easier for both administrators, students and parents.",
+  "main": "app.js",
+  "author": "dapzz-id",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.raadeveloperz.presenceapps",
+    "productName": "PresenceApps",
+    "copyright": "© 2025 dapzz-id",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "page/**/*",
+      "src/**/*",
+      "build/**/*",
+      "app.js",
+      "preload.js",
+      "package.json"
+    ],
+    "extraResources": [],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "uninstallDisplayName": "PresenceApps",
+      "shortcutName": "PresenceApps",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "license": "license.txt",
+      "guid": "{C8E26BDD-571B-4672-AD3E-7A2714918B12}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^38.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2"
+  }
+}
