@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-require("dotenv").config();
+require("dotenv").config({
+  path: path.join(__dirname, ".env")
+});
 
 const createWindow = () => {
   // Create the browser window.
@@ -10,14 +12,15 @@ const createWindow = () => {
     titleBarOverlay: {
       color: '#ff000000',        // warna background titlebar
       symbolColor: '#ffffff',  // warna icon silang/minimize/maximize
-      height: 30
+      height: 102
     },
     autoHideMenuBar: true,
     menuBarVisible: false,
     icon: path.join(__dirname, "build", "icon.ico"),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 

@@ -17,9 +17,9 @@
                         foreground: '#374151',
                         card: '#fefce8',
                         'card-foreground': '#374151',
-                        primary: '#d97706',
+                        primary: '#488EF8',
                         'primary-foreground': '#ffffff',
-                        secondary: '#f59e0b',
+                        secondary: '#143072',
                         'secondary-foreground': '#ffffff',
                         muted: '#fefce8',
                         'muted-foreground': '#6b7280',
@@ -57,19 +57,19 @@
 </head>
 <body class="bg-background text-foreground font-sans min-h-screen">
     <!-- Modern header with gradient and better typography -->
-    <header class="w-full bg-gradient-to-r top-0 fixed from-primary to-secondary shadow-lg z-50 pt-4">
+    <header class="w-full bg-gradient-to-r top-0 fixed from-primary to-secondary shadow-lg z-50">
         <div class="container mx-auto px-6 py-8">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                     <img src="../src/icon.png" alt="E-Presence Logo" class="w-12 h-12">
                     <div>
                         <h1 class="text-2xl font-bold text-white">E-Presence</h1>
-                        <p class="text-amber-100 text-sm">raadeveloperz - v2.0.0</p>
+                        <p class="text-amber-100 text-sm">raadeveloperz - v2.0.3</p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <div id="timeDisplay" class="text-3xl font-mono font-bold text-white">12:11:39</div>
-                    <div id="dateDisplay" class="text-amber-100 text-sm">Kamis, 12 September 2024</div>
+                <div class="text-right mr-16 md:mr-22 sm:mr-42">
+                    <div id="timeDisplay" class="text-3xl font-mono font-bold text-white">00:00:00</div>
+                    <div id="dateDisplay" class="text-amber-100 text-sm">Kamis, 12 November 2007</div>
                 </div>
             </div>
         </div>
@@ -99,11 +99,11 @@
                                     </div>
                                     <div class="flex items-center space-x-3">
                                         <span class="text-sm font-medium text-muted-foreground min-w-[60px]">Nama:</span>
-                                        <span id="studentName" class="text-lg font-bold text-foreground">DIRTANDRA PUTRA TAUFIQ</span>
+                                        <span id="studentName" class="text-lg font-bold text-foreground">KADAVI RADITYA ALVINO</span>
                                     </div>
                                     <div class="flex items-center space-x-3">
                                         <span class="text-sm font-medium text-muted-foreground min-w-[60px]">Kelas:</span>
-                                        <span id="studentClass" class="text-lg font-bold text-foreground">XI RPL 2</span>
+                                        <span id="studentClass" class="text-lg font-bold text-foreground">XII RPL 2</span>
                                     </div>
                                 </div>
                                 <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -147,7 +147,7 @@
                 </div>
                 <div class="flex-1 flex flex-col justify-center">
                     <div class="text-center">
-                        <span id="totalToday" class="text-5xl font-bold text-card-foreground">127</span>
+                        <span id="totalToday" class="text-5xl font-bold text-card-foreground">0</span>
                         <p class="text-muted-foreground text-sm mt-2">siswa hadir</p>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                 </div>
                 <div class="flex-1 flex flex-col justify-center">
                     <div class="text-center">
-                        <span id="totalSickPermission" class="text-5xl font-bold text-card-foreground">8</span>
+                        <span id="totalSickPermission" class="text-5xl font-bold text-card-foreground">0</span>
                         <p class="text-muted-foreground text-sm mt-2">siswa tidak hadir</p>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                 </div>
                 <div class="flex-1 flex flex-col justify-center">
                     <div class="text-center">
-                        <span id="totalOverall" class="text-5xl font-bold text-card-foreground">150</span>
+                        <span id="totalOverall" class="text-5xl font-bold text-card-foreground">0</span>
                         <p class="text-muted-foreground text-sm mt-2">siswa terdaftar</p>
                     </div>
                 </div>
@@ -210,7 +210,8 @@
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kelas</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Masuk</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Keluar</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status Masuk</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status Keluar</th>
                                 </tr>
                             </thead>
                             <tbody id="attendanceTable" class="bg-white divide-y divide-border">

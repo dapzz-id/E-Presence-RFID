@@ -1,9 +1,9 @@
 {
   "name": "presenceapps",
-  "version": "2.0.0",
+  "version": "2.0.3",
   "description": "E-Presence is an attendance application that utilizes NFC technology to facilitate quick and efficient attendance recording. This application is designed to streamline the attendance process, making it easier for both administrators, students and parents.",
   "main": "app.js",
-  "author": "dapzz-id",
+  "author": "raadeveloperz",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
@@ -12,7 +12,7 @@
   "build": {
     "appId": "com.raadeveloperz.presenceapps",
     "productName": "PresenceApps",
-    "copyright": "© 2025 dapzz-id",
+    "copyright": "© 2025 raadeveloperz",
     "directories": {
       "buildResources": "build",
       "output": "dist"
@@ -23,7 +23,8 @@
       "build/**/*",
       "app.js",
       "preload.js",
-      "package.json"
+      "package.json",
+      ".env"
     ],
     "extraResources": [],
     "win": {

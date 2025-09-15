@@ -153,6 +153,15 @@ async function LoadDataAsync() {
                         ${row["Status Masuk"] || "-"}
                     </span>
                 </td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                        row["Status Keluar"] === "Hadir"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                    }">
+                        ${row["Status Keluar"] || "-"}
+                    </span>
+                </td>
             `;
             tableBody.appendChild(tr);
         });
