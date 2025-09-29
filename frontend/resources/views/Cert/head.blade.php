@@ -37,13 +37,31 @@
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/hari' || request()->path() == 'admin/hari/form' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Tentukan Hari</a>
             <a href="{{ route('siswa') }}"
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/siswa' || request()->path() == 'admin/siswa/add' || Str::startsWith(request()->path(), 'admin/akun-siswa') || request()->path() == 'admin/photos' || Str::startsWith(request()->path(), 'admin/siswa/edit/') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Kelola Siswa</a>
-            <a href="{{ route('rfid.connect') }}"
-                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Daftarkan Kartu</a>
+            @php
+                $systemSettings = App\Models\Settings::first();
+                $attendanceMethod = $systemSettings->attendance_method ?? 'rfid';
+            @endphp
+            
+            @if($attendanceMethod === 'face_id')
+                <a href="{{ route('settings.register-face') }}"
+                    class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->routeIs('settings.register-face') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
+                    Daftarkan Wajah
+                </a>
+            @else
+                <a href="{{ route('rfid.connect') }}"
+                    class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
+                   Daftarkan Kartu
+                </a>
+            @endif
                 @php
                     $statusMembership = App\Models\AdminAccount::where('id', auth()->user()->id)->where('membership', true)->exists();
                 @endphp
             <a href="{{ route('connections.index') }}"
                 class="flex flex-row items-center px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/connections' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Hubungkan Data @if (!$statusMembership)  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown-icon ml-auto text-yellow-500 lucide-crown"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>  @endif</a>
+            <a href="{{ route('settings.index') }}"
+                class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/settings' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
+                Setting
+            </a>
             <a onclick="confirmLogout()"
                 class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'logout' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">Logout</a>
         </nav>
