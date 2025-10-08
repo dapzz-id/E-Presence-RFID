@@ -71,9 +71,9 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Registration Form -->
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700">
                     <h2 class="text-xl font-semibold text-white">
                         <i class="fas fa-camera mr-2"></i>Registrasi Wajah
@@ -81,40 +81,97 @@
                 </div>
                 
                 <div class="p-6">
-                    <!-- Camera Container -->
-                    <div class="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style="aspect-ratio: 4/3;">
+                    <!-- Student Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Pilih Akun Siswa
+                        </label>
+                        <div class="relative">
+                            <button id="studentSelectBtn" type="button" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-left flex items-center justify-between">
+                                <span id="selectedStudentText">-- Pilih Siswa --</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <input type="hidden" id="selectedStudentNIS" value="">
+                        </div>
+                    </div>
+                    
+                    <!-- Student Selection Modal -->
+                    <div id="studentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 max-h-96 flex flex-col">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-600">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Pilih Siswa</h3>
+                                <div class="mt-2">
+                                    <input type="text" id="studentSearch" placeholder="Cari nama atau NIS..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-2">
+                                <div id="studentList" class="space-y-1">
+                                    @foreach($students as $student)
+                                        <div class="student-item p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer border border-transparent hover:border-primary-300" data-nis="{{ $student->nis }}" data-name="{{ $student->name }}">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mr-3">
+                                                    <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium text-gray-900 dark:text-white">{{ $student->name }}</div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">NIS: {{ $student->nis }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="p-4 border-t border-gray-200 dark:border-gray-600">
+                                <button id="closeStudentModal" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg">
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Liveness Detection Instructions -->
+                    <div id="livenessInstructions" class="mb-4 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg hidden">
+                        <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">Instruksi Liveness Detection:</h4>
+                        <div id="currentInstruction" class="text-blue-800 dark:text-blue-200 text-center text-lg font-medium">
+                            Berkedip 3 kali
+                        </div>
+                        <div class="mt-2 text-sm text-blue-600 dark:text-blue-300 text-center">
+                            <span id="instructionTimer">3</span> detik tersisa
+                        </div>
+                    </div>
+                    
+                    <!-- Camera Container (proporsional dan tidak memakan tempat) -->
+                    <div class="relative bg-gray-900 rounded-lg overflow-hidden mb-6 w-full" style="height: 320px; max-width: 480px; margin: 0 auto; aspect-ratio: 4/3;">
                         <video id="video" autoplay muted playsinline class="w-full h-full object-cover"></video>
                         <canvas id="canvas" class="hidden"></canvas>
                         
-                        <!-- Face Detection Overlay -->
-                        <div id="faceOverlay" class="absolute inset-0 pointer-events-none">
-                            <!-- Face detection box will be drawn here -->
+                        <!-- Face Detection Overlay - DISABLED -->
+                        <div id="faceOverlay" class="absolute inset-0 pointer-events-none hidden">
+                            <!-- Face detection box disabled for registration -->
                         </div>
                         
-                        <!-- Status Overlay -->
-                        <div id="statusOverlay" class="absolute top-4 left-4 right-4">
-                            <div id="statusMessage" class="bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg text-sm text-center hidden">
-                                Memulai kamera...
-                            </div>
-                        </div>
-                        
-                        <!-- Capture Counter -->
-                        <div id="captureCounter" class="absolute bottom-4 right-4">
-                            <div class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                <span id="captureCount">0</span>/3 Foto
+                        <!-- Photo Progress Indicator -->
+                        <div id="photoProgress" class="absolute top-4 left-4 hidden">
+                            <div class="bg-black bg-opacity-75 text-white px-3 py-2 rounded-lg text-sm">
+                                <div id="currentPhotoIndicator" class="font-medium">Foto 1 dari 3</div>
+                                <div class="flex space-x-1 mt-1">
+                                    <div id="progress1" class="w-6 h-1 bg-gray-400 rounded"></div>
+                                    <div id="progress2" class="w-6 h-1 bg-gray-400 rounded"></div>
+                                    <div id="progress3" class="w-6 h-1 bg-gray-400 rounded"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Controls -->
                     <div class="space-y-4">
-                        <button id="startCamera" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
-                            <i class="fas fa-camera mr-2"></i>Mulai Kamera
+                        <button id="startCamera" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center" disabled>
+                            <i class="fas fa-camera mr-2"></i>Mulai Registrasi Wajah
                         </button>
                         
-                        <button id="captureBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden" disabled>
-                            <i class="fas fa-camera-retro mr-2"></i><span id="captureButtonText">Ambil Foto</span>
-                        </button>
+                        <div id="livenessStatus" class="w-full bg-blue-600 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center hidden">
+                            <i class="fas fa-eye mr-2"></i><span id="livenessText">Liveness Detection Aktif</span>
+                        </div>
                         
                         <button id="registerBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden" disabled>
                             <i class="fas fa-user-check mr-2"></i>Daftar Face ID
@@ -128,90 +185,35 @@
                             <i class="fas fa-stop mr-2"></i>Stop Kamera
                         </button>
                     </div>
+                    
+                    <!-- Registration Status -->
+                    <div id="registrationStatus" class="mt-6 hidden">
+                        <!-- Status akan ditampilkan di sini -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Instructions & Preview -->
-            <div class="space-y-6">
-                <!-- Captured Photos Preview -->
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-                        <h3 class="text-lg font-semibold text-white">
-                            <i class="fas fa-images mr-2"></i>Foto yang Diambil
-                        </h3>
-                    </div>
-                    
-                    <div class="p-6">
-                        <div id="photoPreview" class="grid grid-cols-3 gap-4">
-                            <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 text-2xl"></i>
-                            </div>
-                            <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 text-2xl"></i>
-                            </div>
-                            <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-camera text-gray-400 text-2xl"></i>
-                            </div>
+            <!-- Preview Foto Compact -->
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700">
+                    <h3 class="text-sm font-semibold text-white">
+                        <i class="fas fa-images mr-2"></i>Preview Foto
+                    </h3>
+                </div>
+                
+                <div class="p-4">
+                    <div id="photoPreview" class="grid grid-cols-1 gap-3">
+                        <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-camera text-gray-400 text-xl"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-camera text-gray-400 text-xl"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-camera text-gray-400 text-xl"></i>
                         </div>
                     </div>
                 </div>
-
-                <!-- Instructions -->
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
-                        <h3 class="text-lg font-semibold text-white">
-                            <i class="fas fa-info-circle mr-2"></i>Petunjuk Registrasi
-                        </h3>
-                    </div>
-                    
-                    <div class="p-6">
-                        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Ambil 3 foto wajah dari sudut yang berbeda
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Pastikan pencahayaan cukup dan wajah terlihat jelas
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Jangan memakai kacamata gelap atau masker
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Foto 1: Wajah menghadap lurus ke kamera
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Foto 2: Wajah sedikit miring ke kiri
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-3 mt-0.5"></i>
-                                Foto 3: Wajah sedikit miring ke kanan
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Registration Status -->
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700">
-                        <h3 class="text-lg font-semibold text-white">
-                            <i class="fas fa-chart-pie mr-2"></i>Status Registrasi
-                        </h3>
-                    </div>
-                    
-                    <div class="p-6">
-                        <div id="registrationStatus">
-                            <div class="text-center text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-hourglass-start text-4xl mb-4"></i>
-                                <p>Siap untuk memulai registrasi</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -239,33 +241,35 @@ class FaceRegistrationSystem {
     
     initializeElements() {
         this.startBtn = document.getElementById('startCamera');
-        this.captureBtn = document.getElementById('captureBtn');
         this.registerBtn = document.getElementById('registerBtn');
         this.resetBtn = document.getElementById('resetBtn');
         this.stopBtn = document.getElementById('stopCamera');
         this.statusMessage = document.getElementById('statusMessage');
-        this.captureCount = document.getElementById('captureCount');
-        this.captureButtonText = document.getElementById('captureButtonText');
         this.photoPreview = document.getElementById('photoPreview');
         this.registrationStatus = document.getElementById('registrationStatus');
+        this.livenessStatus = document.getElementById('livenessStatus');
+        this.livenessText = document.getElementById('livenessText');
+        this.livenessInstructions = document.getElementById('livenessInstructions');
+        this.currentInstruction = document.getElementById('currentInstruction');
+        this.instructionTimer = document.getElementById('instructionTimer');
         
-        this.startBtn.addEventListener('click', () => this.startCamera());
-        this.captureBtn.addEventListener('click', () => this.capturePhoto());
-        this.registerBtn.addEventListener('click', () => this.registerFace());
-        this.resetBtn.addEventListener('click', () => this.resetCapture());
-        this.stopBtn.addEventListener('click', () => this.stopCamera());
+        // Add event listeners with null checks
+        if (this.startBtn) this.startBtn.addEventListener('click', () => this.startCamera());
+        if (this.registerBtn) this.registerBtn.addEventListener('click', () => this.registerFace());
+        if (this.resetBtn) this.resetBtn.addEventListener('click', () => this.resetCapture());
+        if (this.stopBtn) this.stopBtn.addEventListener('click', () => this.stopCamera());
     }
     
     initializeCounters() {
-        // Initialize counters to show correct values from start
-        this.updateCaptureCount(); // Should show 0
-        // Don't update button text yet - button is still hidden
+        // Counters disabled since UI elements removed
+        console.log('Counters initialized - UI elements disabled');
     }
     
     async initializeSystem() {
-        // Enable start button immediately for better UX
-        this.startBtn.disabled = false;
-        this.showStatus('Sistem siap - Klik "Mulai Kamera" untuk memulai', 'success');
+        // DISABLE start button until student is selected
+        this.startBtn.disabled = true;
+        this.startBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Pilih Siswa Terlebih Dahulu';
+        this.showStatus('Pilih siswa terlebih dahulu untuk memulai registrasi', 'info');
         
         // Try to load models in background
         this.loadModels();
@@ -283,10 +287,10 @@ class FaceRegistrationSystem {
             // Try to load models, but don't fail completely if it fails
             try {
                 await Promise.all([
-                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-                    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-                    faceapi.nets.faceExpressionNet.loadFromUri('/models')
+                    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model'),
+                    faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model'),
+                    faceapi.nets.faceExpressionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model')
                 ]);
                 
                 this.isModelLoaded = true;
@@ -306,6 +310,13 @@ class FaceRegistrationSystem {
     
     async startCamera() {
         try {
+            // Validate student selection first
+            const selectedStudentNIS = document.getElementById('selectedStudentNIS');
+            if (!selectedStudentNIS.value) {
+                this.showStatus('Pilih akun siswa terlebih dahulu!', 'error');
+                return;
+            }
+            
             this.showStatus('Memulai kamera...', 'info');
             
             // Check if getUserMedia is supported
@@ -328,23 +339,15 @@ class FaceRegistrationSystem {
                 this.canvas.height = this.video.videoHeight;
                 
                 this.startBtn.classList.add('hidden');
-                this.captureBtn.classList.remove('hidden');
+                this.livenessStatus.classList.remove('hidden');
                 this.stopBtn.classList.remove('hidden');
                 
-                // Enable capture button temporarily for testing
-                this.captureBtn.disabled = false;
+                // Show progress indicator
+                document.getElementById('photoProgress').classList.remove('hidden');
+                this.updateProgressIndicator();
                 
-                // Initialize button text correctly - should show "Ambil Foto Pertama"
-                this.updateCaptureButtonText();
-                
-                this.showStatus('Kamera aktif - Posisikan wajah Anda', 'success');
-                
-                // Start detection if models are loaded
-                if (this.isModelLoaded) {
-                    this.startDetection();
-                } else {
-                    this.showStatus('Kamera aktif - Model AI sedang dimuat...', 'info');
-                }
+                // Start liveness detection
+                this.startLivenessDetection();
             };
             
         } catch (error) {
@@ -363,160 +366,218 @@ class FaceRegistrationSystem {
         }
     }
     
+    // Face detection disabled for registration
     startDetection() {
-        if (!this.isModelLoaded) return;
-        
-        this.isDetecting = true;
-        this.detectionInterval = setInterval(async () => {
-            await this.detectFace();
-        }, 100);
+        // No face detection needed for registration
+        return;
     }
     
     async detectFace() {
-        if (!this.video.videoWidth || !this.video.videoHeight) return;
-        
-        try {
-            const detections = await faceapi.detectAllFaces(
-                this.video,
-                new faceapi.TinyFaceDetectorOptions()
-            ).withFaceLandmarks().withFaceExpressions();
-            
-            // Clear previous overlays
-            const overlay = document.getElementById('faceOverlay');
-            overlay.innerHTML = '';
-            
-            if (detections.length > 0) {
-                const detection = detections[0];
-                
-                // Draw face detection box
-                this.drawFaceBox(detection.detection.box, overlay);
-                
-                // Enable capture if face is detected
-                this.captureBtn.disabled = false;
-                this.showStatus(`Wajah terdeteksi - Siap untuk foto ${this.capturedPhotos.length + 1}`, 'success');
-                
-            } else {
-                this.captureBtn.disabled = true;
-                this.showStatus('Posisikan wajah Anda di depan kamera', 'info');
-            }
-            
-        } catch (error) {
-            console.error('Detection error:', error);
-        }
+        // Face detection disabled for registration
+        return;
     }
     
     drawFaceBox(box, overlay) {
-        const faceBox = document.createElement('div');
-        faceBox.style.position = 'absolute';
-        faceBox.style.left = `${box.x}px`;
-        faceBox.style.top = `${box.y}px`;
-        faceBox.style.width = `${box.width}px`;
-        faceBox.style.height = `${box.height}px`;
-        faceBox.style.border = '3px solid #10B981';
-        faceBox.style.borderRadius = '8px';
-        faceBox.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.5)';
-        
-        overlay.appendChild(faceBox);
+        // Face box drawing disabled for registration
+        return;
     }
     
-    async capturePhoto() {
+    startLivenessDetection() {
+        this.livenessInstructions.classList.remove('hidden');
+        this.livenessText.textContent = 'Liveness Detection - Berkedip & Menoleh';
+        
+        // Single liveness pattern for all photos
+        const phases = [
+            { instruction: 'Berkedip 3 kali', duration: 3000 },
+            { instruction: 'Tengok ke kanan', duration: 3000 },
+            { instruction: 'Tengok ke kiri', duration: 3000 }
+        ];
+        
+        // Start continuous photo capture every second
+        this.startContinuousCapture();
+        
+        // Simulate liveness detection phases
+        let phase = 0;
+        
+        const runPhase = () => {
+            if (phase < phases.length) {
+                const currentPhase = phases[phase];
+                this.currentInstruction.textContent = currentPhase.instruction;
+                this.livenessText.textContent = `Liveness: ${currentPhase.instruction}`;
+                
+                let timeLeft = currentPhase.duration / 1000;
+                this.instructionTimer.textContent = timeLeft;
+                
+                this.livenessTimer = setInterval(() => {
+                    timeLeft--;
+                    this.instructionTimer.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(this.livenessTimer);
+                        phase++;
+                        
+                        if (phase < phases.length) {
+                            this.phaseTimeout = setTimeout(runPhase, 500);
+                        } else {
+                            // Liveness complete, stop continuous capture and finalize
+                            this.completeLivenessDetection();
+                        }
+                    }
+                }, 1000);
+            }
+        };
+        
+        runPhase();
+    }
+    
+    startContinuousCapture() {
+        // Start capturing photos every second
+        this.continuousCaptureInterval = setInterval(() => {
+            this.capturePhotoSilent();
+        }, 1000);
+    }
+    
+    completeLivenessDetection() {
+        // Stop continuous capture
+        if (this.continuousCaptureInterval) {
+            clearInterval(this.continuousCaptureInterval);
+            this.continuousCaptureInterval = null;
+        }
+        
+        this.livenessInstructions.classList.add('hidden');
+        this.livenessText.textContent = 'Liveness Complete - Processing Photos';
+        
+        // Take only the last 3 photos from all captured photos
+        this.finalizePhotos();
+    }
+    
+    async capturePhotoSilent() {
         try {
-            // Capture current frame
+            // Capture current frame silently (no UI updates)
             this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
             const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
             
-            let faceDescriptor = null;
-            
-            // Try to detect face, but don't fail if not detected
-            try {
-                if (this.isModelLoaded && typeof faceapi !== 'undefined') {
-                    const detections = await faceapi.detectSingleFace(
-                        this.video,
-                        new faceapi.TinyFaceDetectorOptions()
-                    ).withFaceLandmarks().withFaceDescriptor();
-                    
-                    if (detections) {
-                        faceDescriptor = detections.descriptor;
-                        this.showStatus(`Foto ${this.capturedPhotos.length + 1} berhasil dengan deteksi wajah`, 'success');
-                    } else {
-                        this.showStatus(`Foto ${this.capturedPhotos.length + 1} berhasil (tanpa deteksi wajah)`, 'warning');
-                    }
-                } else {
-                    this.showStatus(`Foto ${this.capturedPhotos.length + 1} berhasil (mode manual)`, 'success');
-                }
-            } catch (detectionError) {
-                console.warn('Face detection failed, continuing without:', detectionError);
-                this.showStatus(`Foto ${this.capturedPhotos.length + 1} berhasil (deteksi gagal)`, 'warning');
+            // Store in temporary array (will be processed later)
+            if (!this.allCapturedPhotos) {
+                this.allCapturedPhotos = [];
             }
             
-            // Store photo data
-            this.capturedPhotos.push({
+            this.allCapturedPhotos.push({
                 imageData: imageData,
-                descriptor: faceDescriptor,
                 timestamp: Date.now()
             });
+            
+        } catch (error) {
+            console.error('Silent capture error:', error);
+        }
+    }
+    
+    finalizePhotos() {
+        // Take the last 3 photos from all captured photos
+        const totalPhotos = this.allCapturedPhotos ? this.allCapturedPhotos.length : 0;
+        
+        if (totalPhotos >= 3) {
+            // Get last 3 photos
+            const lastThreePhotos = this.allCapturedPhotos.slice(-3);
+            
+            // Store as final photos
+            this.capturedPhotos = lastThreePhotos.map((photo, index) => ({
+                imageData: photo.imageData,
+                descriptor: null, // Will be processed if needed
+                timestamp: photo.timestamp
+            }));
             
             // Update UI
             this.updatePhotoPreview();
             this.updateCaptureCount();
+            this.updateProgressIndicator();
             
-            // Check if we have enough photos
-            if (this.capturedPhotos.length >= this.maxPhotos) {
-                this.captureBtn.classList.add('hidden');
-                this.registerBtn.classList.remove('hidden');
-                this.registerBtn.disabled = false; // Enable register button
-                this.resetBtn.classList.remove('hidden');
-                this.showStatus('Semua foto berhasil diambil - Siap untuk registrasi', 'success');
-            } else {
-                const nextPhoto = this.capturedPhotos.length + 1;
-                this.showStatus(`Foto ${this.capturedPhotos.length} berhasil - Siap untuk foto ${nextPhoto}`, 'success');
-                this.updateCaptureButtonText();
-            }
+            // Show completion
+            this.livenessStatus.classList.add('hidden');
+            this.registerBtn.classList.remove('hidden');
+            this.registerBtn.disabled = false;
+            this.resetBtn.classList.remove('hidden');
             
-        } catch (error) {
-            console.error('Capture error:', error);
-            this.showStatus('Gagal mengambil foto: ' + error.message, 'error');
+            this.showStatus(`Berhasil mengambil ${totalPhotos} foto, 3 foto terbaik dipilih untuk registrasi`, 'success');
+        } else {
+            this.showStatus('Tidak cukup foto yang diambil, coba lagi', 'error');
         }
     }
     
+    
     updatePhotoPreview() {
         const previewDivs = this.photoPreview.children;
-        const photoIndex = this.capturedPhotos.length - 1;
         
-        if (photoIndex >= 0 && photoIndex < previewDivs.length) {
-            const previewDiv = previewDivs[photoIndex];
-            previewDiv.innerHTML = `
-                <img src="${this.capturedPhotos[photoIndex].imageData}" 
-                     class="w-full h-full object-cover rounded-lg" 
-                     alt="Foto ${photoIndex + 1}">
-            `;
+        // Update all preview divs with captured photos
+        for (let i = 0; i < previewDivs.length; i++) {
+            if (i < this.capturedPhotos.length) {
+                previewDivs[i].innerHTML = `
+                    <img src="${this.capturedPhotos[i].imageData}" 
+                         class="w-full h-full object-cover rounded-lg" 
+                         alt="Foto ${i + 1}">
+                `;
+            } else {
+                previewDivs[i].innerHTML = `
+                    <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-camera text-gray-400 text-xl"></i>
+                    </div>
+                `;
+            }
         }
     }
     
     updateCaptureCount() {
-        this.captureCount.textContent = this.capturedPhotos.length;
+        // Capture count UI removed - just log to console
+        console.log(`Photos captured: ${this.capturedPhotos.length}`);
     }
     
-    updateCaptureButtonText() {
-        if (this.capturedPhotos.length === 0) {
-            // Belum ada foto yang diambil
-            this.captureButtonText.textContent = 'Ambil Foto Pertama';
-        } else if (this.capturedPhotos.length < this.maxPhotos) {
-            // Masih ada foto yang perlu diambil
-            const nextPhoto = this.capturedPhotos.length + 1;
-            this.captureButtonText.textContent = `Ambil Foto ${nextPhoto}`;
+    updateProgressIndicator() {
+        const indicator = document.getElementById('currentPhotoIndicator');
+        const capturedCount = this.capturedPhotos.length;
+        
+        if (capturedCount >= 3) {
+            // Hide indicator once complete to keep UI clean
+            indicator.parentElement.parentElement.classList.add('hidden');
+            for (let i = 1; i <= 3; i++) {
+                const progressBar = document.getElementById(`progress${i}`);
+                if (progressBar) progressBar.className = 'w-6 h-1 bg-green-500 rounded';
+            }
+        } else {
+            const currentPhoto = capturedCount + 1;
+            indicator.textContent = `Foto ${currentPhoto} dari 3`;
+            
+            // Update progress bars
+            for (let i = 1; i <= 3; i++) {
+                const progressBar = document.getElementById(`progress${i}`);
+                if (i <= capturedCount) {
+                    progressBar.className = 'w-6 h-1 bg-green-500 rounded';
+                } else if (i === currentPhoto) {
+                    progressBar.className = 'w-6 h-1 bg-blue-500 rounded';
+                } else {
+                    progressBar.className = 'w-6 h-1 bg-gray-400 rounded';
+                }
+            }
         }
     }
     
+    
     async registerFace() {
         try {
+            const selectedStudentNIS = document.getElementById('selectedStudentNIS');
+            const selectedStudent = selectedStudentNIS.value;
+            
+            if (!selectedStudent) {
+                this.showStatus('Pilih siswa terlebih dahulu!', 'error');
+                return;
+            }
+            
             this.showStatus('Mendaftarkan Face ID...', 'info');
             this.registerBtn.disabled = true;
             
-            // Prepare face data - simplified
+            // Prepare face data with student info
             const faceData = this.capturedPhotos.map(photo => photo.imageData);
             
-            // Send to backend - simplified endpoint
+            // Send to backend with student info
             const response = await fetch('/admin/face-id/register', {
                 method: 'POST',
                 headers: {
@@ -524,7 +585,8 @@ class FaceRegistrationSystem {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({
-                    face_images: faceData
+                    face_images: faceData,
+                    student_nis: selectedStudent
                 })
             });
             
@@ -534,10 +596,17 @@ class FaceRegistrationSystem {
                 this.showRegistrationSuccess(result);
                 this.showStatus('Registrasi Face ID berhasil!', 'success');
                 
-                // Redirect ke settings setelah 2 detik
-                setTimeout(() => {
-                    window.location.href = '/admin/settings';
-                }, 2000);
+                // Reset untuk registrasi berikutnya setelah 3 detik
+                let countdown = 3;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        this.showStatus(`Registrasi berhasil! Reset otomatis dalam ${countdown} detik...`, 'success');
+                    } else {
+                        clearInterval(countdownInterval);
+                        this.resetForNextRegistration();
+                    }
+                }, 1000);
             } else {
                 this.showRegistrationError(result);
                 this.showStatus('Gagal mendaftarkan Face ID: ' + (result.message || 'Unknown error'), 'error');
@@ -552,26 +621,55 @@ class FaceRegistrationSystem {
     }
     
     showRegistrationSuccess(result) {
-        this.registrationStatus.innerHTML = `
+        const statusElement = document.getElementById('registrationStatus');
+        if (!statusElement) {
+            console.error('Registration status element not found');
+            return;
+        }
+        
+        statusElement.classList.remove('hidden');
+        statusElement.innerHTML = `
             <div class="text-center">
                 <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
                 <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">✅ Registrasi Berhasil!</h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">${result.message}</p>
-                <div class="space-y-2 text-sm">
+                <div class="space-y-2 text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                     <div class="flex justify-between">
-                        <span>Foto Terdaftar:</span>
-                        <span class="font-medium">${this.capturedPhotos.length}</span>
+                        <span>Siswa:</span>
+                        <span class="font-medium">${result.student_name}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>NIS:</span>
+                        <span class="font-medium">${result.student_nis}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Foto Tersimpan:</span>
+                        <span class="font-medium">${result.photos_count}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Status:</span>
+                        <span class="font-medium text-green-600">Approved</span>
                     </div>
                 </div>
-                <p class="text-xs text-gray-500 dark:text-gray-500">Mengalihkan ke halaman settings...</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-3">Face ID siap digunakan untuk login!</p>
+                <p class="text-xs text-blue-500 dark:text-blue-400 mt-2">
+                    <i class="fas fa-refresh mr-1"></i>Sistem akan reset otomatis untuk registrasi siswa berikutnya...
+                </p>
             </div>
         `;
     }
     
     showRegistrationError(result) {
-        this.registrationStatus.innerHTML = `
+        const statusElement = document.getElementById('registrationStatus');
+        if (!statusElement) {
+            console.error('Registration status element not found');
+            return;
+        }
+        
+        statusElement.classList.remove('hidden');
+        statusElement.innerHTML = `
             <div class="text-center">
                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-times-circle text-2xl text-red-600"></i>
@@ -590,93 +688,218 @@ class FaceRegistrationSystem {
     resetCapture() {
         this.capturedPhotos = [];
         this.updateCaptureCount();
-        this.updateCaptureButtonText();
+        this.updateProgressIndicator();
         
         // Reset photo preview
         const previewDivs = this.photoPreview.children;
         for (let i = 0; i < previewDivs.length; i++) {
             previewDivs[i].innerHTML = `
                 <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-camera text-gray-400 text-2xl"></i>
+                    <i class="fas fa-camera text-gray-400 text-xl"></i>
                 </div>
             `;
         }
         
         // Reset buttons
-        this.captureBtn.classList.remove('hidden');
+        this.livenessStatus.classList.add('hidden');
         this.registerBtn.classList.add('hidden');
         this.resetBtn.classList.add('hidden');
         this.registerBtn.disabled = false;
         
         // Reset status
-        this.registrationStatus.innerHTML = `
-            <div class="text-center text-gray-500 dark:text-gray-400">
-                <i class="fas fa-hourglass-start text-4xl mb-4"></i>
-                <p>Siap untuk memulai registrasi</p>
-            </div>
-        `;
+        const statusElement = document.getElementById('registrationStatus');
+        if (statusElement) {
+            statusElement.classList.add('hidden');
+            statusElement.innerHTML = '';
+        }
         
         this.showStatus('Reset berhasil - Mulai ambil foto lagi', 'info');
     }
     
+    resetForNextRegistration() {
+        // Stop camera if running
+        this.stopCamera();
+        
+        // Reset all data
+        this.capturedPhotos = [];
+        this.allCapturedPhotos = [];
+        
+        // Reset UI elements
+        this.updatePhotoPreview();
+        this.updateCaptureCount();
+        this.updateProgressIndicator();
+        
+        // Reset photo preview to empty state
+        const previewDivs = this.photoPreview.children;
+        for (let i = 0; i < previewDivs.length; i++) {
+            previewDivs[i].innerHTML = `
+                <div class="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-camera text-gray-400 text-xl"></i>
+                </div>
+            `;
+        }
+        
+        // Reset student selection
+        const selectedStudentText = document.getElementById('selectedStudentText');
+        const selectedStudentNIS = document.getElementById('selectedStudentNIS');
+        const startBtn = document.getElementById('startCamera');
+        
+        if (selectedStudentText) selectedStudentText.textContent = '-- Pilih Siswa --';
+        if (selectedStudentNIS) selectedStudentNIS.value = '';
+        if (startBtn) {
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Pilih Siswa Terlebih Dahulu';
+        }
+        
+        // Reset registration status
+        const statusElement = document.getElementById('registrationStatus');
+        if (statusElement) {
+            statusElement.classList.add('hidden');
+            statusElement.innerHTML = '';
+        }
+        
+        // Reset buttons
+        this.startBtn.classList.remove('hidden');
+        this.livenessStatus.classList.add('hidden');
+        this.livenessInstructions.classList.add('hidden');
+        this.registerBtn.classList.add('hidden');
+        this.resetBtn.classList.add('hidden');
+        this.stopBtn.classList.add('hidden');
+        document.getElementById('photoProgress').classList.add('hidden');
+        
+        this.showStatus('Siap untuk registrasi siswa berikutnya', 'info');
+    }
+    
     stopCamera() {
+        // Stop all camera streams
         if (this.stream) {
-            this.stream.getTracks().forEach(track => track.stop());
+            this.stream.getTracks().forEach(track => {
+                track.stop();
+                console.log('Track stopped:', track.kind);
+            });
             this.stream = null;
         }
         
+        // Clear all intervals and timers
         if (this.detectionInterval) {
             clearInterval(this.detectionInterval);
             this.detectionInterval = null;
         }
         
+        // Clear any liveness detection timers
+        if (this.livenessTimer) {
+            clearInterval(this.livenessTimer);
+            this.livenessTimer = null;
+        }
+        
+        if (this.phaseTimeout) {
+            clearTimeout(this.phaseTimeout);
+            this.phaseTimeout = null;
+        }
+        
+        // Clear continuous capture
+        if (this.continuousCaptureInterval) {
+            clearInterval(this.continuousCaptureInterval);
+            this.continuousCaptureInterval = null;
+        }
+        
         this.isDetecting = false;
         this.video.srcObject = null;
         
+        // Reset UI elements
         this.startBtn.classList.remove('hidden');
-        this.captureBtn.classList.add('hidden');
+        this.livenessStatus.classList.add('hidden');
+        this.livenessInstructions.classList.add('hidden');
         this.registerBtn.classList.add('hidden');
         this.resetBtn.classList.add('hidden');
         this.stopBtn.classList.add('hidden');
+        document.getElementById('photoProgress').classList.add('hidden');
+        
+        // Clear face overlay
+        const overlay = document.getElementById('faceOverlay');
+        if (overlay) overlay.innerHTML = '';
         
         this.showStatus('Kamera dihentikan', 'info');
     }
     
     showStatus(message, type = 'info') {
-        const statusDiv = this.statusMessage;
-        statusDiv.textContent = message;
-        statusDiv.classList.remove('hidden');
-        
-        // Remove existing type classes
-        statusDiv.classList.remove('bg-blue-600', 'bg-green-600', 'bg-yellow-600', 'bg-red-600');
-        
-        // Add appropriate color based on type
-        switch (type) {
-            case 'success':
-                statusDiv.classList.add('bg-green-600');
-                break;
-            case 'warning':
-                statusDiv.classList.add('bg-yellow-600');
-                break;
-            case 'error':
-                statusDiv.classList.add('bg-red-600');
-                break;
-            default:
-                statusDiv.classList.add('bg-blue-600');
-        }
-        
-        // Auto-hide after 3 seconds for non-error messages
-        if (type !== 'error') {
-            setTimeout(() => {
-                statusDiv.classList.add('hidden');
-            }, 3000);
-        }
+        // Status disabled for clean registration UI - just log to console
+        console.log(`Status [${type}]: ${message}`);
     }
 }
 
 // Initialize Face Registration System when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    new FaceRegistrationSystem();
+    const system = new FaceRegistrationSystem();
+    
+    // Student Selection Modal Logic
+    const studentSelectBtn = document.getElementById('studentSelectBtn');
+    const studentModal = document.getElementById('studentModal');
+    const closeStudentModal = document.getElementById('closeStudentModal');
+    const studentSearch = document.getElementById('studentSearch');
+    const studentList = document.getElementById('studentList');
+    const selectedStudentText = document.getElementById('selectedStudentText');
+    const selectedStudentNIS = document.getElementById('selectedStudentNIS');
+    const startBtn = document.getElementById('startCamera');
+    
+    // Open modal
+    studentSelectBtn.addEventListener('click', function() {
+        studentModal.classList.remove('hidden');
+        studentSearch.focus();
+    });
+    
+    // Close modal
+    closeStudentModal.addEventListener('click', function() {
+        studentModal.classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    studentModal.addEventListener('click', function(e) {
+        if (e.target === studentModal) {
+            studentModal.classList.add('hidden');
+        }
+    });
+    
+    // Search functionality
+    studentSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const studentItems = document.querySelectorAll('.student-item');
+        
+        studentItems.forEach(item => {
+            const name = item.dataset.name.toLowerCase();
+            const nis = item.dataset.nis.toLowerCase();
+            
+            if (name.includes(searchTerm) || nis.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+    
+    // Select student
+    document.querySelectorAll('.student-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const name = this.dataset.name;
+            const nis = this.dataset.nis;
+            
+            selectedStudentText.textContent = name + ' (' + nis + ')';
+            selectedStudentNIS.value = nis;
+            
+            // Update start button
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i class="fas fa-camera mr-2"></i>Mulai Registrasi untuk ' + name;
+            
+            // Close modal
+            studentModal.classList.add('hidden');
+            
+            // Clear search
+            studentSearch.value = '';
+            document.querySelectorAll('.student-item').forEach(i => i.style.display = 'block');
+        });
+    });
+    
+    // Initial state handled by FaceRegistrationSystem.initializeSystem()
 });
 </script>
     </div>
