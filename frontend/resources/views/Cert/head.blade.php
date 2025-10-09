@@ -47,6 +47,10 @@
                     class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->routeIs('settings.register-face') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
                     Daftarkan Wajah
                 </a>
+                <a href="{{ route('settings.face-id') }}"
+                    class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->routeIs('settings.face-id') ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
+                    Login Wajah
+                </a>
             @else
                 <a href="{{ route('rfid.connect') }}"
                     class="block px-4 py-2 text-gray-700 dark:text-gray-200 {{ request()->path() == 'admin/rfid-connect' ? 'bg-gray-100 dark:bg-gray-700 border-l-4' : 'hover:border-l-4 hover:bg-gray-100 dark:hover:bg-gray-700' }} rounded-md border-primary max-md:text-sm">
