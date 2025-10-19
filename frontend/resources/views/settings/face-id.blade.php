@@ -75,10 +75,16 @@
         
         /* Face Ring Animations - SISTEM WARNA YANG BENAR */
         .face-ring {
-            transition: all 0.3s ease-in-out;
+            transition: all 0.1s ease-out; /* Faster transition for real-time tracking */
             border: 4px solid #10b981; /* Default hijau untuk wajah dikenali */
             background: rgba(16, 185, 129, 0.05);
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        
+        /* Smooth name label transitions */
+        .user-name-label {
+            transition: all 0.1s ease-out; /* Fast smooth movement */
+            will-change: transform; /* Optimize for animations */
         }
         
         .face-ring.unknown-face {
@@ -215,9 +221,9 @@
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <script>
-class AdvancedFaceIDSystem {
+class SimpleFaceIDSystem {
     constructor() {
-        console.log('Initializing AdvancedFaceIDSystem...');
+        console.log('Initializing SimpleFaceIDSystem...');
         
         this.video = document.getElementById('video');
         this.canvas = document.getElementById('canvas');
@@ -231,35 +237,26 @@ class AdvancedFaceIDSystem {
         this.isModelLoaded = false;
         this.isDetecting = false;
         this.detectionInterval = null;
-        this.recognitionInterval = null;
-        this.antiSpoofingFrames = [];
-        this.maxFrames = 10;
-        this.registeredFaces = [];
-        this.currentDetections = [];
-        this.lastRecognitionTime = 0;
-        this.recognitionCooldown = 500; // 0.5 second cooldown for faster recognition
-        this.currentFaceStatus = 'unknown'; // Track current face status to avoid flickering
-        this.lastKnownUser = null; // Store last known user for stability
-        this.faceDetectionHistory = []; // Track face detection history
-        this.stableDetectionCount = 0; // Count stable detections
-        this.noFaceCount = 0; // Count frames without face
-        this.nameDisplayed = false; // Track if name is currently displayed
-        this.stableFaceBox = null; // Store stable face box position
         
-        // Enhanced recognition stability
-        this.persistentKnownUser = null; // Store persistent known user
-        this.recognitionStability = 0; // Track recognition stability
-        this.minStabilityThreshold = 1; // Minimum stable recognitions needed (lowered for better recognition)
-        this.currentNameElement = null; // Store current name element
-        this.lastNameUpdate = 0; // Track last name update time
-        this.nameUpdateCooldown = 200; // Reduced to 200ms for better responsiveness
-        this.stableUserName = null; // Store stable user name
+        // Simplified state management
+        this.currentUser = null; // Currently recognized user
+        this.faceDetected = false; // Is face currently detected
+        this.lastRecognitionTime = 0;
+        this.recognitionCooldown = 2000; // 2 second cooldown for stability
+        this.isLoggingIn = false; // Prevent multiple login attempts
+        
+        // Training data storage (9 photos per user)
+        this.trainingData = new Map(); // userId -> [descriptors]
+        this.knownUsers = []; // Will be loaded from database
+        
+        // UI state
+        this.currentRing = null;
+        this.currentNameLabel = null;
         
         console.log('Elements found, initializing...');
         this.initializeElements();
-        this.loadModels();
-        this.loadRegisteredFaces();
-        console.log('AdvancedFaceIDSystem constructor completed');
+        this.initializeSystem();
+        console.log('SimpleFaceIDSystem constructor completed');
     }
     
     initializeElements() {
@@ -277,69 +274,179 @@ class AdvancedFaceIDSystem {
         this.attendanceBtn.addEventListener('click', () => this.recordAttendance());
     }
     
-    // Map helper: converts face-api (video pixel) coordinates to overlay coordinates when video uses object-cover
-    getVideoCoverMapping() {
+    async initializeSystem() {
+        // Load models first
+        await this.loadModels();
+        
+        // Then load users from database
+        await this.loadKnownUsersFromDatabase();
+        
+        console.log('System initialization completed');
+    }
+    
+    // Generate training data for 9 photos per user (simulated)
+    async loadKnownUsersFromDatabase() {
+        try {
+            console.log('Loading users from database...');
+            
+            // Fetch users with face data from Laravel backend
+            const response = await fetch('/admin/api/face-id/users', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.knownUsers = data.users || [];
+                console.log(`✅ Loaded ${this.knownUsers.length} users from database:`, this.knownUsers);
+                
+                if (this.knownUsers.length === 0) {
+                    console.log('⚠️ NO USERS FOUND IN DATABASE - All faces will be UNKNOWN (RED RING)');
+                } else {
+                    console.log('👥 Users available for recognition:', this.knownUsers.map(u => u.name));
+                    
+                    // Generate training data from actual photos
+                    await this.generateTrainingData();
+                }
+            } else {
+                console.log('❌ API Error - No users found in database or API error');
+                console.log('Response status:', response.status);
+                this.knownUsers = [];
+                this.trainingData.clear();
+            }
+        } catch (error) {
+            console.error('Error loading users from database:', error);
+            console.log('Using empty user list - all faces will be unknown');
+            this.knownUsers = [];
+            this.trainingData.clear();
+        }
+    }
+
+    async generateTrainingData() {
+        console.log('🔄 Generating training data from actual photos...');
+        
+        if (this.knownUsers.length === 0) {
+            console.log('❌ No users to generate training data for');
+            return;
+        }
+        
+        if (!this.isModelLoaded) {
+            console.log('❌ Cannot generate training data - face-api.js model not loaded');
+            console.log('   Please refresh the page and wait for models to load');
+            return;
+        }
+        
+        // Process each user's photos to extract face descriptors
+        for (const user of this.knownUsers) {
+            const descriptors = [];
+            
+            // Get all face photos for this user (face_data, face_data_2, face_data_3)
+            const facePhotos = [user.face_data, user.face_data_2, user.face_data_3].filter(photo => photo);
+            
+            if (facePhotos.length === 0) {
+                console.warn(`⚠️ No face photos found for user: ${user.name}`);
+                continue;
+            }
+            
+            console.log(`📸 Processing ${facePhotos.length} photos for ${user.name}...`);
+            
+            // Extract descriptors from each photo
+            for (let i = 0; i < facePhotos.length; i++) {
+                try {
+                    const photoData = facePhotos[i];
+                    console.log(`   Processing photo ${i + 1}/${facePhotos.length}...`);
+                    const descriptor = await this.extractDescriptorFromPhoto(photoData);
+                    if (descriptor) {
+                        descriptors.push(descriptor);
+                        console.log(`   ✅ Photo ${i + 1} processed successfully`);
+                    } else {
+                        console.warn(`   ⚠️ Photo ${i + 1} - no face detected`);
+                    }
+                } catch (error) {
+                    console.error(`   ❌ Error processing photo ${i + 1} for ${user.name}:`, error);
+                }
+            }
+            
+            if (descriptors.length > 0) {
+                this.trainingData.set(user.id, descriptors);
+                console.log(`✅ Generated ${descriptors.length} training descriptors for ${user.name}`);
+            } else {
+                console.warn(`⚠️ No valid descriptors generated for ${user.name} - user will not be recognized`);
+            }
+        }
+        
+        console.log(`\n🎉 Training data generation completed!`);
+        console.log(`   Total users ready: ${this.trainingData.size}`);
+        console.log(`   Users in database: ${this.knownUsers.length}`);
+        
+        if (this.trainingData.size === 0) {
+            console.error('❌ NO TRAINING DATA GENERATED - Face recognition will not work!');
+            console.error('   Please check if face photos are properly saved in database');
+        }
+    }
+    
+    async extractDescriptorFromPhoto(photoData) {
+        try {
+            // Create image element from base64 data
+            const img = await this.loadImage(photoData);
+            
+            // Detect face and extract descriptor
+            if (this.isModelLoaded) {
+                const detection = await faceapi.detectSingleFace(img)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                
+                if (detection && detection.descriptor) {
+                    return detection.descriptor;
+                } else {
+                    console.warn('No face detected in training photo');
+                    return null;
+                }
+            } else {
+                console.warn('Model not loaded, cannot extract descriptor');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error extracting descriptor:', error);
+            return null;
+        }
+    }
+    
+    loadImage(dataUrl) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = dataUrl;
+        });
+    }
+    
+    // Coordinate mapping for overlay positioning
+    mapBoxToOverlay(box) {
         const containerWidth = this.video.clientWidth;
         const containerHeight = this.video.clientHeight;
         const videoWidth = this.video.videoWidth || 640;
         const videoHeight = this.video.videoHeight || 480;
+        
         if (!containerWidth || !containerHeight) {
-            return { scale: 1, offsetX: 0, offsetY: 0 };
+            return box;
         }
+        
         const scale = Math.max(containerWidth / videoWidth, containerHeight / videoHeight);
         const displayedWidth = videoWidth * scale;
         const displayedHeight = videoHeight * scale;
         const offsetX = (containerWidth - displayedWidth) / 2;
         const offsetY = (containerHeight - displayedHeight) / 2;
-        return { scale, offsetX, offsetY };
-    }
-    
-    mapPointToOverlay(point) {
-        const { scale, offsetX, offsetY } = this.getVideoCoverMapping();
-        return {
-            x: offsetX + point.x * scale,
-            y: offsetY + point.y * scale
-        };
-    }
-    
-    mapBoxToOverlay(box) {
-        const { scale, offsetX, offsetY } = this.getVideoCoverMapping();
+        
         return {
             x: offsetX + box.x * scale,
             y: offsetY + box.y * scale,
             width: box.width * scale,
-            height: box.height * scale,
-            scale
+            height: box.height * scale
         };
-    }
-    
-    async loadRegisteredFaces() {
-        try {
-            const response = await fetch('/admin/face-id/registered-faces');
-            const data = await response.json();
-            
-            if (data.success) {
-                this.registeredFaces = data.faces || [];
-                console.log('Loaded registered faces:', this.registeredFaces.length);
-            } else {
-                // For demo purposes, add sample registered faces including current user
-                this.registeredFaces = [
-                    { id: 1, name: 'Dirman', nis: '12345', confidence_score: 0.95 },
-                    { id: 2, name: 'Ahmad Rizki', nis: '12346', confidence_score: 0.92 },
-                    { id: 3, name: 'Sari Dewi', nis: '12347', confidence_score: 0.88 }
-                ];
-                console.log('Using demo registered faces:', this.registeredFaces.length);
-            }
-        } catch (error) {
-            console.error('Error loading registered faces:', error);
-            // Fallback to demo data
-            this.registeredFaces = [
-                { id: 1, name: 'Dirman', nis: '12345', confidence_score: 0.95 },
-                { id: 2, name: 'Ahmad Rizki', nis: '12346', confidence_score: 0.92 },
-                { id: 3, name: 'Sari Dewi', nis: '12347', confidence_score: 0.88 }
-            ];
-            console.log('Using fallback demo registered faces:', this.registeredFaces.length);
-        }
     }
     
     async loadModels() {
@@ -354,28 +461,28 @@ class AdvancedFaceIDSystem {
             }
             
             if (typeof faceapi === 'undefined') {
-                console.log('Face API library tidak ditemukan, menggunakan mode deteksi dasar');
+                console.log('Face API library tidak ditemukan');
                 this.isModelLoaded = false;
-                this.showStatus('Sistem siap - Mode deteksi dasar', 'success');
+                this.showStatus('Sistem siap - Mode simulasi', 'success');
                 this.startBtn.disabled = false;
                 return;
             }
             
-            // Load Face-API.js models - AKURASI TINGGI dengan ssdMobilenetv1
+            // Load only essential models for accuracy
             try {
                 const modelPath = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model';
                 await Promise.all([
-                    faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath),     // Detektor paling akurat
-                    faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),  // Untuk titik-titik wajah (hidung)
-                    faceapi.nets.faceRecognitionNet.loadFromUri(modelPath), // Untuk identifikasi wajah
-                    faceapi.nets.ageGenderNet.loadFromUri(modelPath)        // Optional: age/gender
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath),     // Face detection
+                    faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),  // Face landmarks
+                    faceapi.nets.faceRecognitionNet.loadFromUri(modelPath)  // Face recognition
                 ]);
                 
                 this.isModelLoaded = true;
                 this.showStatus('Model AI berhasil dimuat - Sistem siap', 'success');
+                console.log('Face-API.js models loaded successfully');
             } catch (modelError) {
-                console.log('Model loading failed, continuing in basic mode:', modelError);
-                this.showStatus('Sistem siap - Mode deteksi dasar', 'success');
+                console.log('Model loading failed:', modelError);
+                this.showStatus('Sistem siap - Mode simulasi', 'success');
                 this.isModelLoaded = false;
             }
             
@@ -383,7 +490,7 @@ class AdvancedFaceIDSystem {
             
         } catch (error) {
             console.error('Error loading models:', error);
-            this.showStatus('Sistem siap - Mode deteksi dasar', 'success');
+            this.showStatus('Sistem siap - Mode simulasi', 'success');
             this.isModelLoaded = false;
             this.startBtn.disabled = false;
         }
@@ -411,9 +518,8 @@ class AdvancedFaceIDSystem {
                 this.stopBtn.classList.remove('hidden');
                 this.autoDetectionStatus.classList.remove('hidden');
                 
-                
                 this.showStatus('Sistem Face ID aktif - Deteksi otomatis berjalan', 'success');
-                this.startAdvancedDetection();
+                this.startDetection();
             };
             
         } catch (error) {
@@ -422,838 +528,452 @@ class AdvancedFaceIDSystem {
         }
     }
     
-    startAdvancedDetection() {
+    startDetection() {
         this.isDetecting = true;
         
-        // Always start detection (with or without AI models) - 200ms optimal
+        // Real-time detection loop for smooth tracking
         this.detectionInterval = setInterval(async () => {
-            await this.detectAndAnalyzeFace();
-        }, 200); // 200ms untuk performa & akurasi optimal
-        
-        // Face recognition for login attempts - optimized timing
-        this.recognitionInterval = setInterval(async () => {
-            await this.performFaceRecognition();
-        }, 800); // 800ms for better responsiveness
+            await this.detectAndRecognizeFace();
+        }, 100); // 100ms for real-time smooth tracking
     }
     
-    async detectAndAnalyzeFace() {
+    async detectAndRecognizeFace() {
         if (!this.video.videoWidth || !this.video.videoHeight) return;
         
         try {
-            let detections;
+            let detection = null;
             
             if (this.isModelLoaded) {
-                // Use ssdMobilenetv1 dengan detectSingleFace - LEBIH AKURAT & CEPAT
+                // Use face-api.js for real detection with lower confidence for better tracking
                 const options = new faceapi.SsdMobilenetv1Options({
-                    minConfidence: 0.5  // Lebih toleran untuk wajah miring
+                    minConfidence: 0.4  // Lower confidence for better real-time tracking
                 });
                 
-                // detectSingleFace lebih stabil daripada detectAllFaces
-                const singleDetection = await faceapi.detectSingleFace(this.video, options)
-                    .withFaceLandmarks()      // Untuk titik hidung dan mata
-                    .withFaceDescriptor();    // Untuk identifikasi wajah
-                
-                detections = singleDetection ? [singleDetection] : [];
+                detection = await faceapi.detectSingleFace(this.video, options)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
             } else {
-                // Fallback: simulate basic detection
-                detections = this.simulateBasicFaceDetection();
+                // Real-time simulation based on actual video analysis
+                detection = this.simulateRealTimeFaceDetection();
             }
             
-            // Clear previous overlays
-            this.faceOverlay.innerHTML = '';
-            this.currentDetections = detections;
-            
-            if (detections.length > 0) {
-                const detection = detections[0];
+            if (detection) {
+                this.faceDetected = true;
                 
-                // Use REAL Face-API.js dengan landmarks untuk ring di tengah hidung
-                if (detection.landmarks) {
-                    this.drawAccurateFaceRing(detection);
-                } else {
-                    // Fallback ke detection box biasa
-                    const box = detection.detection.box;
-                    this.drawRealFaceApiBox(box);
+                // ALWAYS update ring position in real-time
+                this.updateFaceRingPosition(detection);
+                
+                // Recognize user (with longer cooldown to prevent flickering)
+                const now = Date.now();
+                if (now - this.lastRecognitionTime > this.recognitionCooldown) {
+                    await this.recognizeUser(detection);
+                    this.lastRecognitionTime = now;
                 }
                 
-                // Check if this face matches any registered user
-                await this.checkForRegisteredUser(detection);
+                // ALWAYS update name position to follow ring
+                if (this.currentUser) {
+                    this.updateUserLabelPosition();
+                }
                 
-                // Anti-spoofing analysis
-                const antiSpoofingScore = this.performAntiSpoofingAnalysis(detection);
-                
-                // Update status based on face quality
-                const faceQuality = this.assessFaceQuality(detection);
-                this.updateAutoStatus(faceQuality, antiSpoofingScore);
+                // Update status
+                this.updateStatus('Wajah terdeteksi - Tracking real-time...');
                 
             } else {
-                // No face detected - DON'T clear user name, only update status
-                this.currentFaceStatus = 'no_face';
-                // DON'T reset lastKnownUser or clear name - keep it persistent
-                this.autoStatusText.textContent = 'Tidak ada wajah terdeteksi - Posisikan wajah Anda';
-                
-                // Keep showing the name if we have a known user
-                if (this.lastKnownUser && this.nameDisplayed) {
-                    // Keep the name displayed even when no face detected
-                    this.showKnownUserName(this.lastKnownUser.name);
+                // Don't clear UI immediately - keep showing for smooth experience
+                if (this.faceDetected) {
+                    this.updateStatus('Mencari wajah...');
+                } else {
+                    this.updateStatus('Tidak ada wajah terdeteksi - Posisikan wajah Anda');
                 }
+                this.faceDetected = false;
             }
             
         } catch (error) {
             console.error('Detection error:', error);
-            // Even on error, show basic detection for demo
-            const detections = this.simulateBasicFaceDetection();
-            this.currentDetections = detections;
-            if (detections.length > 0) {
-                this.drawAdvancedFaceBox(detections[0].detection.box);
-                await this.checkForRegisteredUser(detections[0]);
-            }
+            this.updateStatus('Error dalam deteksi wajah');
         }
     }
     
-    showUnknownFaceIndicator() {
-        // Clear previous overlays
-        this.faceOverlay.innerHTML = '';
-        this.userOverlay.innerHTML = '';
-        
-        // Show red ring for unknown face area (center of video)
+    // Real-time face detection simulation with movement tracking
+    simulateRealTimeFaceDetection() {
         const videoWidth = this.video.videoWidth || 640;
         const videoHeight = this.video.videoHeight || 480;
         
-        const unknownBox = {
-            x: videoWidth * 0.25,
-            y: videoHeight * 0.2,
-            width: videoWidth * 0.5,
-            height: videoHeight * 0.6
-        };
-        
-        this.drawUnknownFaceBox(unknownBox);
-        this.showUnknownUserName();
-    }
-    
-    drawUnknownFaceBox(box) {
-        // Draw red ring centered with correct mapping
-        const mapped = this.mapBoxToOverlay(box);
-        const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-        const mappedCenter = this.mapPointToOverlay(center);
-        const ringSize = Math.max(box.width * 1.2, box.height * 1.1) * mapped.scale;
-        const faceRing = document.createElement('div');
-        faceRing.style.position = 'absolute';
-        faceRing.style.zIndex = '1';
-        faceRing.style.left = `${mappedCenter.x - ringSize/2}px`;
-        faceRing.style.top = `${mappedCenter.y - ringSize/2}px`;
-        faceRing.style.width = `${ringSize}px`;
-        faceRing.style.height = `${ringSize}px`;
-        faceRing.style.borderRadius = '12px';
-        faceRing.className = 'face-ring unknown-face';
-        faceRing.style.animation = 'pulseRed 2s infinite';
-        this.faceOverlay.appendChild(faceRing);
-    }
-    
-    showUnknownUserName() {
-        // Clear previous overlays first
-        this.userOverlay.innerHTML = '';
-        
-        // FORCE RED RING for unknown user
-        this.updateFaceBoxColor('#EF4444'); // Red for unknown
-        
-        let box;
-        if (this.currentDetections && this.currentDetections.length > 0) {
-            box = this.currentDetections[0].detection.box;
-        } else {
-            // Fallback to center position - FULL FACE COVERAGE
-            const videoWidth = this.video.videoWidth || 640;
-            const videoHeight = this.video.videoHeight || 480;
-            const faceWidth = Math.min(videoWidth * 0.35, 250);
-            const faceHeight = faceWidth * 1.2;
-            box = {
-                x: (videoWidth - faceWidth) / 2,
-                y: (videoHeight - faceHeight) / 2 - 30,
-                width: faceWidth,
-                height: faceHeight
-            };
-        }
-        
-        const nameBox = document.createElement('div');
-        nameBox.style.position = 'absolute';
-        // Center the name above the face box
-        nameBox.style.left = `${box.x + (box.width / 2)}px`;
-        nameBox.style.top = `${Math.max(box.y - 45, 10)}px`; // Above the face box
-        nameBox.style.transform = 'translateX(-50%)'; // Center horizontally
-        nameBox.style.backgroundColor = '#EF4444'; // Red background
-        nameBox.style.color = 'white';
-        nameBox.style.padding = '8px 16px';
-        nameBox.style.borderRadius = '20px';
-        nameBox.style.fontSize = '16px';
-        nameBox.style.fontWeight = 'bold';
-        nameBox.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
-        nameBox.style.zIndex = '10';
-        nameBox.style.minWidth = '120px';
-        nameBox.style.textAlign = 'center';
-        nameBox.textContent = 'Tidak Dikenal';
-        
-    this.userOverlay.appendChild(nameBox);
-    
-    // Position label exactly above the current ring center
-    const ring = this.faceOverlay.querySelector('.face-ring');
-    if (ring) {
-        const ringLeft = parseFloat(ring.style.left || '0');
-        const ringTop = parseFloat(ring.style.top || '0');
-        const ringWidth = parseFloat(ring.style.width || '0');
-        const centerX = ringLeft + ringWidth / 2;
-        const gap = 6;
-        const nameHeight = nameBox.offsetHeight || 32;
-        nameBox.style.left = `${centerX}px`;
-        nameBox.style.top = `${Math.max(ringTop - nameHeight - gap, 10)}px`;
-        nameBox.style.transform = 'translateX(-50%)';
-    }
-    }
-    
-    async checkForRegisteredUser(detection) {
-        // ALWAYS show name if we have a known user - NO FLICKERING
-        if (this.lastKnownUser && !this.nameDisplayed) {
-            this.showKnownUserName(this.lastKnownUser.name);
-            this.nameDisplayed = true;
-        }
-        
-        // Skip API calls if we just did a check recently
-        const now = Date.now();
-        if (now - this.lastRecognitionTime < 1500) { // Longer cooldown to prevent flickering
-            return;
-        }
-        
-        this.lastRecognitionTime = now;
-        
-        try {
-            // Capture current frame for recognition
-            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
-            
-            // Get anti-spoofing score
-            const antiSpoofingScore = this.performAntiSpoofingAnalysis(detection);
-            
-            // Skip demo simulation - use REAL backend recognition
-            // Comment out demo simulation to use real backend
-            /*
-            if (this.registeredFaces && this.registeredFaces.length > 0) {
-                // Demo simulation disabled - using real backend
-            }
-            */
-            
-            // Send to backend for quick recognition check
-            const response = await fetch('/admin/face-id/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    face_data: imageData,
-                    anti_spoofing_score: antiSpoofingScore,
-                    confidence_threshold: 0.5 // Lower threshold for preview
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                // User recognized - BUILD STABILITY
-                const recognizedUser = result.user;
-                
-                // Check if this is the same user as before
-                if (this.persistentKnownUser && this.persistentKnownUser.name === recognizedUser.name) {
-                    this.recognitionStability++;
-                } else {
-                    // New user or different user
-                    this.persistentKnownUser = recognizedUser;
-                    this.recognitionStability = 1;
-                }
-                
-                // Update current user
-                this.lastKnownUser = recognizedUser;
-                this.stableDetectionCount++;
-                
-                // Always show known user name (simplified)
-                this.showKnownUserName(recognizedUser.name);
-                
-                if (this.currentFaceStatus !== 'known') {
-                    this.showStatus(`Wajah dikenali: ${recognizedUser.name}`, 'success');
-                    this.showAttendanceButton();
-                }
-                this.currentFaceStatus = 'known';
-                
-            } else {
-                // User not recognized - but check if we have a stable persistent user
-                if (this.persistentKnownUser && this.recognitionStability >= this.minStabilityThreshold) {
-                    // Keep showing the persistent known user (avoid flickering)
-                    this.lastKnownUser = this.persistentKnownUser;
-                    
-                    // Keep showing persistent user (simplified)
-                    this.showKnownUserName(this.persistentKnownUser.name);
-                    
-                    this.currentFaceStatus = 'known';
-                    console.log(`Maintaining stable user: ${this.persistentKnownUser.name}`);
-                } else {
-                    // Truly unknown user
-                    this.showUnknownUserName();
-                    this.currentFaceStatus = 'unknown';
-                    this.hideAttendanceButton();
-                    
-                    // Gradual degradation - don't clear immediately
-                    if (this.recognitionStability > 0) {
-                        this.recognitionStability -= 0.5; // Slower degradation
-                    }
-                    
-                    // Only clear after significant failures
-                    if (this.recognitionStability <= -2) {
-                        this.persistentKnownUser = null;
-                        this.lastKnownUser = null;
-                        this.currentNameElement = null;
-                        this.stableUserName = null;
-                    } else if (this.stableUserName) {
-                        // Keep showing last stable name during temporary failures
-                        this.showKnownUserName(this.stableUserName);
-                        this.currentFaceStatus = 'known';
-                    }
-                }
-            }
-            
-        } catch (error) {
-            console.error('User check error:', error);
-            // Only show unknown if we don't have a stable user
-            if (!this.lastKnownUser) {
-                this.lastKnownUser = null; // keep red until true match
-                this.currentFaceStatus = 'unknown';
-                this.showUnknownUserName();
-            } else {
-                // Keep showing known user for stability
-                this.showKnownUserName(this.lastKnownUser.name);
-                this.updateFaceBoxColor('#10B981'); // Green
-            }
-        }
-    }
-    
-    showKnownUserName(userName) {
-        // Store stable user name
-        this.stableUserName = userName;
-        
-        // FORCE GREEN RING for known user
-        this.updateFaceBoxColor('#10B981'); // Green for known
-        
-        // Check if name element exists and is correct
-        if (this.currentNameElement && this.currentNameElement.textContent === userName) {
-            // Just update position, don't recreate
-            this.updateNamePosition();
-            return;
-        }
-        
-        // Create or recreate name element
-        this.userOverlay.innerHTML = '';
-        
-        let box;
-        if (this.currentDetections && this.currentDetections.length > 0) {
-            box = this.currentDetections[0].detection.box;
-            // Store stable box position
-            this.stableFaceBox = box;
-        } else if (this.stableFaceBox) {
-            // Use last stable position
-            box = this.stableFaceBox;
-        } else {
-            // Fallback to center position - FULL FACE COVERAGE
-            const videoWidth = this.video.videoWidth || 640;
-            const videoHeight = this.video.videoHeight || 480;
-            const faceWidth = Math.min(videoWidth * 0.35, 250);
-            const faceHeight = faceWidth * 1.2;
-            box = {
-                x: (videoWidth - faceWidth) / 2,
-                y: (videoHeight - faceHeight) / 2 - 30,
-                width: faceWidth,
-                height: faceHeight
-            };
-        }
-        
-        const nameBox = document.createElement('div');
-        nameBox.style.position = 'absolute';
-        // Center the name above the face box
-        nameBox.style.left = `${box.x + (box.width / 2)}px`;
-        nameBox.style.top = `${Math.max(box.y - 45, 10)}px`; // Above the face box
-        nameBox.style.transform = 'translateX(-50%)'; // Center horizontally
-        nameBox.style.backgroundColor = '#10B981'; // Green background
-        nameBox.style.color = 'white';
-        nameBox.style.padding = '8px 16px';
-        nameBox.style.borderRadius = '20px';
-        nameBox.style.fontSize = '16px';
-        nameBox.style.fontWeight = 'bold';
-        nameBox.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
-        nameBox.style.animation = 'fadeIn 0.3s ease-in';
-        nameBox.style.zIndex = '10';
-        nameBox.style.minWidth = '120px';
-        nameBox.style.textAlign = 'center';
-        nameBox.style.pointerEvents = 'none'; // Don't interfere with interactions
-        nameBox.className = 'persistent-user-name'; // Add class for identification
-        nameBox.textContent = userName;
-        
-        this.userOverlay.appendChild(nameBox);
-        this.nameDisplayed = true;
-        
-        // Store the name element for persistence
-        this.currentNameElement = nameBox;
-    }
-    
-    updateNamePosition() {
-        if (!this.currentNameElement) return;
-        
-        let box;
-        if (this.currentDetections && this.currentDetections.length > 0) {
-            box = this.currentDetections[0].detection.box;
-            this.stableFaceBox = box;
-        } else if (this.stableFaceBox) {
-            box = this.stableFaceBox;
-        } else {
-            return; // No position to update to
-        }
-        
-        // Update position smoothly
-        this.currentNameElement.style.left = `${box.x + (box.width / 2)}px`;
-        this.currentNameElement.style.top = `${Math.max(box.y - 45, 10)}px`;
-    }
-    
-    updateFaceBoxColor(color) {
-        const faceRing = this.faceOverlay.querySelector('.face-ring');
-        if (faceRing) {
-            if (color === '#10B981' || color === 'known') {
-                // HIJAU - Wajah dikenali (HAPUS class unknown-face)
-                faceRing.classList.remove('unknown-face');
-                faceRing.style.animation = 'pulseGreen 2s infinite';
-                faceRing.style.borderColor = '#10B981';
-                faceRing.style.background = 'rgba(16, 185, 129, 0.05)';
-                this.currentFaceStatus = 'known';
-            } else {
-                // MERAH - Wajah tidak dikenali (TAMBAH class unknown-face)
-                faceRing.classList.add('unknown-face');
-                faceRing.style.animation = 'pulseRed 2s infinite';
-                faceRing.style.borderColor = '#EF4444';
-                faceRing.style.background = 'rgba(239, 68, 68, 0.1)';
-                this.currentFaceStatus = 'unknown';
-            }
-        }
-    }
-    
-    simulateBasicFaceDetection() {
-        // Enhanced face detection with better tracking
-        const videoWidth = this.video.videoWidth || 640;
-        const videoHeight = this.video.videoHeight || 480;
-        
-        // Use canvas to analyze actual video content for better detection
+        // Analyze actual video content for face-like regions
         this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
         const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
         
-        // Simple face detection based on skin color and movement
-        const hasFace = this.detectFaceInImage(imageData);
+        // Find the brightest/most active region (likely face area)
+        const faceRegion = this.findFaceRegion(imageData, videoWidth, videoHeight);
         
-        if (!hasFace) {
-            this.noFaceCount++;
-            // Only return empty if no face for several frames
-            if (this.noFaceCount > 5) {
-                return [];
-            }
-        } else {
-            this.noFaceCount = 0;
-        }
-        
-        // Calculate face dimensions - FULL FACE COVERAGE (EAR TO EAR)
-        const faceWidth = Math.min(videoWidth * 0.35, 250); // Much wider for full face coverage
-        const faceHeight = faceWidth * 1.2; // Balanced face ratio
-        
-        // PERFECT CENTER positioning - ensure full face coverage
-        const x = (videoWidth - faceWidth) / 2;
-        const y = (videoHeight - faceHeight) / 2 - 30; // Centered on face area
-        
-        return [{
-            detection: {
-                box: {
-                    x: Math.max(0, x),
-                    y: Math.max(0, y),
-                    width: faceWidth,
-                    height: faceHeight
+        if (faceRegion) {
+            return {
+                detection: {
+                    box: faceRegion,
+                    score: 0.9
                 },
-                score: 0.95
-            },
-            landmarks: null,
-            expressions: null
-        }];
-    }
-    
-    detectFaceInImage(imageData) {
-        // Simple face detection based on image analysis
-        // This is a basic implementation - in real app you'd use proper face detection
-        const data = imageData.data;
-        let skinPixels = 0;
-        let totalPixels = data.length / 4;
-        
-        // Sample every 10th pixel for performance
-        for (let i = 0; i < data.length; i += 40) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            
-            // Simple skin color detection
-            if (r > 95 && g > 40 && b > 20 && 
-                Math.max(r, g, b) - Math.min(r, g, b) > 15 &&
-                Math.abs(r - g) > 15 && r > g && r > b) {
-                skinPixels++;
-            }
-        }
-        
-        // If more than 2% of sampled pixels are skin-colored, assume face is present
-        return (skinPixels / (totalPixels / 10)) > 0.02;
-    }
-    
-    drawAccurateFaceRing(detection) {
-        // RING TEPAT DI TENGAH WAJAH - perbaikan positioning
-        const landmarks = detection.landmarks;
-        const box = detection.detection.box;
-        
-        // Gunakan detection box sebagai base, lebih reliable
-        const boxCenter = {
-            x: box.x + box.width / 2,
-            y: box.y + box.height / 2
-        };
-        
-        // Ambil landmark untuk fine-tuning (opsional)
-        let faceCenter = boxCenter;
-        
-        try {
-            const nose = landmarks.getNose();
-            const leftEye = landmarks.getLeftEye();
-            const rightEye = landmarks.getRightEye();
-            
-            // CENTER TEPAT DI HIDUNG - TIDAK DICAMPUR DENGAN MATA
-            const noseCenterX = (nose[0].x + nose[4].x) / 2; // Center hidung horizontal
-            const noseCenterY = nose[2].y; // Ujung hidung
-            
-            // FACE CENTER TEPAT DI HIDUNG
-            faceCenter = {
-                x: noseCenterX, // Tepat di tengah hidung
-                y: noseCenterY  // Tepat di ujung hidung
+                landmarks: null,
+                descriptor: this.generateSimulatedDescriptor()
             };
-        } catch (error) {
-            console.log('Using detection box center as fallback');
-            // Tetap gunakan box center jika landmark error
         }
         
-        // Hitung mapping ke layar (karena video menggunakan object-cover)
-        const mappedBox = this.mapBoxToOverlay(box);
-        const mappedCenter = this.mapPointToOverlay(faceCenter);
-        
-        // UKURAN RING BESAR - SAMPAI DAGU (skala sesuai tampilan)
-        const ringSize = Math.max(box.width * 1.2, box.height * 1.1) * mappedBox.scale;
-        
-        // Buat ring yang centered di wajah (koordinat overlay)
-        const faceRing = document.createElement('div');
-        faceRing.style.position = 'absolute';
-        faceRing.style.zIndex = '1';
-        faceRing.style.left = `${mappedCenter.x - ringSize/2}px`;
-        faceRing.style.top = `${mappedCenter.y - ringSize/2}px`;
-        faceRing.style.width = `${ringSize}px`;
-        faceRing.style.height = `${ringSize}px`;
-        faceRing.style.borderRadius = '12px';
-        faceRing.className = 'face-ring';
-        const isKnown = !!this.lastKnownUser; // lock color to latest recognition result
-        if (!isKnown) {
-            faceRing.classList.add('unknown-face');
-            faceRing.style.animation = 'pulseRed 2s infinite';
-        } else {
-            faceRing.style.animation = 'pulseGreen 2s infinite';
-        }
-        
-        this.faceOverlay.appendChild(faceRing);
-        
-        // Keep name label locked to ring position
-        const attachedLabel1 = this.userOverlay.firstElementChild;
-        if (attachedLabel1) {
-            const rLeft = parseFloat(faceRing.style.left || '0');
-            const rTop = parseFloat(faceRing.style.top || '0');
-            const rWidth = parseFloat(faceRing.style.width || '0');
-            const cX = rLeft + rWidth / 2;
-            const gap = 6;
-            const h = attachedLabel1.offsetHeight || 32;
-            attachedLabel1.style.left = `${cX}px`;
-            attachedLabel1.style.top = `${Math.max(rTop - h - gap, 10)}px`;
-            attachedLabel1.style.transform = 'translateX(-50%)';
-        }
-        
-        // Debug: tampilkan center point
-        if (window.DEBUG_LANDMARKS) {
-            this.drawDebugPoints([faceCenter]);
-        }
+        return null; // No face detected
     }
     
-    drawDebugPoints(points) {
-        // Fungsi debug untuk melihat titik landmark
-        points.forEach((point, index) => {
-            const dot = document.createElement('div');
-            dot.style.position = 'absolute';
-            dot.style.left = `${point.x - 3}px`;
-            dot.style.top = `${point.y - 3}px`;
-            dot.style.width = '6px';
-            dot.style.height = '6px';
-            dot.style.backgroundColor = ['red', 'blue', 'yellow'][index];
-            dot.style.borderRadius = '50%';
-            dot.style.zIndex = '10';
-            this.faceOverlay.appendChild(dot);
-        });
-    }
-    
-    drawRealFaceApiBox(box) {
-        // Fallback: Create face detection box - UKURAN YANG SAMA
-        const mappedBox = this.mapBoxToOverlay(box);
-        const boxCenter = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-        const mappedCenter = this.mapPointToOverlay(boxCenter);
+    findFaceRegion(imageData, videoWidth, videoHeight) {
+        const data = imageData.data;
+        let maxBrightness = 0;
+        let bestRegion = null;
         
-        // UKURAN RING BESAR - SAMA DENGAN FUNCTION UTAMA (skala sesuai tampilan)
-        const ringSize = Math.max(box.width * 1.2, box.height * 1.1) * mappedBox.scale;
-        
-        const faceBox = document.createElement('div');
-        faceBox.style.position = 'absolute';
-        faceBox.style.zIndex = '1';
-        faceBox.style.left = `${mappedCenter.x - ringSize/2}px`;
-        faceBox.style.top = `${mappedCenter.y - ringSize/2}px`;
-        faceBox.style.width = `${ringSize}px`;
-        faceBox.style.height = `${ringSize}px`;
-        faceBox.style.borderRadius = '12px';
-        faceBox.className = 'face-ring';
-        const isKnown = !!this.lastKnownUser; // lock color to latest recognition result
-        if (!isKnown) {
-            faceBox.classList.add('unknown-face');
-            faceBox.style.animation = 'pulseRed 2s infinite';
-        } else {
-            faceBox.style.animation = 'pulseGreen 2s infinite';
-        }
-        
-        this.faceOverlay.appendChild(faceBox);
-        
-        // Keep name label locked to ring position
-        const attachedLabel2 = this.userOverlay.firstElementChild;
-        if (attachedLabel2) {
-            const rLeft = parseFloat(faceBox.style.left || '0');
-            const rTop = parseFloat(faceBox.style.top || '0');
-            const rWidth = parseFloat(faceBox.style.width || '0');
-            const cX = rLeft + rWidth / 2;
-            const gap = 6;
-            const h = attachedLabel2.offsetHeight || 32;
-            attachedLabel2.style.left = `${cX}px`;
-            attachedLabel2.style.top = `${Math.max(rTop - h - gap, 10)}px`;
-            attachedLabel2.style.transform = 'translateX(-50%)';
-        }
-    }
-    
-    drawAdvancedFaceBox(box) {
-        const faceBox = document.createElement('div');
-        faceBox.style.position = 'absolute';
-        faceBox.style.zIndex = '1';
-        faceBox.style.left = `${box.x}px`;
-        faceBox.style.top = `${box.y}px`;
-        faceBox.style.width = `${box.width}px`;
-        faceBox.style.height = `${box.height}px`;
-        faceBox.style.border = '3px solid #10B981';
-        faceBox.style.borderRadius = '12px';
-        faceBox.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.8)';
-        faceBox.style.animation = 'pulse 2s infinite';
-        
-        // Add corner indicators
-        const corners = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-        corners.forEach(corner => {
-            const cornerDiv = document.createElement('div');
-            cornerDiv.style.position = 'absolute';
-            cornerDiv.style.width = '20px';
-            cornerDiv.style.height = '20px';
-            cornerDiv.style.border = '3px solid #10B981';
-            
-            switch(corner) {
-                case 'top-left':
-                    cornerDiv.style.top = '-3px';
-                    cornerDiv.style.left = '-3px';
-                    cornerDiv.style.borderRight = 'none';
-                    cornerDiv.style.borderBottom = 'none';
-                    break;
-                case 'top-right':
-                    cornerDiv.style.top = '-3px';
-                    cornerDiv.style.right = '-3px';
-                    cornerDiv.style.borderLeft = 'none';
-                    cornerDiv.style.borderBottom = 'none';
-                    break;
-                case 'bottom-left':
-                    cornerDiv.style.bottom = '-3px';
-                    cornerDiv.style.left = '-3px';
-                    cornerDiv.style.borderRight = 'none';
-                    cornerDiv.style.borderTop = 'none';
-                    break;
-                case 'bottom-right':
-                    cornerDiv.style.bottom = '-3px';
-                    cornerDiv.style.right = '-3px';
-                    cornerDiv.style.borderLeft = 'none';
-                    cornerDiv.style.borderTop = 'none';
-                    break;
+        // Scan in grid to find brightest region (likely face)
+        const gridSize = 32;
+        for (let y = 0; y < videoHeight - 100; y += gridSize) {
+            for (let x = 0; x < videoWidth - 100; x += gridSize) {
+                let brightness = 0;
+                let skinPixels = 0;
+                
+                // Sample region
+                for (let dy = 0; dy < 100; dy += 4) {
+                    for (let dx = 0; dx < 100; dx += 4) {
+                        const idx = ((y + dy) * videoWidth + (x + dx)) * 4;
+                        if (idx < data.length) {
+                            const r = data[idx];
+                            const g = data[idx + 1];
+                            const b = data[idx + 2];
+                            
+                            brightness += (r + g + b) / 3;
+                            
+                            // Check for skin-like colors
+                            if (r > 95 && g > 40 && b > 20 && 
+                                Math.max(r, g, b) - Math.min(r, g, b) > 15 &&
+                                Math.abs(r - g) > 15 && r > g && r > b) {
+                                skinPixels++;
+                            }
+                        }
+                    }
+                }
+                
+                // Score based on brightness and skin pixels
+                const score = brightness + (skinPixels * 50);
+                
+                if (score > maxBrightness && skinPixels > 10) {
+                    maxBrightness = score;
+                    const faceWidth = Math.min(videoWidth * 0.35, 250);
+                    const faceHeight = faceWidth * 1.2;
+                    
+                    bestRegion = {
+                        x: Math.max(0, x - faceWidth/4),
+                        y: Math.max(0, y - faceHeight/4),
+                        width: faceWidth,
+                        height: faceHeight
+                    };
+                }
             }
-            faceBox.appendChild(cornerDiv);
-        });
-        
-        this.faceOverlay.appendChild(faceBox);
-    }
-    
-    performAntiSpoofingAnalysis(detection) {
-        // Simple anti-spoofing based on expressions and landmarks
-        const expressions = detection.expressions;
-        const landmarks = detection.landmarks;
-        
-        let score = 0.5; // Base score
-        
-        // Check for natural expressions variation
-        if (expressions) {
-            const expressionValues = Object.values(expressions);
-            const maxExpression = Math.max(...expressionValues);
-            if (maxExpression > 0.1) score += 0.2;
         }
         
-        // Check for landmark stability (real faces have slight movement)
-        if (landmarks) {
-            score += 0.3; // Landmarks present indicates real face
-        }
-        
-        return Math.min(score, 1.0);
+        return bestRegion;
     }
     
-    assessFaceQuality(detection) {
+    hasMotion(imageData) {
+        // Simple motion detection based on pixel changes
+        const data = imageData.data;
+        let brightness = 0;
+        
+        // Sample every 100th pixel for performance
+        for (let i = 0; i < data.length; i += 400) {
+            brightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
+        }
+        
+        const avgBrightness = brightness / (data.length / 400);
+        
+        // Store previous brightness for comparison
+        if (!this.lastBrightness) {
+            this.lastBrightness = avgBrightness;
+            return true; // First frame, assume motion
+        }
+        
+        const change = Math.abs(avgBrightness - this.lastBrightness);
+        this.lastBrightness = avgBrightness;
+        
+        // If brightness changed significantly, assume face is present
+        return change > 5 || avgBrightness > 50; // Adjust threshold as needed
+    }
+    
+    generateSimulatedDescriptor() {
+        // Generate a random descriptor for simulation
+        const descriptor = new Float32Array(128);
+        for (let i = 0; i < 128; i++) {
+            descriptor[i] = (Math.random() - 0.5) * 2;
+        }
+        return descriptor;
+    }
+    
+    clearOverlays() {
+        // Don't clear overlays in real-time mode to prevent flickering
+        // Only clear when absolutely necessary
+    }
+    
+    updateFaceRingPosition(detection) {
         const box = detection.detection.box;
-        const score = detection.detection.score;
+        const mappedBox = this.mapBoxToOverlay(box);
         
-        // Face size check
-        const faceSize = box.width * box.height;
-        const videoSize = this.video.videoWidth * this.video.videoHeight;
-        const sizeRatio = faceSize / videoSize;
-        
-        let quality = 0;
-        
-        // Size quality (optimal size is 10-40% of video)
-        if (sizeRatio >= 0.1 && sizeRatio <= 0.4) quality += 0.4;
-        else if (sizeRatio >= 0.05 && sizeRatio <= 0.6) quality += 0.2;
-        
-        // Detection confidence
-        quality += score * 0.6;
-        
-        return Math.min(quality, 1.0);
-    }
-    
-    updateAutoStatus(faceQuality, antiSpoofingScore) {
-        if (faceQuality > 0.7 && antiSpoofingScore > 0.7) {
-            this.autoStatusText.textContent = 'Wajah berkualitas tinggi terdeteksi - Siap untuk pengenalan';
-            this.autoDetectionStatus.className = this.autoDetectionStatus.className.replace('bg-blue-100', 'bg-green-100').replace('border-blue-300', 'border-green-300').replace('text-blue-800', 'text-green-800');
-        } else if (faceQuality > 0.5) {
-            this.autoStatusText.textContent = 'Wajah terdeteksi - Perbaiki posisi untuk hasil optimal';
-            this.autoDetectionStatus.className = this.autoDetectionStatus.className.replace('bg-green-100', 'bg-yellow-100').replace('border-green-300', 'border-yellow-300').replace('text-green-800', 'text-yellow-800');
+        // Create or update existing ring
+        if (!this.currentRing) {
+            this.drawFaceRing(detection);
         } else {
-            this.autoStatusText.textContent = 'Deteksi otomatis aktif - Posisikan wajah dengan jelas';
-            this.autoDetectionStatus.className = this.autoDetectionStatus.className.replace('bg-green-100', 'bg-blue-100').replace('border-green-300', 'border-blue-300').replace('text-green-800', 'text-blue-800');
+            // Smoothly update existing ring position
+            this.currentRing.style.left = `${mappedBox.x}px`;
+            this.currentRing.style.top = `${mappedBox.y}px`;
+            this.currentRing.style.width = `${mappedBox.width}px`;
+            this.currentRing.style.height = `${mappedBox.height}px`;
         }
     }
     
-    async performFaceRecognition() {
-        if (!this.currentDetections || this.currentDetections.length === 0) return;
+    updateUserLabelPosition() {
+        if (!this.currentNameLabel || !this.currentRing) return;
         
-        const now = Date.now();
-        if (now - this.lastRecognitionTime < this.recognitionCooldown) return;
+        // Get current ring position
+        const ringLeft = parseFloat(this.currentRing.style.left) || 0;
+        const ringTop = parseFloat(this.currentRing.style.top) || 0;
+        const ringWidth = parseFloat(this.currentRing.style.width) || 200;
         
-        try {
-            // Capture current frame
-            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
-            
-            // Get anti-spoofing score from current detection
-            const detection = this.currentDetections[0];
-            const antiSpoofingScore = this.performAntiSpoofingAnalysis(detection);
-            
-            // Only proceed if anti-spoofing score is good enough
-            if (antiSpoofingScore < 0.6) return;
-            
-            // Send to backend for authentication
-            const response = await fetch('/admin/face-id/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    face_data: imageData,
-                    anti_spoofing_score: antiSpoofingScore,
-                    confidence_threshold: 0.7
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.handleSuccessfulLogin(result.user);
-                this.lastRecognitionTime = now;
+        // Update name position to follow ring smoothly
+        this.currentNameLabel.style.left = `${ringLeft + ringWidth / 2}px`;
+        this.currentNameLabel.style.top = `${Math.max(ringTop - 50, 10)}px`;
+        this.currentNameLabel.style.transform = 'translateX(-50%)';
+    }
+    
+    drawFaceRing(detection) {
+        const box = detection.detection.box;
+        const mappedBox = this.mapBoxToOverlay(box);
+        
+        // Create face ring
+        const ring = document.createElement('div');
+        ring.style.position = 'absolute';
+        ring.style.left = `${mappedBox.x}px`;
+        ring.style.top = `${mappedBox.y}px`;
+        ring.style.width = `${mappedBox.width}px`;
+        ring.style.height = `${mappedBox.height}px`;
+        ring.style.border = '4px solid #10b981'; // Default green
+        ring.style.borderRadius = '12px';
+        ring.style.background = 'rgba(16, 185, 129, 0.1)';
+        ring.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.5)';
+        ring.style.animation = 'pulseGreen 2s infinite';
+        ring.className = 'face-ring';
+        
+        this.faceOverlay.appendChild(ring);
+        this.currentRing = ring;
+    }
+    
+    async recognizeUser(detection) {
+        // STRICT VALIDATION: Check if we have any users in database first
+        if (this.knownUsers.length === 0) {
+            console.log('❌ No users in database - showing unknown');
+            this.setCurrentUser(null); // Unknown user
+            return;
+        }
+        
+        // STRICT VALIDATION: Check if we have training data
+        if (this.trainingData.size === 0) {
+            console.log('❌ No training data available - showing unknown');
+            this.setCurrentUser(null); // Unknown user
+            return;
+        }
+
+        // Real face-api.js recognition ONLY
+        if (this.isModelLoaded && detection.descriptor) {
+            let bestMatch = null;
+            let bestDistance = Infinity;
+
+            // Check against training data
+            for (const user of this.knownUsers) {
+                const userDescriptors = this.trainingData.get(user.id);
+                if (!userDescriptors || userDescriptors.length === 0) {
+                    console.log(`No training data for user: ${user.name}`);
+                    continue;
+                }
+
+                for (const trainedDescriptor of userDescriptors) {
+                    const distance = this.calculateDistance(detection.descriptor, trainedDescriptor);
+
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestMatch = user;
+                    }
+                }
             }
-            
-        } catch (error) {
-            console.error('Face recognition error:', error);
+
+            // Strict threshold for accurate recognition (0.5 is very strict, 0.6 is standard)
+            const threshold = 0.5; // Lebih ketat untuk akurasi tinggi
+            if (bestDistance < threshold && bestMatch) {
+                console.log(`✅ Face recognized: ${bestMatch.name} (distance: ${bestDistance.toFixed(3)}, threshold: ${threshold})`);
+                this.setCurrentUser(bestMatch);
+            } else {
+                console.log(`❌ Face not recognized (best distance: ${bestDistance.toFixed(3)}, threshold: ${threshold})`);
+                if (bestMatch) {
+                    console.log(`   Closest match was: ${bestMatch.name} (but distance too high)`);
+                }
+                this.setCurrentUser(null); // Unknown user
+            }
+        } else {
+            // Model not loaded - cannot recognize without face descriptors
+            console.log('⚠️ Face-api.js model not loaded - cannot perform face recognition');
+            console.log('   All faces will be marked as UNKNOWN until model is loaded');
+            this.setCurrentUser(null); // Unknown user - no recognition without model
         }
     }
     
-    
-    handleSuccessfulLogin(user) {
-        // Show success notification
-        this.showStatus(`Login berhasil! Selamat datang ${user.name}`, 'success');
-        
-        // Change button to green to indicate success
-        this.updateButtonSuccess();
-        
-        // Play success sound (optional)
-        this.playSuccessSound();
-        
-        // Keep showing user name for longer
-        setTimeout(() => {
-            this.showKnownUserName(user.name);
-        }, 100);
+    calculateDistance(descriptor1, descriptor2) {
+        // Euclidean distance between two face descriptors
+        let sum = 0;
+        for (let i = 0; i < descriptor1.length; i++) {
+            const diff = descriptor1[i] - descriptor2[i];
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum);
     }
     
-    updateButtonSuccess() {
-        const startBtn = this.startBtn;
-        const stopBtn = this.stopBtn;
+    setCurrentUser(user) {
+        // Prevent unnecessary updates to avoid flickering
+        if (this.currentUser && user && this.currentUser.id === user.id) {
+            console.log(`Same user detected: ${user.name}, skipping update`);
+            return; // Same user, no need to update
+        }
         
-        // Change stop button to green success state
-        if (!stopBtn.classList.contains('hidden')) {
-            stopBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Dikenali';
-            stopBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center';
+        console.log(`Setting current user: ${user ? user.name : 'Unknown'}`);
+        console.log(`Database has ${this.knownUsers.length} registered users`);
+        this.currentUser = user;
+        
+        if (user) {
+            // Known user - show green ring
+            console.log(`✅ Showing GREEN ring and name for: ${user.name}`);
+            this.updateRingColor('green');
+            this.showUserLabel(user);
+            this.updateStatus(`Wajah dikenali: ${user.name} - Auto login...`);
             
-            // Reset after 3 seconds
+            // AUTO LOGIN after 2 seconds
             setTimeout(() => {
-                stopBtn.innerHTML = '<i class="fas fa-stop mr-2"></i>Stop Kamera';
-                stopBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center';
-            }, 3000);
+                this.autoLogin(user);
+            }, 2000);
+        } else {
+            // Unknown user - show red ring
+            console.log('❌ Showing RED ring for unknown user');
+            this.updateRingColor('red');
+            this.showUnknownLabel();
+            this.hideAttendanceButton();
+            this.updateStatus('Wajah tidak dikenali');
         }
     }
     
-    playSuccessSound() {
-        // Create a simple beep sound
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+    updateRingColor(color) {
+        if (!this.currentRing) return;
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
+        if (color === 'green') {
+            this.currentRing.style.borderColor = '#10b981';
+            this.currentRing.style.background = 'rgba(16, 185, 129, 0.1)';
+            this.currentRing.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.5)';
+            this.currentRing.style.animation = 'pulseGreen 2s infinite';
+        } else {
+            this.currentRing.style.borderColor = '#ef4444';
+            this.currentRing.style.background = 'rgba(239, 68, 68, 0.1)';
+            this.currentRing.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.5)';
+            this.currentRing.style.animation = 'pulseRed 2s infinite';
+        }
     }
     
+    showUserLabel(user) {
+        // Clear previous label
+        this.userOverlay.innerHTML = '';
+        
+        if (!this.currentRing) {
+            // If no ring yet, wait a bit and try again
+            setTimeout(() => this.showUserLabel(user), 100);
+            return;
+        }
+        
+        // Get ring position directly from style (more reliable)
+        const ringLeft = parseFloat(this.currentRing.style.left) || 0;
+        const ringTop = parseFloat(this.currentRing.style.top) || 0;
+        const ringWidth = parseFloat(this.currentRing.style.width) || 200;
+        
+        const label = document.createElement('div');
+        label.className = 'user-name-label'; // Add CSS class for smooth transitions
+        label.style.position = 'absolute';
+        label.style.left = `${ringLeft + ringWidth / 2}px`;
+        label.style.top = `${Math.max(ringTop - 50, 10)}px`; // 50px above ring
+        label.style.transform = 'translateX(-50%)';
+        label.style.backgroundColor = '#10b981';
+        label.style.color = 'white';
+        label.style.padding = '8px 16px';
+        label.style.borderRadius = '20px';
+        label.style.fontSize = '16px';
+        label.style.fontWeight = 'bold';
+        label.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+        label.style.zIndex = '20'; // Higher z-index
+        label.style.minWidth = '120px';
+        label.style.textAlign = 'center';
+        label.style.pointerEvents = 'none';
+        label.textContent = user.name;
+        
+        this.userOverlay.appendChild(label);
+        this.currentNameLabel = label;
+        
+        console.log(`Showing name label: ${user.name} at position (${ringLeft + ringWidth / 2}, ${ringTop - 50})`);
+    }
+    
+    showUnknownLabel() {
+        // Clear previous label
+        this.userOverlay.innerHTML = '';
+        
+        if (!this.currentRing) {
+            setTimeout(() => this.showUnknownLabel(), 100);
+            return;
+        }
+        
+        // Get ring position directly from style (same as showUserLabel)
+        const ringLeft = parseFloat(this.currentRing.style.left) || 0;
+        const ringTop = parseFloat(this.currentRing.style.top) || 0;
+        const ringWidth = parseFloat(this.currentRing.style.width) || 200;
+        
+        const label = document.createElement('div');
+        label.style.position = 'absolute';
+        label.style.left = `${ringLeft + ringWidth / 2}px`;
+        label.style.top = `${Math.max(ringTop - 50, 10)}px`; // 50px above ring
+        label.style.transform = 'translateX(-50%)';
+        label.style.backgroundColor = '#ef4444';
+        label.style.color = 'white';
+        label.style.padding = '8px 16px';
+        label.style.borderRadius = '20px';
+        label.style.fontSize = '16px';
+        label.style.fontWeight = 'bold';
+        label.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
+        label.style.zIndex = '20'; // Higher z-index
+        label.style.minWidth = '120px';
+        label.style.textAlign = 'center';
+        label.style.pointerEvents = 'none';
+        label.textContent = 'Tidak Dikenal';
+        
+        this.userOverlay.appendChild(label);
+        this.currentNameLabel = label;
+        
+        console.log(`Showing unknown label at position (${ringLeft + ringWidth / 2}, ${ringTop - 50})`);
+    }
+    
+    updateStatus(message) {
+        if (this.autoStatusText) {
+            this.autoStatusText.textContent = message;
+        }
+    }
+    
+    showAttendanceButton() {
+        this.attendanceBtn.classList.remove('hidden');
+        this.stopBtn.classList.add('hidden');
+    }
+    
+    hideAttendanceButton() {
+        this.attendanceBtn.classList.add('hidden');
+        this.stopBtn.classList.remove('hidden');
+    }
     
     stopCamera() {
         if (this.stream) {
@@ -1266,11 +986,6 @@ class AdvancedFaceIDSystem {
             this.detectionInterval = null;
         }
         
-        if (this.recognitionInterval) {
-            clearInterval(this.recognitionInterval);
-            this.recognitionInterval = null;
-        }
-        
         this.isDetecting = false;
         this.video.srcObject = null;
         
@@ -1278,16 +993,22 @@ class AdvancedFaceIDSystem {
         this.startBtn.classList.remove('hidden');
         this.stopBtn.classList.add('hidden');
         this.autoDetectionStatus.classList.add('hidden');
+        this.attendanceBtn.classList.add('hidden');
         
         // Clear overlays
         this.faceOverlay.innerHTML = '';
         this.userOverlay.innerHTML = '';
         
+        // Reset state
+        this.currentUser = null;
+        this.faceDetected = false;
+        this.currentRing = null;
+        this.currentNameLabel = null;
+        
         this.showStatus('Kamera dihentikan', 'info');
     }
     
     showStatus(message, type = 'info') {
-        // Update the span inside statusMessage
         const span = this.statusMessage.querySelector('span');
         if (span) {
             span.textContent = message;
@@ -1296,11 +1017,8 @@ class AdvancedFaceIDSystem {
         }
         
         this.statusMessage.classList.remove('hidden');
-        
-        // Remove existing type classes
         this.statusMessage.classList.remove('bg-blue-600', 'bg-green-600', 'bg-yellow-600', 'bg-red-600');
         
-        // Update icon and color based on type
         const icon = this.statusMessage.querySelector('i');
         if (icon) {
             icon.className = 'mr-2 fas ';
@@ -1324,20 +1042,114 @@ class AdvancedFaceIDSystem {
         }
     }
     
-    showAttendanceButton() {
-        // Show attendance button like in reference image
-        this.attendanceBtn.classList.remove('hidden');
-        this.stopBtn.classList.add('hidden'); // Hide stop button when showing attendance
+    async autoLogin(user) {
+        if (!user) {
+            console.error('Cannot auto-login: no user provided');
+            return;
+        }
+        
+        // Prevent multiple attendance records
+        if (this.isLoggingIn) {
+            console.log('Attendance already in progress, skipping...');
+            return;
+        }
+        
+        this.isLoggingIn = true;
+        
+        try {
+            console.log(`✅ Recording attendance for user: ${user.name} (NIS: ${user.nis})`);
+            this.updateStatus(`Mencatat absensi untuk ${user.name}...`);
+            
+            // Stop camera
+            this.stopCamera();
+            
+            // Call backend to record attendance
+            const response = await fetch('/admin/face-id/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    nis: user.nis,
+                    auto_login: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Attendance recorded successfully');
+                this.updateStatus(`✅ Absensi berhasil dicatat!`);
+                
+                // Show success message
+                this.showAttendanceSuccess(user);
+                
+                // Reset after 5 seconds for next user
+                setTimeout(() => {
+                    this.resetForNextUser();
+                }, 5000);
+            } else {
+                console.error('❌ Attendance failed:', result.message);
+                this.updateStatus(`❌ Gagal mencatat absensi: ${result.message}`);
+                this.isLoggingIn = false;
+            }
+            
+        } catch (error) {
+            console.error('Auto-attendance error:', error);
+            this.updateStatus('❌ Terjadi kesalahan saat mencatat absensi');
+            this.isLoggingIn = false;
+        }
     }
     
-    hideAttendanceButton() {
-        // Hide attendance button
-        this.attendanceBtn.classList.add('hidden');
-        this.stopBtn.classList.remove('hidden'); // Show stop button back
+    showAttendanceSuccess(user) {
+        // Show success overlay
+        const successOverlay = document.createElement('div');
+        successOverlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+        successOverlay.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md mx-4 text-center">
+                <div class="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-4xl text-green-600 dark:text-green-400"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Absensi Berhasil!</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-300 mb-4">Selamat datang, <strong>${user.name}</strong></p>
+                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">NIS</div>
+                    <div class="text-lg font-bold text-gray-900 dark:text-white">${user.nis}</div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Kehadiran Anda telah tercatat pada ${new Date().toLocaleString('id-ID')}
+                </p>
+            </div>
+        `;
+        
+        document.body.appendChild(successOverlay);
+        
+        // Remove overlay after 5 seconds
+        setTimeout(() => {
+            successOverlay.remove();
+        }, 5000);
+    }
+    
+    resetForNextUser() {
+        // Reset state for next user
+        this.isLoggingIn = false;
+        this.currentUser = null;
+        this.faceDetected = false;
+        
+        // Clear overlays
+        this.faceOverlay.innerHTML = '';
+        this.userOverlay.innerHTML = '';
+        
+        // Reset UI
+        this.updateStatus('Sistem siap untuk pengguna berikutnya');
+        this.startBtn.classList.remove('hidden');
+        
+        console.log('🔄 System reset, ready for next user');
     }
     
     async recordAttendance() {
-        if (!this.lastKnownUser) {
+        if (!this.currentUser) {
             this.showStatus('Tidak ada user yang dikenali untuk absen', 'error');
             return;
         }
@@ -1345,33 +1157,8 @@ class AdvancedFaceIDSystem {
         try {
             this.showStatus('Mencatat kehadiran...', 'info');
             
-            // Send attendance record to backend
-            const response = await fetch('/admin/attendance/record', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    user_id: this.lastKnownUser.id,
-                    method: 'face_id',
-                    timestamp: new Date().toISOString()
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.showStatus(`✅ Absensi berhasil dicatat untuk ${this.lastKnownUser.name}!`, 'success');
-                this.hideAttendanceButton();
-                
-                // Auto hide after 3 seconds
-                setTimeout(() => {
-                    this.showStatus('Sistem siap untuk deteksi wajah berikutnya', 'info');
-                }, 3000);
-            } else {
-                this.showStatus(`Gagal mencatat absensi: ${result.message}`, 'error');
-            }
+            // Call auto-login instead
+            await this.autoLogin(this.currentUser);
             
         } catch (error) {
             console.error('Attendance recording error:', error);
@@ -1382,15 +1169,13 @@ class AdvancedFaceIDSystem {
 
 // Initialize Face ID System when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing Face ID System...');
-    console.log('💡 Debug mode: ketik "window.DEBUG_LANDMARKS = true" di console untuk melihat titik landmark');
+    console.log('DOM loaded, initializing Simple Face ID System...');
     try {
-        const system = new AdvancedFaceIDSystem();
-        console.log('Face ID System initialized successfully');
+        const system = new SimpleFaceIDSystem();
+        console.log('Simple Face ID System initialized successfully');
         window.faceIDSystem = system; // For debugging
     } catch (error) {
         console.error('Failed to initialize Face ID System:', error);
-        // Show error message to user
         const statusMessage = document.getElementById('statusMessage');
         if (statusMessage) {
             statusMessage.innerHTML = `<i class="fas fa-times-circle mr-2"></i><span>Gagal memuat sistem Face ID: ${error.message}</span>`;
@@ -1403,3 +1188,4 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </body>
 </html>
+       
