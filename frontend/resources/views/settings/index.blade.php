@@ -141,9 +141,9 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="max-w-4xl mx-auto">
             <!-- Settings Form -->
-            <div class="lg:col-span-2">
+            <div>
                 <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                     <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700">
                         <h2 class="text-xl font-semibold text-white">
@@ -159,21 +159,52 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                                 Metode Absensi
                             </label>
+                            
+                            <!-- Info Box -->
+                            <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-lg mt-0.5 mr-3"></i>
+                                    <div class="text-sm text-blue-800 dark:text-blue-200">
+                                        <p class="font-medium mb-2">Pilih metode absensi yang akan digunakan:</p>
+                                        <ul class="space-y-1.5 text-xs">
+                                            <li class="flex items-start">
+                                                <i class="fas fa-credit-card text-blue-600 dark:text-blue-400 mr-2 mt-0.5"></i>
+                                                <span><strong>RFID Only:</strong> Absensi menggunakan kartu RFID. Menu "Daftarkan Kartu" akan tersedia di sidebar.</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <i class="fas fa-user-circle text-blue-600 dark:text-blue-400 mr-2 mt-0.5"></i>
+                                                <span><strong>Face ID Only:</strong> Absensi menggunakan pengenalan wajah. Menu "Daftarkan Wajah" dan "Login Wajah" akan tersedia di sidebar.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="space-y-3">
-                                <label class="flex items-center cursor-pointer">
+                                <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
                                     <input type="radio" name="attendance_method" value="rfid" 
                                            {{ ($settings->attendance_method ?? 'rfid') == 'rfid' ? 'checked' : '' }}
                                            id="method_rfid">
-                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                                        <i class="fas fa-credit-card mr-2 text-blue-500"></i>RFID Only
+                                    <span class="ml-3 flex-1">
+                                        <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                                            <i class="fas fa-credit-card mr-2 text-blue-500"></i>RFID Only
+                                        </span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Gunakan kartu RFID untuk absensi siswa
+                                        </span>
                                     </span>
                                 </label>
-                                <label class="flex items-center cursor-pointer">
+                                <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-green-500 dark:hover:border-green-500 transition-colors">
                                     <input type="radio" name="attendance_method" value="face_id" 
                                            {{ ($settings->attendance_method ?? 'rfid') == 'face_id' ? 'checked' : '' }}
                                            id="method_face_id">
-                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                                        <i class="fas fa-user-circle mr-2 text-green-500"></i>Face ID Only
+                                    <span class="ml-3 flex-1">
+                                        <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                                            <i class="fas fa-user-circle mr-2 text-green-500"></i>Face ID Only
+                                        </span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Gunakan pengenalan wajah untuk absensi siswa
+                                        </span>
                                     </span>
                                 </label>
                             </div>
@@ -186,159 +217,10 @@
                             </button>
                         </div>
                         
-                        <!-- Info about menu changes -->
-                        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg" id="menuInfoBox">
-                            <div class="flex items-start">
-                                <i class="fas fa-info-circle text-blue-500 mr-3 mt-0.5"></i>
-                                <div class="text-sm text-blue-800">
-                                    <p class="font-medium mb-1">Informasi Pengaturan:</p>
-                                    <div id="settingsInfo">
-                                        <ul class="space-y-1 text-xs">
-                                            <li>• <strong>RFID Only:</strong> Menu "Daftarkan Kartu" akan muncul, pengaturan Face ID dinonaktifkan</li>
-                                            <li>• <strong>Face ID Only:</strong> Menu "Daftarkan Wajah" akan muncul, Face Recognition otomatis aktif</li>
-                                        </ul>
-                                    </div>
-                                    <p class="text-xs mt-2 italic">Menu sidebar dan pengaturan akan berubah otomatis setelah disimpan.</p>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Face ID Status & Actions -->
-            <div class="space-y-6">
-                <!-- Face ID Status -->
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-                        <h3 class="text-lg font-semibold text-white">
-                            <i class="fas fa-user-check mr-2"></i>Status Face ID
-                        </h3>
-                    </div>
-                    
-                    <div class="p-6">
-                        @if($userFaceRegistration)
-                            @if($userFaceRegistration->status == 'approved')
-                                <div class="text-center">
-                                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-check-circle text-2xl text-green-600"></i>
-                                    </div>
-                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Terdaftar</h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        Face ID Anda sudah aktif dan dapat digunakan untuk absensi
-                                    </p>
-                                    <div class="mt-4 space-y-2">
-                                        <a href="{{ route('settings.face-id') }}" class="block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition duration-200">
-                                            <i class="fas fa-camera mr-2"></i>Test Face ID
-                                        </a>
-                                        <a href="{{ route('settings.register-face') }}" class="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center py-2 px-4 rounded-lg transition duration-200">
-                                            <i class="fas fa-sync-alt mr-2"></i>Daftar Ulang
-                                        </a>
-                                    </div>
-                                </div>
-                            @elseif($userFaceRegistration->status == 'pending')
-                                <div class="text-center">
-                                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-clock text-2xl text-yellow-600"></i>
-                                    </div>
-                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Menunggu Persetujuan</h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        Registrasi Face ID Anda sedang diproses oleh admin
-                                    </p>
-                                </div>
-                            @else
-                                <div class="text-center">
-                                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-times-circle text-2xl text-red-600"></i>
-                                    </div>
-                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Ditolak</h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        Registrasi Face ID ditolak. Silakan daftar ulang.
-                                    </p>
-                                    <div class="mt-4">
-                                        <a href="{{ route('settings.register-face') }}" class="block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition duration-200">
-                                            <i class="fas fa-redo mr-2"></i>Daftar Ulang
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
-                        @else
-                            <div class="text-center">
-                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="fas fa-user-plus text-2xl text-gray-600"></i>
-                                </div>
-                                <h4 class="text-lg font-medium text-gray-900 dark:text-white">Belum Terdaftar</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Daftarkan wajah Anda untuk menggunakan Face ID
-                                </p>
-                                <div class="mt-4">
-                                    <a href="{{ route('settings.register-face') }}" class="block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition duration-200">
-                                        <i class="fas fa-user-plus mr-2"></i>Daftar Face ID
-                                    </a>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Current Settings Info -->
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
-                        <h3 class="text-lg font-semibold text-white">
-                            <i class="fas fa-info-circle mr-2"></i>Pengaturan Aktif
-                        </h3>
-                    </div>
-                    
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Metode Absensi</span>
-                            @php
-                                $methodLabels = [
-                                    'rfid' => 'RFID Only',
-                                    'face_id' => 'Face ID Only'
-                                ];
-                                $methodColors = [
-                                    'rfid' => 'text-blue-600',
-                                    'face_id' => 'text-purple-600'
-                                ];
-                                $methodIcons = [
-                                    'rfid' => 'fas fa-credit-card',
-                                    'face_id' => 'fas fa-user-circle'
-                                ];
-                                $currentMethod = $settings->attendance_method ?? 'rfid';
-                            @endphp
-                            <span class="text-sm font-medium {{ $methodColors[$currentMethod] }}">
-                                <i class="{{ $methodIcons[$currentMethod] }} mr-1"></i>{{ $methodLabels[$currentMethod] }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Face Recognition</span>
-                            <span class="text-sm font-medium {{ ($settings->face_recognition_enabled ?? false) ? 'text-green-600' : 'text-red-600' }}">
-                                <i class="fas {{ ($settings->face_recognition_enabled ?? false) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>{{ ($settings->face_recognition_enabled ?? false) ? 'Active' : 'Inactive' }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Anti-Spoofing</span>
-                            <span class="text-sm font-medium {{ ($settings->anti_spoofing_enabled ?? true) ? 'text-green-600' : 'text-red-600' }}">
-                                <i class="fas {{ ($settings->anti_spoofing_enabled ?? true) ? 'fa-shield-alt' : 'fa-shield' }} mr-1"></i>{{ ($settings->anti_spoofing_enabled ?? true) ? 'Protected' : 'Disabled' }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Confidence Level</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ number_format(($settings->face_confidence_threshold ?? 0.70) * 100, 0) }}%
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Version</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">1.0 | 2025</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

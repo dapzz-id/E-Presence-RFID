@@ -155,9 +155,10 @@
                 </h1>
             </div>
             <p class="text-gray-600 dark:text-gray-400">
-                Gunakan kamera untuk melakukan absensi dengan Face ID
+                Sistem absensi otomatis menggunakan pengenalan wajah. Scan pertama untuk absen masuk, scan kedua untuk absen keluar.
             </p>
         </div>
+
 
         <!-- Status Message Area (Moved Above Camera) -->
         <div id="statusMessage" class="bg-blue-600 text-white px-6 py-4 rounded-lg text-center mb-6 shadow-lg">
@@ -194,22 +195,22 @@
                 <!-- System Status -->
                 <div id="autoDetectionStatus" class="w-full bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg text-sm text-center mb-4 hidden">
                     <i class="fas fa-robot mr-2"></i>
-                    <span id="autoStatusText">Deteksi otomatis aktif - Posisikan wajah Anda</span>
+                    <span id="autoStatusText">🤖 Deteksi otomatis aktif - Posisikan wajah Anda di depan kamera</span>
                 </div>
 
                 <!-- Controls -->
                 <div class="space-y-4">
                     <button id="startCamera" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
-                        <i class="fas fa-camera mr-2"></i>Scan Face ID
+                        <i class="fas fa-camera mr-2"></i>Mulai Scan Wajah
                     </button>
                     
                     <button id="stopCamera" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden">
-                        <i class="fas fa-stop mr-2"></i>Stop Kamera
+                        <i class="fas fa-stop mr-2"></i>Hentikan Kamera
                     </button>
                     
                     <!-- Attendance Button - Like in reference image -->
                     <button id="attendanceBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden">
-                        <i class="fas fa-check mr-2"></i>Klik untuk Absen
+                        <i class="fas fa-check mr-2"></i>Konfirmasi Absensi
                     </button>
                 </div>
             </div>
@@ -451,7 +452,7 @@ class SimpleFaceIDSystem {
     
     async loadModels() {
         try {
-            this.showStatus('Memuat model AI...', 'info');
+            this.showStatus('🚀 Memuat model AI...', 'info');
             
             // Wait for face-api.js to load
             let retries = 0;
@@ -498,7 +499,7 @@ class SimpleFaceIDSystem {
     
     async startCamera() {
         try {
-            this.showStatus('Memulai sistem Face ID...', 'info');
+            this.showStatus('🚀 Memulai sistem Face ID...', 'info');
             
             this.stream = await navigator.mediaDevices.getUserMedia({
                 video: { 
@@ -518,7 +519,7 @@ class SimpleFaceIDSystem {
                 this.stopBtn.classList.remove('hidden');
                 this.autoDetectionStatus.classList.remove('hidden');
                 
-                this.showStatus('Sistem Face ID aktif - Deteksi otomatis berjalan', 'success');
+                this.showStatus('✅ Sistem Face ID aktif - Wajah akan terdeteksi otomatis', 'success');
                 this.startDetection();
             };
             
@@ -576,21 +577,21 @@ class SimpleFaceIDSystem {
                 }
                 
                 // Update status
-                this.updateStatus('Wajah terdeteksi - Tracking real-time...');
+                this.updateStatus('👤 Wajah terdeteksi - Mengenali identitas...');
                 
             } else {
                 // Don't clear UI immediately - keep showing for smooth experience
                 if (this.faceDetected) {
-                    this.updateStatus('Mencari wajah...');
+                    this.updateStatus('🔍 Mencari wajah...');
                 } else {
-                    this.updateStatus('Tidak ada wajah terdeteksi - Posisikan wajah Anda');
+                    this.updateStatus('📷 Posisikan wajah Anda di depan kamera');
                 }
                 this.faceDetected = false;
             }
             
         } catch (error) {
             console.error('Detection error:', error);
-            this.updateStatus('Error dalam deteksi wajah');
+            this.updateStatus('⚠️ Terjadi kesalahan dalam deteksi wajah');
         }
     }
     
@@ -849,7 +850,7 @@ class SimpleFaceIDSystem {
             console.log(`✅ Showing GREEN ring and name for: ${user.name}`);
             this.updateRingColor('green');
             this.showUserLabel(user);
-            this.updateStatus(`Wajah dikenali: ${user.name} - Auto login...`);
+            this.updateStatus(`✅ Wajah dikenali: ${user.name} - Mencatat absensi...`);
             
             // AUTO LOGIN after 2 seconds
             setTimeout(() => {
@@ -861,7 +862,7 @@ class SimpleFaceIDSystem {
             this.updateRingColor('red');
             this.showUnknownLabel();
             this.hideAttendanceButton();
-            this.updateStatus('Wajah tidak dikenali');
+            this.updateStatus('❌ Wajah tidak terdaftar - Silakan daftarkan wajah terlebih dahulu');
         }
     }
     
@@ -1005,7 +1006,7 @@ class SimpleFaceIDSystem {
         this.currentRing = null;
         this.currentNameLabel = null;
         
-        this.showStatus('Kamera dihentikan', 'info');
+        this.showStatus('⏹️ Kamera dihentikan', 'info');
     }
     
     showStatus(message, type = 'info') {
@@ -1058,7 +1059,7 @@ class SimpleFaceIDSystem {
         
         try {
             console.log(`✅ Recording attendance for user: ${user.name} (NIS: ${user.nis})`);
-            this.updateStatus(`Mencatat absensi untuk ${user.name}...`);
+            this.updateStatus(`⏳ Mencatat absensi untuk ${user.name}...`);
             
             // Stop camera
             this.stopCamera();
@@ -1079,11 +1080,22 @@ class SimpleFaceIDSystem {
             const result = await response.json();
             
             if (result.success) {
-                console.log('✅ Attendance recorded successfully');
-                this.updateStatus(`✅ Absensi berhasil dicatat!`);
+                const attendanceType = result.attendance_type || 'check_in';
+                console.log(`✅ Attendance recorded successfully: ${attendanceType}`);
+                
+                // Update status based on attendance type
+                if (attendanceType === 'check_in') {
+                    this.updateStatus(`🎉 Absen Masuk berhasil dicatat untuk ${user.name}!`);
+                } else if (attendanceType === 'check_out') {
+                    this.updateStatus(`🎉 Absen Keluar berhasil dicatat untuk ${user.name}!`);
+                } else if (attendanceType === 'already_complete') {
+                    this.updateStatus(`ℹ️ ${user.name} sudah absen masuk dan keluar hari ini`);
+                } else {
+                    this.updateStatus(`🎉 Absensi berhasil dicatat untuk ${user.name}!`);
+                }
                 
                 // Show success message
-                this.showAttendanceSuccess(user);
+                this.showAttendanceSuccess(user, result);
                 
                 // Reset after 5 seconds for next user
                 setTimeout(() => {
@@ -1091,35 +1103,70 @@ class SimpleFaceIDSystem {
                 }, 5000);
             } else {
                 console.error('❌ Attendance failed:', result.message);
-                this.updateStatus(`❌ Gagal mencatat absensi: ${result.message}`);
+                this.updateStatus(`❌ Gagal: ${result.message}`);
                 this.isLoggingIn = false;
             }
             
         } catch (error) {
             console.error('Auto-attendance error:', error);
-            this.updateStatus('❌ Terjadi kesalahan saat mencatat absensi');
+            this.updateStatus('❌ Kesalahan sistem - Silakan coba lagi');
             this.isLoggingIn = false;
         }
     }
     
-    showAttendanceSuccess(user) {
+    showAttendanceSuccess(user, result) {
+        // Determine attendance type and customize message
+        const attendanceType = result.attendance_type || 'check_in';
+        let title = 'Absensi Berhasil!';
+        let greeting = `Selamat datang, <strong>${user.name}</strong>`;
+        let icon = 'fa-check-circle';
+        let iconColor = 'text-green-600 dark:text-green-400';
+        let bgColor = 'bg-green-100 dark:bg-green-900';
+        let statusMessage = '';
+        let timeInfo = '';
+        
+        if (attendanceType === 'check_in') {
+            title = '✅ Absen Masuk Berhasil!';
+            greeting = `Selamat datang, <strong>${user.name}</strong>`;
+            icon = 'fa-sign-in-alt';
+            statusMessage = 'Absen masuk Anda telah tercatat';
+            timeInfo = `Waktu masuk: ${new Date().toLocaleTimeString('id-ID')}`;
+        } else if (attendanceType === 'check_out') {
+            title = '✅ Absen Keluar Berhasil!';
+            greeting = `Sampai jumpa, <strong>${user.name}</strong>`;
+            icon = 'fa-sign-out-alt';
+            statusMessage = 'Absen keluar Anda telah tercatat';
+            timeInfo = `Waktu keluar: ${new Date().toLocaleTimeString('id-ID')}`;
+        } else if (attendanceType === 'already_complete') {
+            title = 'ℹ️ Absensi Sudah Lengkap';
+            greeting = `<strong>${user.name}</strong>`;
+            icon = 'fa-info-circle';
+            iconColor = 'text-blue-600 dark:text-blue-400';
+            bgColor = 'bg-blue-100 dark:bg-blue-900';
+            statusMessage = 'Anda sudah absen masuk dan keluar hari ini';
+            timeInfo = `Tanggal: ${new Date().toLocaleDateString('id-ID')}`;
+        }
+        
         // Show success overlay
         const successOverlay = document.createElement('div');
         successOverlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
         successOverlay.innerHTML = `
             <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md mx-4 text-center">
-                <div class="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-check-circle text-4xl text-green-600 dark:text-green-400"></i>
+                <div class="w-20 h-20 ${bgColor} rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas ${icon} text-4xl ${iconColor}"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Absensi Berhasil!</h2>
-                <p class="text-lg text-gray-700 dark:text-gray-300 mb-4">Selamat datang, <strong>${user.name}</strong></p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${title}</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-300 mb-4">${greeting}</p>
                 <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
                     <div class="text-sm text-gray-600 dark:text-gray-400">NIS</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white">${user.nis}</div>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Kehadiran Anda telah tercatat pada ${new Date().toLocaleString('id-ID')}
-                </p>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    ${statusMessage}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-500">
+                    ${timeInfo}
+                </div>
             </div>
         `;
         
@@ -1142,7 +1189,7 @@ class SimpleFaceIDSystem {
         this.userOverlay.innerHTML = '';
         
         // Reset UI
-        this.updateStatus('Sistem siap untuk pengguna berikutnya');
+        this.updateStatus('✅ Sistem siap untuk pengguna berikutnya');
         this.startBtn.classList.remove('hidden');
         
         console.log('🔄 System reset, ready for next user');
@@ -1150,19 +1197,19 @@ class SimpleFaceIDSystem {
     
     async recordAttendance() {
         if (!this.currentUser) {
-            this.showStatus('Tidak ada user yang dikenali untuk absen', 'error');
+            this.showStatus('❌ Tidak ada wajah yang dikenali', 'error');
             return;
         }
         
         try {
-            this.showStatus('Mencatat kehadiran...', 'info');
+            this.showStatus('⏳ Mencatat kehadiran...', 'info');
             
             // Call auto-login instead
             await this.autoLogin(this.currentUser);
             
         } catch (error) {
             console.error('Attendance recording error:', error);
-            this.showStatus('Terjadi kesalahan saat mencatat absensi', 'error');
+            this.showStatus('❌ Kesalahan sistem - Silakan coba lagi', 'error');
         }
     }
 }

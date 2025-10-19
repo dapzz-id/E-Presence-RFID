@@ -1634,6 +1634,16 @@ class FaceRegistrationSystem {
         this.captureMessage.textContent = '🎉 Face ID berhasil disimpan!';
         this.captureMessage.className = 'mt-2 text-sm text-green-600 dark:text-green-400 font-bold';
         
+        // Remove registered student from dropdown list
+        const registeredNIS = result.student_nis;
+        const studentItems = document.querySelectorAll('.student-item');
+        studentItems.forEach(item => {
+            if (item.dataset.nis === registeredNIS) {
+                item.remove();
+                console.log(`✅ Removed student ${result.student_name} (NIS: ${registeredNIS}) from dropdown`);
+            }
+        });
+        
         // Show success in registration status area
         const statusElement = document.getElementById('registrationStatus');
         if (statusElement) {

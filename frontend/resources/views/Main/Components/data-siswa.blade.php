@@ -66,6 +66,9 @@
                                     Foto</th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Face ID</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     Aksi</th>
                             </tr>
                         </thead>
@@ -86,12 +89,35 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         <img src="{{ Storage::disk('s3')->temporaryUrl('profile/' . $wargaku->foto_profile, now()->addMinutes(5)) }}" loading="lazy" alt="{{ $wargaku->name }}" class="h-auto w-14 aspect-[3/4]">
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                        @php
+                                            $user = \App\Models\User::where('nis', $wargaku->nis)->first();
+                                            $hasFaceId = $user && \App\Models\FaceRegistration::where('user_id', $user->id)->where('status', 'approved')->exists();
+                                        @endphp
+                                        @if($hasFaceId)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                <i class="fas fa-check-circle mr-1"></i> Terdaftar
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                <i class="fas fa-times-circle mr-1"></i> Belum
+                                            </span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('siswa.edit', $wargaku->nis) }}" 
-                                           title="Edit Button"
+                                           title="Edit Siswa"
                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
                                             <i class="bi bi-pencil text-orange-300"></i>
                                         </a>
+                                        @if($hasFaceId)
+                                            <button type="button"
+                                                    onclick="event.preventDefault(); resetFaceId('{{ $wargaku->nis }}', '{{ $wargaku->name }}');"
+                                                    title="Reset Face ID"
+                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -149,6 +175,74 @@
                     });
                 });
             });
+
+            // Reset Face ID function
+            function resetFaceId(nis, name) {
+                Swal.fire({
+                    title: "Reset Face ID",
+                    html: `Apakah Anda yakin ingin menghapus Face ID untuk siswa:<br><strong>${name}</strong> (NIS: ${nis})?<br><br>Siswa harus mendaftar ulang Face ID mereka.`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Ya, Reset!",
+                    cancelButtonText: "Batal",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: 'Menghapus Face ID...',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Send AJAX request to reset Face ID
+                        fetch(`/admin/face-id/reset/${nis}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: "Berhasil!",
+                                    text: data.message,
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    // Reload page to update status
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: "Gagal!",
+                                    text: data.message || "Terjadi kesalahan saat menghapus Face ID",
+                                    icon: "error",
+                                    confirmButtonText: "OK"
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Terjadi kesalahan sistem",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        });
+                    }
+                });
+            }
         </script>
 
         <!-- Pagination -->

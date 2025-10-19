@@ -536,18 +536,6 @@
                                     <th scope="col"
                                         class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                                         Tanggal Keluar</th>
-                                    <th scope="col"
-                                        class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status Keluar</th>
-                                    @if ($tab !== 'izin' && $tab !== 'sakit')
-                                        <th scope="col"
-                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Keterangan Datang</th>
-
-                                        <th scope="col"
-                                            class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Keterangan Pulang</th>
-                                    @endif
                                     @if ($tab === 'izin' || $tab === 'sakit')
                                         <th scope="col"
                                             class="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
@@ -604,32 +592,6 @@
                                         <td
                                             class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden md:table-cell">
                                             {{ $dataku->time_keluar ?? '-' }}</td>
-                                        <td class="px-2 sm:px-6 py-4 whitespace-nowrap">
-                                            @if ($dataku->status_keluar == 'Tepat Waktu')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Tepat
-                                                    Waktu</span>
-                                            @elseif ($dataku->status_keluar == 'Belum Waktunya')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Belum
-                                                    Waktunya</span>
-                                            @elseif ($dataku->status_keluar == 'Terlambat')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">Terlambat</span>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                        @if ($tab != 'izin' && $tab != 'sakit')
-                                            <td
-                                                class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $dataku->alasan_datang_telat ?? $dataku->alasan_datang ?? '-' }}
-                                            </td>
-                                            <td
-                                                class="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $dataku->alasan_pulang_telat ?? $dataku->alasan_pulang_duluan ?? '-' }}
-                                            </td>
-                                        @endif
                                         @if ($tab === 'izin' || $tab === 'sakit')
                                             <td
                                                 class="px-2 sm:px-6 py-4 text-sm text-gray-900 dark:text-gray-100 hidden sm:table-cell">
