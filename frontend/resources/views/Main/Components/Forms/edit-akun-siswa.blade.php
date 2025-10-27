@@ -47,7 +47,7 @@
     <form action="{{ route('akun.siswa.update', $user->id) }}" method="POST" class="space-y-4 sm:space-y-6">
         @csrf
         
-        <!-- Username dan Email -->
+        <!-- Username, Email, dan Nomor Orang Tua -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
                 <label for="username" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
@@ -63,6 +63,18 @@
                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm">
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Email digunakan untuk verifikasi dan reset password</p>
                 @error('email')
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
+        <!-- Nomor HP Orang Tua -->
+        <div class="grid grid-cols-1 gap-4 sm:gap-6">
+            <div>
+                <label for="no_ortu" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor HP Orang Tua</label>
+                <input type="text" id="no_ortu" name="no_ortu" value="{{ old('no_ortu', $user->no_ortu) }}" class="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm" placeholder="08xxxxxxxxxx">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nomor HP orang tua untuk notifikasi SP (Surat Peringatan) via WhatsApp</p>
+                @error('no_ortu')
                 <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
             </div>

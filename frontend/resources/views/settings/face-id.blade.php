@@ -50,90 +50,111 @@
         }
     </script>
     <style>
-        @keyframes pulse {
-            0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
-            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 1); }
-            100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
-        }
-        
-        @keyframes pulseRed {
-            0% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
-            50% { box-shadow: 0 0 40px rgba(239, 68, 68, 1); }
-            100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
-        }
-        
+        /* Vercel-inspired minimal animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .face-detection-box {
-            border: 3px solid #10B981;
-            border-radius: 12px;
-            animation: pulse 2s infinite;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Face Ring Animations - SISTEM WARNA YANG BENAR */
+        .animate-fadeIn {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        /* Face detection - minimal and clean */
         .face-ring {
-            transition: all 0.1s ease-out; /* Faster transition for real-time tracking */
-            border: 4px solid #10b981; /* Default hijau untuk wajah dikenali */
-            background: rgba(16, 185, 129, 0.05);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3);
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
-        /* Smooth name label transitions */
-        .user-name-label {
-            transition: all 0.1s ease-out; /* Fast smooth movement */
-            will-change: transform; /* Optimize for animations */
+        @keyframes pulse-ring {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+            }
         }
         
         .face-ring.unknown-face {
-            border-color: #ef4444; /* MERAH untuk tidak dikenali */
-            background: rgba(239, 68, 68, 0.1);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            animation: pulse-ring-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
-        @keyframes pulseGreen {
-            0% { 
-                box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-                transform: scale(1);
+        @keyframes pulse-ring-red {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
             }
-            50% { 
-                box-shadow: 0 0 25px rgba(16, 185, 129, 0.8);
-                transform: scale(1.02);
-            }
-            100% { 
-                box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-                transform: scale(1);
+            50% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
             }
         }
         
-        @keyframes pulseRed {
-            0% { 
-                box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-                transform: scale(1);
+        .user-name-label {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        
+        /* Mode button hover effect */
+        .mode-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .mode-card.selected {
+            background: linear-gradient(to bottom right, rgb(59, 130, 246), rgb(37, 99, 235));
+            color: white;
+        }
+        
+        /* Progress bar animation */
+        @keyframes progress {
+            0% {
+                width: 0%;
             }
-            50% { 
-                box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
-                transform: scale(1.02);
-            }
-            100% { 
-                box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-                transform: scale(1);
+            100% {
+                width: 100%;
             }
         }
         
-        /* Responsive camera container */
+        .animate-progress {
+            animation: progress 3s linear forwards;
+        }
+        
+        /* Modal entrance animation */
+        #successModal:not(.hidden) > div {
+            animation: modalEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        @keyframes modalEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .camera-container {
                 height: 400px !important;
-                max-width: 100% !important;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .camera-container {
-                height: 300px !important;
             }
         }
     </style>
@@ -142,77 +163,214 @@
 <body class="antialiased h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div class="min-h-full">
         @include('Cert.head')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="mb-8">
-            <div class="flex items-center mb-4">
-                <a href="{{ route('settings.index') }}" class="text-primary-600 hover:text-primary-700 mr-4">
-                    <i class="fas fa-arrow-left text-xl"></i>
-                </a>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    <i class="fas fa-camera mr-3 text-primary-600"></i>Face ID Authentication
+        <div class="mb-12 animate-fadeIn">
+            <div class="mb-6">
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
+                    Face ID Authentication
                 </h1>
+                <p class="text-base text-gray-500 dark:text-gray-400">
+                    Pilih mode absensi, kemudian scan wajah Anda untuk melakukan presensi.
+                </p>
             </div>
-            <p class="text-gray-600 dark:text-gray-400">
-                Sistem absensi otomatis menggunakan pengenalan wajah. Scan pertama untuk absen masuk, scan kedua untuk absen keluar.
-            </p>
         </div>
 
-
-        <!-- Status Message Area (Moved Above Camera) -->
-        <div id="statusMessage" class="bg-blue-600 text-white px-6 py-4 rounded-lg text-center mb-6 shadow-lg">
-            <i class="fas fa-info-circle mr-2"></i>
-            <span>Memulai sistem Face ID...</span>
-        </div>
-
-        <!-- Camera Section Full Width -->
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700">
-                <h2 class="text-xl font-semibold text-white">
-                    <i class="fas fa-video mr-2"></i>Kamera Face ID
+        <!-- Mode Selection -->
+        <div id="modeSelectionSection" class="mb-12 animate-slideUp">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Pilih Mode Absensi
                 </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Pilih salah satu mode untuk memulai scan wajah
+                </p>
             </div>
             
-            <div class="p-6">
-                <!-- Camera Container - Made Wider and Taller -->
-                <div class="camera-container relative bg-gray-900 rounded-lg overflow-hidden mb-6 w-full" style="height: 500px; max-width: 900px; margin: 0 auto; aspect-ratio: 16/10;">
-                    <video id="video" autoplay muted playsinline class="w-full h-full object-cover"></video>
-                    <canvas id="canvas" class="hidden"></canvas>
-                    
-                    <!-- Face Detection Overlay -->
-                    <div id="faceOverlay" class="absolute inset-0 pointer-events-none">
-                        <!-- Dynamic face detection boxes will be drawn here -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Absen Masuk -->
+                <button id="modeMasuk" class="mode-card group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-left hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-lg">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center group-hover:bg-blue-500 group-hover:scale-110 transition-all">
+                            <i class="fas fa-sign-in-alt text-blue-600 dark:text-blue-400 text-xl group-hover:text-white"></i>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500"></i>
+                        </div>
                     </div>
-                    
-                    <!-- User Recognition Overlay -->
-                    <div id="userOverlay" class="absolute inset-0 pointer-events-none">
-                        <!-- User name boxes will appear here -->
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        Absen Masuk
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Presensi kedatangan siswa
+                    </p>
+                </button>
+                
+                <!-- Absen Keluar -->
+                <button id="modeKeluar" class="mode-card group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-left hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-lg">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center group-hover:bg-orange-500 group-hover:scale-110 transition-all">
+                            <i class="fas fa-sign-out-alt text-orange-600 dark:text-orange-400 text-xl group-hover:text-white"></i>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-arrow-right text-gray-400 group-hover:text-orange-500"></i>
+                        </div>
                     </div>
-                    
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                        Absen Keluar
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Presensi kepulangan siswa
+                    </p>
+                </button>
+            </div>
+            
+            <!-- Mode Indicator -->
+            <div id="modeIndicator" class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg hidden">
+                <div class="flex items-center gap-3">
+                    <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-white text-xs"></i>
+                    </div>
+                    <span id="modeText" class="text-sm font-medium text-gray-900 dark:text-white">Mode dipilih</span>
                 </div>
+            </div>
+        </div>
 
-                <!-- System Status -->
-                <div id="autoDetectionStatus" class="w-full bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg text-sm text-center mb-4 hidden">
-                    <i class="fas fa-robot mr-2"></i>
-                    <span id="autoStatusText">🤖 Deteksi otomatis aktif - Posisikan wajah Anda di depan kamera</span>
-                </div>
 
-                <!-- Controls -->
-                <div class="space-y-4">
-                    <button id="startCamera" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
-                        <i class="fas fa-camera mr-2"></i>Mulai Scan Wajah
-                    </button>
-                    
-                    <button id="stopCamera" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden">
-                        <i class="fas fa-stop mr-2"></i>Hentikan Kamera
-                    </button>
-                    
-                    <!-- Attendance Button - Like in reference image -->
-                    <button id="attendanceBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden">
-                        <i class="fas fa-check mr-2"></i>Konfirmasi Absensi
-                    </button>
+        <!-- Status Message -->
+        <div id="statusMessage" class="mb-8 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Silakan pilih mode absensi terlebih dahulu</span>
+        </div>
+
+        <!-- Camera Section -->
+        <div id="cameraSection" class="hidden animate-slideUp">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Kamera Face ID
+                    </h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Posisikan wajah Anda di depan kamera
+                    </p>
                 </div>
+                
+                <div class="p-6">
+                    <!-- Camera View -->
+                    <div class="camera-container relative bg-black rounded-lg overflow-hidden mb-6 w-full" style="height: 480px; max-width: 100%;">
+                        <video id="video" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                        <canvas id="canvas" class="hidden"></canvas>
+                        
+                        <!-- Face Detection Overlay -->
+                        <div id="faceOverlay" class="absolute inset-0 pointer-events-none"></div>
+                        
+                        <!-- User Recognition Overlay -->
+                        <div id="userOverlay" class="absolute inset-0 pointer-events-none"></div>
+                    </div>
+
+                    <!-- Status -->
+                    <div id="autoDetectionStatus" class="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg text-center hidden">
+                        <span id="autoStatusText" class="text-sm text-green-700 dark:text-green-300">Deteksi otomatis aktif</span>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex gap-3">
+                        <button id="startCamera" class="flex-1 font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-camera"></i>
+                            <span>Mulai Scan</span>
+                        </button>
+                        
+                        <button id="stopCamera" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 hidden">
+                            <i class="fas fa-stop"></i>
+                            <span>Stop</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Modal -->
+        <div id="qrModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full border border-gray-200 dark:border-gray-700 shadow-2xl text-center">
+                <div class="mb-6">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto">
+                        <i class="fas fa-qrcode text-3xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">Scan QR Code</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" id="qrMessage"></p>
+                <p class="text-xs text-blue-600 dark:text-blue-400 mb-6">
+                    <i class="fas fa-mobile-alt mr-1"></i>Scan QR code dengan HP untuk mengisi form
+                </p>
+                <div class="flex justify-center mb-6">
+                    <div id="qrCodeContainer" class="bg-white p-4 rounded-xl inline-block shadow-lg">
+                        <!-- QR Code will be generated here -->
+                    </div>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Tutup otomatis dalam <span id="qrCountdown" class="font-semibold text-blue-600 dark:text-blue-400">10</span> detik
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-10 max-w-md w-full border-2 border-green-200 dark:border-green-700 shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100">
+                <!-- Animated Success Icon -->
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-green-500 opacity-20 rounded-full blur-2xl animate-pulse"></div>
+                    <div class="relative w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg transform transition-transform duration-500 hover:rotate-12">
+                        <i class="fas fa-check text-5xl text-white animate-bounce"></i>
+                    </div>
+                </div>
+                
+                <!-- Success Title -->
+                <h2 class="text-3xl font-bold text-center bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent mb-3" id="successTitle">Absensi Berhasil!</h2>
+                
+                <!-- User Name -->
+                <p class="text-xl text-center text-gray-700 dark:text-gray-300 mb-6 font-medium" id="successMessage"></p>
+                
+                <!-- Time Card -->
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl p-5 border border-green-200 dark:border-green-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-green-600 dark:text-green-400 font-semibold uppercase tracking-wide">Waktu Absensi</div>
+                                <div class="text-lg font-bold text-gray-900 dark:text-white" id="successTime"></div>
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl text-green-500 animate-pulse"></i>
+                    </div>
+                </div>
+                
+                <!-- Loading Bar Animation -->
+                <div class="mt-6 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
+        <div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full border border-gray-200 dark:border-gray-700 shadow-2xl">
+                <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-info-circle text-3xl text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2" id="infoTitle">Informasi</h2>
+                <p class="text-base text-gray-600 dark:text-gray-400 mb-6" id="infoMessage"></p>
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                    <p class="text-sm text-blue-800 dark:text-blue-200" id="infoDetail"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QRCode.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
             </div>
         </div>
     </div>
@@ -243,7 +401,7 @@ class SimpleFaceIDSystem {
         this.currentUser = null; // Currently recognized user
         this.faceDetected = false; // Is face currently detected
         this.lastRecognitionTime = 0;
-        this.recognitionCooldown = 2000; // 2 second cooldown for stability
+        this.recognitionCooldown = 500; // 500ms cooldown for faster recognition
         this.isLoggingIn = false; // Prevent multiple login attempts
         
         // Training data storage (9 photos per user)
@@ -254,6 +412,9 @@ class SimpleFaceIDSystem {
         this.currentRing = null;
         this.currentNameLabel = null;
         
+        // Mode selection
+        this.selectedMode = null; // 'masuk' or 'keluar'
+        
         console.log('Elements found, initializing...');
         this.initializeElements();
         this.initializeSystem();
@@ -263,16 +424,75 @@ class SimpleFaceIDSystem {
     initializeElements() {
         this.startBtn = document.getElementById('startCamera');
         this.stopBtn = document.getElementById('stopCamera');
-        this.attendanceBtn = document.getElementById('attendanceBtn');
         this.statusMessage = document.getElementById('statusMessage');
         this.autoDetectionStatus = document.getElementById('autoDetectionStatus');
         this.autoStatusText = document.getElementById('autoStatusText');
         this.faceOverlay = document.getElementById('faceOverlay');
         this.userOverlay = document.getElementById('userOverlay');
+        this.cameraSection = document.getElementById('cameraSection');
         
+        // Mode selection buttons
+        this.modeSelectionSection = document.getElementById('modeSelectionSection');
+        this.modeMasukBtn = document.getElementById('modeMasuk');
+        this.modeKeluarBtn = document.getElementById('modeKeluar');
+        this.modeIndicator = document.getElementById('modeIndicator');
+        this.modeText = document.getElementById('modeText');
+        
+        // Modals
+        this.qrModal = document.getElementById('qrModal');
+        this.successModal = document.getElementById('successModal');
+        this.infoModal = document.getElementById('infoModal');
+        
+        // Event listeners
         this.startBtn.addEventListener('click', () => this.startCamera());
         this.stopBtn.addEventListener('click', () => this.stopCamera());
-        this.attendanceBtn.addEventListener('click', () => this.recordAttendance());
+        
+        // Mode selection
+        this.modeMasukBtn.addEventListener('click', () => this.selectMode('masuk'));
+        this.modeKeluarBtn.addEventListener('click', () => this.selectMode('keluar'));
+    }
+    
+    selectMode(mode) {
+        this.selectedMode = mode;
+        
+        // Hide mode selection section
+        this.modeSelectionSection.classList.add('hidden');
+        
+        // Update button color based on mode
+        if (mode === 'masuk') {
+            this.modeText.textContent = 'Mode: Absen Masuk';
+            
+            // Set button to green for masuk
+            this.startBtn.className = 'flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2';
+            
+            // Update status
+            this.statusMessage.innerHTML = '<span class="text-sm text-green-700 dark:text-green-300">✓ Mode Absen Masuk dipilih - Silakan mulai scan wajah</span>';
+            this.statusMessage.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700');
+            this.statusMessage.classList.add('bg-green-50', 'dark:bg-green-900/30', 'border-green-200', 'dark:border-green-700');
+        } else {
+            this.modeText.textContent = 'Mode: Absen Keluar';
+            
+            // Set button to orange for keluar
+            this.startBtn.className = 'flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2';
+            
+            // Update status
+            this.statusMessage.innerHTML = '<span class="text-sm text-orange-700 dark:text-orange-300">✓ Mode Absen Keluar dipilih - Silakan mulai scan wajah</span>';
+            this.statusMessage.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700');
+            this.statusMessage.classList.add('bg-orange-50', 'dark:bg-orange-900/30', 'border-orange-200', 'dark:border-orange-700');
+        }
+        
+        // Show mode indicator
+        this.modeIndicator.classList.remove('hidden');
+        
+        // Show camera section
+        this.cameraSection.classList.remove('hidden');
+        
+        // Scroll to camera section
+        setTimeout(() => {
+            this.cameraSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+        
+        console.log('Mode selected:', mode);
     }
     
     async initializeSystem() {
@@ -452,7 +672,8 @@ class SimpleFaceIDSystem {
     
     async loadModels() {
         try {
-            this.showStatus('🚀 Memuat model AI...', 'info');
+            // Silent loading - no UI message
+            console.log('🚀 Loading Face-API models...');
             
             // Wait for face-api.js to load
             let retries = 0;
@@ -462,10 +683,8 @@ class SimpleFaceIDSystem {
             }
             
             if (typeof faceapi === 'undefined') {
-                console.log('Face API library tidak ditemukan');
+                console.log('Face API library tidak ditemukan - using simulation mode');
                 this.isModelLoaded = false;
-                this.showStatus('Sistem siap - Mode simulasi', 'success');
-                this.startBtn.disabled = false;
                 return;
             }
             
@@ -479,21 +698,15 @@ class SimpleFaceIDSystem {
                 ]);
                 
                 this.isModelLoaded = true;
-                this.showStatus('Model AI berhasil dimuat - Sistem siap', 'success');
-                console.log('Face-API.js models loaded successfully');
+                console.log('✅ Face-API.js models loaded successfully');
             } catch (modelError) {
-                console.log('Model loading failed:', modelError);
-                this.showStatus('Sistem siap - Mode simulasi', 'success');
+                console.log('Model loading failed:', modelError, '- using simulation mode');
                 this.isModelLoaded = false;
             }
             
-            this.startBtn.disabled = false;
-            
         } catch (error) {
             console.error('Error loading models:', error);
-            this.showStatus('Sistem siap - Mode simulasi', 'success');
             this.isModelLoaded = false;
-            this.startBtn.disabled = false;
         }
     }
     
@@ -967,12 +1180,16 @@ class SimpleFaceIDSystem {
     }
     
     showAttendanceButton() {
-        this.attendanceBtn.classList.remove('hidden');
+        if (this.attendanceBtn) {
+            this.attendanceBtn.classList.remove('hidden');
+        }
         this.stopBtn.classList.add('hidden');
     }
     
     hideAttendanceButton() {
-        this.attendanceBtn.classList.add('hidden');
+        if (this.attendanceBtn) {
+            this.attendanceBtn.classList.add('hidden');
+        }
         this.stopBtn.classList.remove('hidden');
     }
     
@@ -994,7 +1211,9 @@ class SimpleFaceIDSystem {
         this.startBtn.classList.remove('hidden');
         this.stopBtn.classList.add('hidden');
         this.autoDetectionStatus.classList.add('hidden');
-        this.attendanceBtn.classList.add('hidden');
+        if (this.attendanceBtn) {
+            this.attendanceBtn.classList.add('hidden');
+        }
         
         // Clear overlays
         this.faceOverlay.innerHTML = '';
@@ -1005,47 +1224,55 @@ class SimpleFaceIDSystem {
         this.faceDetected = false;
         this.currentRing = null;
         this.currentNameLabel = null;
+        this.lastRecognitionTime = 0; // Reset cooldown timer
         
         this.showStatus('⏹️ Kamera dihentikan', 'info');
     }
     
     showStatus(message, type = 'info') {
-        const span = this.statusMessage.querySelector('span');
-        if (span) {
-            span.textContent = message;
-        } else {
-            this.statusMessage.innerHTML = `<i class="fas fa-info-circle mr-2"></i><span>${message}</span>`;
+        // Remove all color classes
+        this.statusMessage.classList.remove(
+            'bg-gray-100', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700',
+            'bg-green-50', 'dark:bg-green-900/30', 'border-green-200', 'dark:border-green-700',
+            'bg-blue-50', 'dark:bg-blue-900/30', 'border-blue-200', 'dark:border-blue-700',
+            'bg-yellow-50', 'dark:bg-yellow-900/30', 'border-yellow-200', 'dark:border-yellow-700',
+            'bg-red-50', 'dark:bg-red-900/30', 'border-red-200', 'dark:border-red-700'
+        );
+        
+        let colorClass = '';
+        let textColorClass = '';
+        
+        switch (type) {
+            case 'success':
+                colorClass = 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700';
+                textColorClass = 'text-green-700 dark:text-green-300';
+                break;
+            case 'warning':
+                colorClass = 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700';
+                textColorClass = 'text-yellow-700 dark:text-yellow-300';
+                break;
+            case 'error':
+                colorClass = 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700';
+                textColorClass = 'text-red-700 dark:text-red-300';
+                break;
+            default:
+                colorClass = 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700';
+                textColorClass = 'text-blue-700 dark:text-blue-300';
         }
         
-        this.statusMessage.classList.remove('hidden');
-        this.statusMessage.classList.remove('bg-blue-600', 'bg-green-600', 'bg-yellow-600', 'bg-red-600');
-        
-        const icon = this.statusMessage.querySelector('i');
-        if (icon) {
-            icon.className = 'mr-2 fas ';
-            switch (type) {
-                case 'success':
-                    this.statusMessage.classList.add('bg-green-600');
-                    icon.className += 'fa-check-circle';
-                    break;
-                case 'warning':
-                    this.statusMessage.classList.add('bg-yellow-600');
-                    icon.className += 'fa-exclamation-triangle';
-                    break;
-                case 'error':
-                    this.statusMessage.classList.add('bg-red-600');
-                    icon.className += 'fa-times-circle';
-                    break;
-                default:
-                    this.statusMessage.classList.add('bg-blue-600');
-                    icon.className += 'fa-info-circle';
-            }
-        }
+        this.statusMessage.className = `mb-8 p-4 border rounded-lg text-center ${colorClass}`;
+        this.statusMessage.innerHTML = `<span class="text-sm ${textColorClass}">${message}</span>`;
     }
     
     async autoLogin(user) {
         if (!user) {
             console.error('Cannot auto-login: no user provided');
+            return;
+        }
+        
+        if (!this.selectedMode) {
+            console.error('No mode selected');
+            this.showStatus('❌ Silakan pilih mode absensi terlebih dahulu', 'error');
             return;
         }
         
@@ -1058,21 +1285,22 @@ class SimpleFaceIDSystem {
         this.isLoggingIn = true;
         
         try {
-            console.log(`✅ Recording attendance for user: ${user.name} (NIS: ${user.nis})`);
+            console.log(`✅ Recording attendance for user: ${user.name} (NIS: ${user.nis}), Mode: ${this.selectedMode}`);
             this.updateStatus(`⏳ Mencatat absensi untuk ${user.name}...`);
             
             // Stop camera
             this.stopCamera();
             
-            // Call backend to record attendance
+            // Call backend to record attendance with mode
             const response = await fetch('/admin/face-id/authenticate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')
                 },
                 body: JSON.stringify({
                     nis: user.nis,
+                    mode: this.selectedMode,
                     auto_login: true
                 })
             });
@@ -1081,37 +1309,184 @@ class SimpleFaceIDSystem {
             
             if (result.success) {
                 const attendanceType = result.attendance_type || 'check_in';
-                console.log(`✅ Attendance recorded successfully: ${attendanceType}`);
+                console.log(`✅ Attendance processed: ${attendanceType}`);
                 
-                // Update status based on attendance type
-                if (attendanceType === 'check_in') {
-                    this.updateStatus(`🎉 Absen Masuk berhasil dicatat untuk ${user.name}!`);
-                } else if (attendanceType === 'check_out') {
-                    this.updateStatus(`🎉 Absen Keluar berhasil dicatat untuk ${user.name}!`);
-                } else if (attendanceType === 'already_complete') {
-                    this.updateStatus(`ℹ️ ${user.name} sudah absen masuk dan keluar hari ini`);
+                // Check if QR code is needed
+                if (result.show_qr && result.redirect_url) {
+                    this.showQRCode(result.redirect_url, result.message);
                 } else {
-                    this.updateStatus(`🎉 Absensi berhasil dicatat untuk ${user.name}!`);
+                    // Direct success - no form needed
+                    this.showSuccessModal(user, result);
+                    
+                    // Reset after 3 seconds for next user
+                    setTimeout(() => {
+                        this.resetForNextUser();
+                    }, 3000);
                 }
-                
-                // Show success message
-                this.showAttendanceSuccess(user, result);
-                
-                // Reset after 5 seconds for next user
-                setTimeout(() => {
-                    this.resetForNextUser();
-                }, 5000);
             } else {
                 console.error('❌ Attendance failed:', result.message);
-                this.updateStatus(`❌ Gagal: ${result.message}`);
+                
+                // Show appropriate modal/message based on attendance_type
+                const attendanceType = result.attendance_type;
+                let message = result.message;
+                
+                if (attendanceType === 'already_checked_in') {
+                    this.showInfoModal(
+                        'Sudah Absen Masuk',
+                        `${user.name}, ${message}`,
+                        'Silakan gunakan mode Absen Keluar saat pulang nanti'
+                    );
+                } else if (attendanceType === 'already_checked_out') {
+                    this.showInfoModal(
+                        'Sudah Absen Keluar',
+                        `${user.name}, ${message}`,
+                        'Absensi hari ini sudah lengkap'
+                    );
+                } else if (attendanceType === 'not_checked_in') {
+                    this.showInfoModal(
+                        'Belum Absen Masuk',
+                        `${user.name}, ${message}`,
+                        'Silakan gunakan mode Absen Masuk terlebih dahulu'
+                    );
+                } else {
+                    // Generic error
+                    this.showStatus(`❌ ${message}`, 'error');
+                }
+                
                 this.isLoggingIn = false;
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    this.resetForNextUser();
+                }, 3000);
             }
             
         } catch (error) {
             console.error('Auto-attendance error:', error);
-            this.updateStatus('❌ Kesalahan sistem - Silakan coba lagi');
+            this.showStatus('❌ Kesalahan sistem - Silakan coba lagi', 'error');
             this.isLoggingIn = false;
         }
+    }
+    
+    showQRCode(url, message) {
+        // Clear previous countdown interval if exists
+        if (this.qrCountdownInterval) {
+            clearInterval(this.qrCountdownInterval);
+        }
+        
+        // Show QR modal
+        document.getElementById('qrMessage').textContent = message;
+        this.qrModal.classList.remove('hidden');
+        
+        // Clear previous QR code
+        const qrContainer = document.getElementById('qrCodeContainer');
+        qrContainer.innerHTML = '';
+        
+        // Generate QR code
+        if (typeof QRCode !== 'undefined') {
+            new QRCode(qrContainer, {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } else {
+            qrContainer.innerHTML = `<a href="${url}" class="text-blue-600 underline">Klik di sini untuk melanjutkan</a>`;
+        }
+        
+        // Auto-close QR modal after 10 seconds
+        let countdown = 10;
+        document.getElementById('qrCountdown').textContent = countdown;
+        
+        this.qrCountdownInterval = setInterval(() => {
+            countdown--;
+            document.getElementById('qrCountdown').textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(this.qrCountdownInterval);
+                // Close modal and reset for next user
+                this.qrModal.classList.add('hidden');
+                this.resetForNextUser();
+            }
+        }, 1000);
+    }
+    
+    showSuccessModal(user, result) {
+        const modal = this.successModal;
+        const title = document.getElementById('successTitle');
+        const message = document.getElementById('successMessage');
+        const time = document.getElementById('successTime');
+        
+        // Get modal container for color updates
+        const modalContainer = modal.querySelector('div');
+        
+        // Set content and colors based on mode
+        if (this.selectedMode === 'masuk') {
+            title.innerHTML = '🎉 Absen Masuk Berhasil!';
+            message.innerHTML = `Selamat datang, <span class="font-bold">${user.name}</span>! 👋`;
+            
+            // Update to green colors
+            modalContainer.className = modalContainer.className.replace(/border-\w+-\d+/g, 'border-green-200')
+                .replace(/dark:border-\w+-\d+/g, 'dark:border-green-700');
+        } else {
+            title.innerHTML = '👋 Absen Keluar Berhasil!';
+            message.innerHTML = `Sampai jumpa, <span class="font-bold">${user.name}</span>! 🏠`;
+            
+            // Update to orange colors for keluar
+            modalContainer.className = modalContainer.className.replace(/border-green-\d+/g, 'border-orange-200')
+                .replace(/dark:border-green-\d+/g, 'dark:border-orange-700');
+            
+            // Update title gradient
+            title.className = title.className.replace(/from-green-\d+/g, 'from-orange-600')
+                .replace(/to-emerald-\d+/g, 'to-orange-600')
+                .replace(/dark:from-green-\d+/g, 'dark:from-orange-400')
+                .replace(/dark:to-emerald-\d+/g, 'dark:to-orange-400');
+            
+            // Update time card colors
+            const timeCard = modalContainer.querySelector('.bg-gradient-to-r');
+            timeCard.className = timeCard.className.replace(/from-green-\d+/g, 'from-orange-50')
+                .replace(/to-emerald-\d+/g, 'to-orange-50')
+                .replace(/dark:from-green-\d+/g, 'dark:from-orange-900/30')
+                .replace(/dark:to-emerald-\d+/g, 'dark:to-orange-900/30')
+                .replace(/border-green-\d+/g, 'border-orange-200')
+                .replace(/dark:border-green-\d+/g, 'dark:border-orange-700');
+            
+            // Update icon colors
+            const iconBg = modalContainer.querySelector('.w-10.h-10.bg-green-500');
+            if (iconBg) iconBg.className = iconBg.className.replace('bg-green-500', 'bg-orange-500');
+            
+            const labels = modalContainer.querySelectorAll('.text-green-600, .text-green-400, .text-green-500');
+            labels.forEach(el => {
+                el.className = el.className.replace(/text-green-\d+/g, match => match.replace('green', 'orange'));
+            });
+        }
+        
+        time.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 3000);
+    }
+    
+    showInfoModal(title, message, detail) {
+        const modal = this.infoModal;
+        document.getElementById('infoTitle').textContent = title;
+        document.getElementById('infoMessage').textContent = message;
+        document.getElementById('infoDetail').textContent = detail;
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 3000);
     }
     
     showAttendanceSuccess(user, result) {
@@ -1179,18 +1554,45 @@ class SimpleFaceIDSystem {
     }
     
     resetForNextUser() {
+        // Stop camera if running
+        if (this.isDetecting) {
+            this.stopCamera();
+        }
+        
         // Reset state for next user
         this.isLoggingIn = false;
         this.currentUser = null;
         this.faceDetected = false;
+        this.lastRecognitionTime = 0; // Reset cooldown timer
         
         // Clear overlays
         this.faceOverlay.innerHTML = '';
         this.userOverlay.innerHTML = '';
         
-        // Reset UI
-        this.updateStatus('✅ Sistem siap untuk pengguna berikutnya');
+        // Reset ring and label references (IMPORTANT!)
+        this.currentRing = null;
+        this.currentNameLabel = null;
+        
+        // Reset mode selection
+        this.selectedMode = null;
+        this.modeIndicator.classList.add('hidden');
+        
+        // Hide camera section
+        this.cameraSection.classList.add('hidden');
+        this.cameraSection.classList.remove('animate-fadeIn');
+        
+        // Show mode selection section again
+        this.modeSelectionSection.classList.remove('hidden');
+        
+        // Reset status message to default
+        this.statusMessage.innerHTML = '<span class="text-sm text-gray-600 dark:text-gray-400">Silakan pilih mode absensi terlebih dahulu</span>';
+        this.statusMessage.className = 'mb-8 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-center';
+        
         this.startBtn.classList.remove('hidden');
+        this.stopBtn.classList.add('hidden');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         console.log('🔄 System reset, ready for next user');
     }

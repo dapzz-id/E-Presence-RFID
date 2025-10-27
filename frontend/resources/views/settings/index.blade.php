@@ -210,6 +210,61 @@
                             </div>
                         </div>
 
+                        <!-- Divider: SP Settings -->
+                        <div class="my-8 border-t-2 border-gray-200 dark:border-gray-700"></div>
+                        
+                        <!-- SP Settings Section -->
+                        <div>
+                            <div class="mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
+                                    Pengaturan SP (Surat Peringatan)
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    Kelola pengaturan otomatis pengiriman Surat Peringatan untuk keterlambatan siswa
+                                </p>
+                            </div>
+                            
+                            <!-- Status SP -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="sp_enabled" name="sp_enabled" value="1" 
+                                           {{ $settings->sp_enabled ? 'checked' : '' }}
+                                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                    <label for="sp_enabled" class="ml-3">
+                                        <span class="text-sm font-medium text-gray-900 dark:text-white">Aktifkan Sistem SP</span>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Centang untuk mengaktifkan pengiriman otomatis Surat Peringatan</p>
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="whatsapp_notification_enabled" name="whatsapp_notification_enabled" value="1" 
+                                           {{ $settings->whatsapp_notification_enabled ? 'checked' : '' }}
+                                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                    <label for="whatsapp_notification_enabled" class="ml-3">
+                                        <span class="text-sm font-medium text-gray-900 dark:text-white">Aktifkan Notifikasi WhatsApp</span>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Centang untuk mengirim SP via WhatsApp</p>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Batas Keterlambatan -->
+                            <div class="mb-6">
+                                <label for="sp_max_late_per_month" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-clock text-primary mr-1"></i>
+                                    Batas Keterlambatan per Bulan
+                                </label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="number" id="sp_max_late_per_month" name="sp_max_late_per_month" 
+                                           value="{{ old('sp_max_late_per_month', $settings->sp_max_late_per_month) }}"
+                                           min="1" max="31" 
+                                           class="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">kali</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">SP akan dikirim ketika siswa terlambat mencapai batas ini dalam sebulan</span>
+                                </div>
+                            </div>
+
+                        </div>
+
                         <!-- Save Button -->
                         <div class="flex justify-end pt-6 border-t">
                             <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center">
@@ -220,7 +275,6 @@
                     </form>
                 </div>
             </div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
