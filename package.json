@@ -31,6 +31,14 @@
       "target": "nsis",
       "icon": "build/icon.ico"
     },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Utility"
+    },
     "nsis": {
       "oneClick": false,
       "perMachine": true,
