@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace 'kadaviradityaa.id.e_presence'
-    compileSdk 36
+    compileSdk = 36
 
     defaultConfig {
         applicationId "kadaviradityaa.id.e_presence"
         minSdk 26
         //noinspection OldTargetApi
-        targetSdk 35
+        targetSdk 36
         vectorDrawables.useSupportLibrary = true
         versionCode 7
         versionName "1.0.7"
